@@ -1,0 +1,32 @@
+name: Rebuild Catalog
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run the catalog build script
+        run: node build-catalog.js
+
+      - name: Commit updated index.html (if changed)
+        run: |
+          git config user.name "barbph-auto-build"
+          git config user.email "actions@github.com"
+          git add index.html
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-rebuild catalog from spreadsheet"
+          git push
+
+      - name: Trigger Netlify deploy
+        run: curl -X POST -d '{}' "https://api.netlify.com/build_hooks/6a82f6ed315c53849cf9970b"
