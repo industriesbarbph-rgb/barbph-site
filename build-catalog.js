@@ -15,11 +15,12 @@ const https = require("https");
 
 // ---- CONFIG ----
 const SHEET_ID = "1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM";
-const SHEET_TAB = "Products"; // change to "Programs" for the Programs build
-const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_TAB}`;
-const CATALOG_FILE = "./catalog.html";
-const START_MARKER = "<!-- BARBPH-AUTOGEN:PRODUCTS-START -->";
-const END_MARKER = "<!-- BARBPH-AUTOGEN:PRODUCTS-END -->";
+const CATALOG_FILE = "./index.html";
+
+const TABS = [
+  { tab: "Products", startMarker: "<!-- BARBPH-AUTOGEN:PRODUCTS-START -->", endMarker: "<!-- BARBPH-AUTOGEN:PRODUCTS-END -->" },
+  { tab: "Programs", startMarker: "<!-- BARBPH-AUTOGEN:PROGRAMS-START -->", endMarker: "<!-- BARBPH-AUTOGEN:PROGRAMS-END -->" },
+];
 
 // ---- Handles Cloudinary / GitHub raw / Google Drive links interchangeably ----
 function normalizeMediaUrl(url) {
@@ -62,12 +63,20 @@ function escapeHtml(str) {
 
 function cardHTML(item) {
   const photo = normalizeMediaUrl(item.photo_url);
+  const voiceOn = item.voice_enabled && item.voice_enabled.toLowerCase() === "yes";
+  const voice = voiceOn ? normalizeMediaUrl(item.voice_url) : "";
   const buttons = [];
   if (item.story_link) buttons.push(`<a href="${escapeHtml(item.story_link)}" target="_blank" rel="noopener">Read the story</a>`);
   if (item.try_link) buttons.push(`<a href="${escapeHtml(item.try_link)}" target="_blank" rel="noopener">Try it</a>`);
   if (item.buy_link) buttons.push(`<a href="${escapeHtml(item.buy_link)}" target="_blank" rel="noopener" class="primary">Buy it</a>`);
 
-  return `    <article class="card">
+  const voiceMarkup = voice
+    ? `<div class="sound-badge" data-sound-badge><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1-3.29-2.5-4.03v8.05c1.5-.73 2.5-2.25 2.5-4.02z"/></svg></div>
+      <audio data-voice-audio preload="none"><source src="${escapeHtml(voice)}" type="audio/mpeg"></audio>`
+    : "";
+
+  return `    <article class="card"${voice ? " data-voice-card" : ""}>
+      ${voiceMarkup}
       <div class="card-photo">
         <img src="${escapeHtml(photo)}" alt="${escapeHtml(item.name)}" loading="lazy">
       </div>
@@ -94,14 +103,14 @@ function fetchCSV(url) {
   });
 }
 
-async function build() {
-  console.log(`Fetching "${SHEET_TAB}" tab...`);
-  const csvText = await fetchCSV(CSV_URL);
+async function buildTab({ tab, startMarker, endMarker }, catalog) {
+  console.log(`Fetching "${tab}" tab...`);
+  const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${tab}`;
+  const csvText = await fetchCSV(csvUrl);
   const rows = parseCSV(csvText);
 
-  // Find the header row (the row containing "name" — skips the note row if present)
   const headerIndex = rows.findIndex((r) => r[0] && r[0].trim().toLowerCase() === "name");
-  if (headerIndex === -1) throw new Error('Could not find header row (expected a "name" column).');
+  if (headerIndex === -1) throw new Error(`Could not find header row in "${tab}" tab.`);
 
   const headers = rows[headerIndex].map((h) => h.trim());
   const dataRows = rows.slice(headerIndex + 1).filter((r) => r.some((cell) => cell && cell.trim()));
@@ -113,18 +122,23 @@ async function build() {
   });
 
   const published = items.filter((i) => i.published && i.published.toLowerCase() === "yes" && i.name);
-  console.log(`Found ${items.length} rows, ${published.length} published.`);
+  console.log(`  ${tab}: ${items.length} rows, ${published.length} published.`);
 
   const html = published.length
     ? published.map(cardHTML).join("\n\n")
     : `    <div class="empty-note">Currently building — check back soon.</div>`;
 
-  let catalog = fs.readFileSync(CATALOG_FILE, "utf8");
-  const pattern = new RegExp(`${START_MARKER}[\\s\\S]*?${END_MARKER}`);
-  catalog = catalog.replace(pattern, `${START_MARKER}\n${html}\n    ${END_MARKER}`);
-  fs.writeFileSync(CATALOG_FILE, catalog);
+  const pattern = new RegExp(`${startMarker}[\\s\\S]*?${endMarker}`);
+  return catalog.replace(pattern, `${startMarker}\n${html}\n    ${endMarker}`);
+}
 
-  console.log("catalog.html updated successfully.");
+async function build() {
+  let catalog = fs.readFileSync(CATALOG_FILE, "utf8");
+  for (const tabConfig of TABS) {
+    catalog = await buildTab(tabConfig, catalog);
+  }
+  fs.writeFileSync(CATALOG_FILE, catalog);
+  console.log("index.html updated successfully.");
 }
 
 build().catch((err) => {

@@ -88,6 +88,33 @@
     display:flex;
     flex-direction:column;
     transition:transform .35s ease, border-color .35s ease;
+    position:relative;
+    cursor:pointer;
+  }
+  .sound-badge{
+    position:absolute;
+    top:14px;
+    right:14px;
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    background:rgba(0,0,0,0.5);
+    backdrop-filter:blur(6px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:5;
+    opacity:.75;
+    transition:opacity .3s;
+  }
+  .sound-badge svg{width:14px;height:14px;fill:var(--gold);}
+  .sound-badge.playing{
+    opacity:1;
+    animation:soundPulse 1.4s ease-in-out infinite;
+  }
+  @keyframes soundPulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(200,169,110,.5);}
+    50%{box-shadow:0 0 0 8px rgba(200,169,110,0);}
   }
   .card:hover{transform:translateY(-4px);border-color:rgba(200,169,110,0.4);}
   .card-photo{
@@ -155,7 +182,13 @@
 <main>
   <section class="grid" id="products-grid">
     <!-- BARBPH-AUTOGEN:PRODUCTS-START -->
-    <article class="card">
+    <article class="card" data-voice-card>
+      <div class="sound-badge" data-sound-badge>
+        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1-3.29-2.5-4.03v8.05c1.5-.73 2.5-2.25 2.5-4.02z"/></svg>
+      </div>
+      <audio data-voice-audio preload="none">
+        <source src="https://raw.githubusercontent.com/industriesbarbph-rgb/barbph-media/main/willwheel-voice.mp3" type="audio/mpeg">
+      </audio>
       <div class="card-photo">
         <img src="https://raw.githubusercontent.com/industriesbarbph-rgb/barbph-media/main/willwheelnightmode.png" alt="Will Wheel">
       </div>
@@ -196,7 +229,55 @@
     </article>
     <!-- BARBPH-AUTOGEN:PRODUCTS-END -->
   </section>
+
+  <h2 class="hub-title" style="font-size:28px;margin-top:64px;text-align:center;">Programs</h2>
+  <section class="grid" id="programs-grid" style="margin-top:24px;">
+    <!-- BARBPH-AUTOGEN:PROGRAMS-START -->
+    <div class="empty-note">Currently building — check back soon.</div>
+    <!-- BARBPH-AUTOGEN:PROGRAMS-END -->
+  </section>
 </main>
+
+<script>
+  // Voice-on-hover (desktop) / voice-on-tap (mobile) for cards with a voice clip.
+  // A card only shows the sound badge and behavior if it actually has an <audio> source.
+  document.querySelectorAll('[data-voice-card]').forEach(card => {
+    const audio = card.querySelector('[data-voice-audio]');
+    const badge = card.querySelector('[data-sound-badge]');
+    if (!audio || !audio.querySelector('source')?.getAttribute('src')) {
+      if (badge) badge.style.display = 'none';
+      return; // no voice clip for this card — skip entirely
+    }
+
+    const isTouchDevice = window.matchMedia('(hover: none)').matches;
+
+    function play() {
+      document.querySelectorAll('audio').forEach(a => { if (a !== audio) { a.pause(); a.currentTime = 0; } });
+      document.querySelectorAll('.sound-badge.playing').forEach(b => { if (b !== badge) b.classList.remove('playing'); });
+      audio.currentTime = 0;
+      audio.play().catch(() => {}); // silently ignore if browser blocks it
+      badge.classList.add('playing');
+    }
+    function stop() {
+      audio.pause();
+      audio.currentTime = 0;
+      badge.classList.remove('playing');
+    }
+
+    if (isTouchDevice) {
+      // Mobile: tap toggles play/stop
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('a')) return; // don't hijack the actual buttons
+        audio.paused ? play() : stop();
+      });
+    } else {
+      // Desktop: hover plays, leaving stops
+      card.addEventListener('mouseenter', play);
+      card.addEventListener('mouseleave', stop);
+    }
+    audio.addEventListener('ended', () => badge.classList.remove('playing'));
+  });
+</script>
 
 </body>
 </html>
