@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Products — Barb the Builder</title>
+<meta name="description" content="Explore digital products built by Barb the Builder — including Jana, a private encrypted notepad app, Will Wheel, a KPI dashboard, and The Bible, a paper-tech story.">
+<link rel="canonical" href="https://barbph.com/products">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Barb the Builder">
+<meta property="og:title" content="Products — Barb the Builder">
+<meta property="og:description" content="Explore digital products built by Barb the Builder — including Jana, a private encrypted notepad app, Will Wheel, a KPI dashboard, and The Bible, a paper-tech story.">
+<meta property="og:url" content="https://barbph.com/products">
+<meta property="og:image" content="https://raw.githubusercontent.com/industriesbarbph-rgb/barbph-media/main/justanotepadapp.entry.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Products by Barb the Builder">
+<meta property="og:locale" content="en_PH">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Products — Barb the Builder">
+<meta name="twitter:description" content="Explore digital products built by Barb the Builder — including Jana, Will Wheel, and The Bible.">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/industriesbarbph-rgb/barbph-media/main/justanotepadapp.entry.png">
+<meta name="twitter:image:alt" content="Products by Barb the Builder">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0b12; --ink:#ffffff; --ink-dim:#c4c4c8; --ink-faint:#7a7a80;
+    --line:rgba(255,255,255,0.12); --silver:#b8b8bf;
+    --accent-grad:linear-gradient(135deg, #f4f4f6, #c9c9d1, #7a2f38);
+    --wine:#7a2f38;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:radial-gradient(ellipse at 20% -10%, #1a1730 0%, var(--bg) 55%);
+    color:var(--ink); font-family:'Work Sans',sans-serif; min-height:100vh; padding-bottom:100px;
+  }
+  .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+  header.page-header{padding:56px 24px 32px;text-align:center;}
+  .back-arrow{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:44px;height:44px;margin-bottom:28px;cursor:pointer;
+  }
+  .back-arrow svg{width:22px;height:22px;}
+  .back-arrow path{
+    fill:none;stroke:var(--silver);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray:40;stroke-dashoffset:40;
+    animation:drawArrow 3s ease-in-out infinite;
+    transition:stroke .3s;
+  }
+  .back-arrow:hover path{stroke:var(--ink);}
+  @keyframes drawArrow{
+    0%{stroke-dashoffset:40;}
+    35%{stroke-dashoffset:0;}
+    70%{stroke-dashoffset:0;}
+    100%{stroke-dashoffset:-40;}
+  }
+  h1.page-title{
+    font-family:'Marcellus',serif;font-weight:400;font-size:clamp(28px,5vw,42px);letter-spacing:3px;
+    background:linear-gradient(180deg, #ffffff 0%, #d4d4da 30%, #8f8f98 55%, #c9c9d1 75%, #a0a0a8 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.5),
+      0 -1px 1px rgba(0,0,0,0.6),
+      0 2px 3px rgba(0,0,0,0.4);
+    filter:drop-shadow(0 0 10px rgba(180,180,190,0.15));
+  }
+  .page-nav{margin-top:22px;display:flex;gap:28px;justify-content:center;}
+  .plaque{
+    position:relative;text-decoration:none;cursor:pointer;padding-bottom:6px;
+    font-family:'Marcellus',serif;font-size:14px;letter-spacing:3px;text-transform:uppercase;
+    transition:filter .3s ease;
+  }
+  .plaque::after{
+    content:"";position:absolute;left:50%;bottom:0;width:0;height:1px;
+    background:linear-gradient(90deg, transparent, var(--silver), transparent);
+    transition:width .35s ease, left .35s ease;
+  }
+  .plaque:hover::after{left:0;width:100%;}
+  .plaque.active::after{
+    left:0;width:100%;
+    background:linear-gradient(90deg, transparent, #b06068, transparent);
+  }
+  .plaque-text{
+    background:linear-gradient(180deg, #ffffff 0%, #d8d8de 25%, #98989f 50%, #c4c4cb 72%, #9d9da5 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+    text-shadow:0 1px 0 rgba(255,255,255,0.3), 0 -1px 1px rgba(0,0,0,0.6);
+  }
+  .plaque.active .plaque-text{
+    background:linear-gradient(180deg, #ffffff 0%, #eaeaee 22%, #a8a8b0 48%, #8a3a42 76%, #b06068 100%);
+    -webkit-background-clip:text;background-clip:text;
+    filter:drop-shadow(0 0 6px rgba(138,58,66,0.35));
+  }
+  .plaque:hover{filter:drop-shadow(0 0 5px rgba(200,200,210,0.4));}
+  main{max-width:100%;margin:0 auto;padding:40px 0 0;}
+
+  .filter-tags{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:36px;padding:16px 34px;overflow:visible;}
+  .filter-tag{
+    font-size:11.5px;letter-spacing:1px;text-transform:uppercase;padding:7px 18px;border-radius:999px;
+    border:1px solid var(--line);color:var(--ink-dim);cursor:pointer;background:transparent;transition:all .25s ease;
+  }
+  .filter-tag:hover{border-color:var(--wine);color:var(--ink);box-shadow:0 0 6px rgba(122,47,56,0.3);}
+  .filter-tag.active{
+    background:linear-gradient(90deg, #f6f6f8, #c7c7cf 45%, #96969e 70%, #7a2f38);
+    color:#1a1a1f;border-color:transparent;
+    box-shadow:0 0 8px rgba(180,180,190,0.25);
+  }
+
+  /* Poster row: one horizontal line of portrait cards, scrollable like a cinema lineup */
+  .grid{
+    display:flex;gap:22px;overflow-x:auto;padding:10px 40px 30px;scroll-snap-type:x proximity;
+    scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.2) transparent;
+  }
+  .grid::-webkit-scrollbar{height:6px;}
+  .grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:3px;}
+  .card{
+    background:linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;
+    transition:transform .35s ease, border-color .35s ease, opacity .3s ease; position:relative; cursor:pointer;
+    flex:0 0 220px;scroll-snap-align:start;
+  }
+  .card:hover{transform:translateY(-6px) scale(1.02);border-color:rgba(200,163,163,0.4);}
+  .card.hidden-by-filter{display:none;}
+  .card-photo{width:100%;aspect-ratio:2/3;background:#1a1a26;overflow:hidden;border-radius:14px 14px 0 0;}
+  .card-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .card-body{padding:16px 16px 18px;display:flex;flex-direction:column;flex:1;}
+  .card-name{font-family:'Marcellus',serif;font-size:16px;letter-spacing:.5px;margin-bottom:6px;color:var(--ink);}
+  .card-desc{font-size:12px;line-height:1.5;color:var(--ink-dim);flex:1;margin-bottom:14px;}
+  .card-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .card-actions a{
+    font-size:10.5px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;padding:7px 12px;
+    border-radius:999px;border:1px solid var(--line);color:var(--ink-dim);transition:all .3s ease;
+  }
+  .card-actions a.primary{
+    background:linear-gradient(135deg, #f4f4f6, #c9c9d1 55%, #8a3a42);color:#1a1a1f;border-color:transparent;
+  }
+  .card-actions a:hover{border-color:var(--silver);color:#fff;}
+  .card-actions a.primary:hover{opacity:.85;color:#1a1a1f;}
+
+  .sound-badge{
+    position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;
+    background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;
+    z-index:5;opacity:.75;transition:opacity .3s;
+  }
+  .sound-badge svg{width:14px;height:14px;fill:var(--silver);}
+  .sound-badge.playing{opacity:1;animation:soundPulse 1.4s ease-in-out infinite;}
+  @keyframes soundPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,220,228,.5);}50%{box-shadow:0 0 0 8px rgba(220,220,228,0);}}
+
+  .empty-note{text-align:center;color:var(--ink-faint);font-size:13px;padding:60px 20px;letter-spacing:.5px;width:100%;}
+
+  /* ---- Secret corner weather: view of a library room, rain outside ---- */
+  .weather-corner{
+    position:fixed;width:260px;height:260px;pointer-events:none;z-index:2;overflow:hidden;
+    -webkit-mask-image:radial-gradient(circle at var(--mx,50%) var(--my,50%), black 0%, black 35%, transparent 75%);
+    mask-image:radial-gradient(circle at var(--mx,50%) var(--my,50%), black 0%, black 35%, transparent 75%);
+  }
+  .weather-corner.tl{top:0;left:0;--mx:0%;--my:0%;}
+  .weather-corner.tr{top:0;right:0;--mx:100%;--my:0%;}
+  .weather-corner.bl{bottom:0;left:0;--mx:0%;--my:100%;}
+  .weather-corner.br{bottom:0;right:0;--mx:100%;--my:100%;}
+
+  .weather-corner.raining .rain-layer{animation:weatherFade 6.8s ease-in-out;}
+  @keyframes weatherFade{
+    0%{opacity:0;} 10%{opacity:1;} 82%{opacity:1;} 100%{opacity:0;}
+  }
+  .rain-layer{position:absolute;inset:0;opacity:0;}
+  .raindrop{
+    position:absolute;top:-20px;width:1px;height:16px;
+    background:linear-gradient(to bottom, transparent, rgba(190,205,225,0.5));
+    animation:fallDrop linear infinite;
+  }
+  @keyframes fallDrop{
+    0%{transform:translateY(-20px);opacity:0;}
+    12%{opacity:1;}
+    100%{transform:translateY(280px);opacity:0;}
+  }
+
+  /* Wet-glass droplets: realistic water beads clinging to glass, sliding down */
+  .droplet-wrap{position:absolute;top:0;}
+  .droplet{
+    position:relative;
+    background:
+      radial-gradient(circle at 34% 28%, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.06) 16%, transparent 32%),
+      radial-gradient(circle at 60% 70%, rgba(180,195,215,0.08), transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(140,155,180,0.06), rgba(140,155,180,0.01) 75%);
+    box-shadow:
+      inset -1px -1px 2px rgba(20,25,35,0.14),
+      inset 1px 1px 1px rgba(255,255,255,0.14);
+  }
+  @keyframes trickleFast{
+    0%{transform:translateY(0);opacity:0;}
+    10%{opacity:.4;}
+    70%{opacity:.4;}
+    100%{transform:translateY(120px);opacity:0;}
+  }
+  @keyframes trickleSlow{
+    0%{transform:translateY(0);opacity:0;}
+    12%{opacity:.5;}
+    50%{transform:translateY(14px);}
+    85%{transform:translateY(26px);opacity:.5;}
+    100%{transform:translateY(40px);opacity:0;}
+  }
+
+  .thunder-flash{
+    position:absolute;inset:0;
+    background:radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(230,225,235,0.95), rgba(122,47,56,0.25) 60%, transparent 85%);
+    opacity:0;mix-blend-mode:overlay;
+  }
+  .weather-corner.thundering .thunder-flash{animation:flashLight 0.5s ease-out;}
+  @keyframes flashLight{
+    0%{opacity:0;} 8%{opacity:.8;} 16%{opacity:0;} 22%{opacity:.5;} 30%{opacity:0;}
+  }
+
+  /* Library silhouette: sits in front of a dim ambient glow (like moonlight/lamp
+     light through a window) so the dark shapes actually read against the dark
+     page background — otherwise black-on-black is invisible. */
+  .library-glow{
+    position:absolute;inset:0;
+    background:radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(130,140,160,0.28), transparent 72%);
+    opacity:0;
+  }
+  .weather-corner.thundering .library-glow{animation:glowFlash 0.9s ease-out;}
+  @keyframes glowFlash{
+    0%{opacity:0;} 10%{opacity:1;} 30%{opacity:.2;} 45%{opacity:.85;} 65%{opacity:.1;} 100%{opacity:0;}
+  }
+  .library-silhouette{
+    position:absolute;inset:0;opacity:0;pointer-events:none;
+  }
+  .weather-corner.thundering .library-silhouette{animation:silhouetteFlash 0.9s ease-out;}
+  @keyframes silhouetteFlash{
+    0%{opacity:0;} 10%{opacity:1;} 30%{opacity:.25;} 45%{opacity:.9;} 65%{opacity:.15;} 100%{opacity:0;}
+  }
+  .library-silhouette svg{width:100%;height:100%;}
+  .library-silhouette path, .library-silhouette rect{fill:rgba(8,8,14,0.95);}
+</style>
+</head>
+<body>
+
+<div class="weather-corner tl" id="w-tl">
+  <div class="thunder-flash"></div>
+  <div class="library-glow"></div>
+  <div class="library-silhouette"><svg viewBox="0 0 260 260" preserveAspectRatio="xMinYMin slice">
+    <!-- tall bookshelf, left wall -->
+    <rect x="14" y="14" width="118" height="246" rx="3"/>
+    <rect x="22" y="26" width="102" height="220" fill="rgba(14,14,20,1)" rx="1"/>
+    <g fill="rgba(6,6,10,1)">
+      <rect x="22" y="62" width="102" height="4"/>
+      <rect x="22" y="98" width="102" height="4"/>
+      <rect x="22" y="134" width="102" height="4"/>
+      <rect x="22" y="170" width="102" height="4"/>
+      <rect x="22" y="206" width="102" height="4"/>
+    </g>
+    <g id="shelf-tl"></g>
+    <!-- hanging chandelier, upper right of this corner -->
+    <line x1="200" y1="0" x2="200" y2="34" stroke="rgba(6,6,10,1)" stroke-width="1.5"/>
+    <circle cx="200" cy="36" r="3"/>
+    <path d="M170 40 Q200 30 230 40" fill="none" stroke="rgba(6,6,10,1)" stroke-width="1.5"/>
+    <g fill="rgba(6,6,10,1)">
+      <path d="M172 40 L169 54 Q172 58 175 54 Z"/>
+      <path d="M200 36 L197 52 Q200 57 203 52 Z"/>
+      <path d="M228 40 L225 54 Q228 58 231 54 Z"/>
+    </g>
+    <circle cx="172" cy="40" r="2.4"/><circle cx="200" cy="36" r="2.4"/><circle cx="228" cy="40" r="2.4"/>
+  </svg></div>
+</div>
+<div class="weather-corner tr" id="w-tr">
+  <div class="thunder-flash"></div>
+  <div class="library-glow"></div>
+  <div class="library-silhouette"><svg viewBox="0 0 260 260" preserveAspectRatio="xMaxYMin slice">
+    <!-- armchair, side profile: back curve, one arm, one visible leg, facing left/inward -->
+    <path d="M232 70 C238 50, 224 40, 210 44 C204 34, 186 36, 182 50 C168 52, 162 66, 170 80 L170 150 C170 154, 173 157, 177 157 L226 157 C230 157, 233 154, 233 150 Z"/>
+    <path d="M164 150 L237 150 L233 164 L168 164 Z"/>
+    <path d="M172 164 C172 164, 170 184, 172 188 C174 190, 178 190, 179 187 C180 183, 178 168, 178 164 Z"/>
+    <path d="M226 164 C226 164, 224 184, 226 188 C228 190, 232 190, 233 187 C234 183, 232 168, 232 164 Z"/>
+    <!-- armrest curve, side-view detail -->
+    <path d="M168 80 C160 82, 156 96, 162 108 C158 120, 162 134, 170 138" fill="none" stroke="rgba(6,6,10,1)" stroke-width="2"/>
+    <!-- small round side table -->
+    <ellipse cx="248" cy="200" rx="14" ry="3"/>
+    <rect x="246" y="160" width="3" height="40" rx="1"/>
+    <ellipse cx="248" cy="158" rx="16" ry="4"/>
+  </svg></div>
+</div>
+<div class="weather-corner bl" id="w-bl">
+  <div class="thunder-flash"></div>
+  <div class="library-glow"></div>
+  <div class="library-silhouette"><svg viewBox="0 0 260 260" preserveAspectRatio="xMinYMax slice">
+    <!-- wide, tall bookshelf -->
+    <rect x="10" y="10" width="150" height="250" rx="3"/>
+    <rect x="20" y="22" width="130" height="226" fill="rgba(14,14,20,1)" rx="1"/>
+    <g fill="rgba(6,6,10,1)">
+      <rect x="20" y="60" width="130" height="4"/>
+      <rect x="20" y="98" width="130" height="4"/>
+      <rect x="20" y="136" width="130" height="4"/>
+      <rect x="20" y="174" width="130" height="4"/>
+      <rect x="20" y="212" width="130" height="4"/>
+    </g>
+    <g id="shelf-bl"></g>
+  </svg></div>
+</div>
+<div class="weather-corner br" id="w-br">
+  <div class="thunder-flash"></div>
+  <div class="library-glow"></div>
+  <div class="library-silhouette"><svg viewBox="0 0 260 260" preserveAspectRatio="xMaxYMax slice">
+    <!-- second bookshelf on the right -->
+    <rect x="150" y="10" width="100" height="250" rx="3"/>
+    <rect x="158" y="22" width="84" height="226" fill="rgba(14,14,20,1)" rx="1"/>
+    <g fill="rgba(6,6,10,1)">
+      <rect x="158" y="60" width="84" height="4"/>
+      <rect x="158" y="98" width="84" height="4"/>
+      <rect x="158" y="136" width="84" height="4"/>
+      <rect x="158" y="174" width="84" height="4"/>
+      <rect x="158" y="212" width="84" height="4"/>
+    </g>
+    <g id="shelf-br"></g>
+    <!-- curtain draped beside it -->
+    <path d="M0 260 L38 260 C28 230, 34 205, 26 182 C36 160, 24 138, 32 116 C22 96, 34 76, 24 56 C32 38, 22 20, 30 0 L0 0 Z"/>
+    <path d="M28 154 C36 156, 38 164, 31 170 C27 166, 26 159, 28 154 Z" fill="rgba(10,10,15,1)"/>
+    <!-- low reading table, open book -->
+    <rect x="52" y="216" width="80" height="6" rx="2"/>
+    <path d="M58 202 C72 195, 92 195, 106 202 L106 213 C92 207, 72 207, 58 213 Z"/>
+  </svg></div>
+</div>
+
+<script>
+  // Fills the shelf silhouettes with book-spine rectangles. Each spine gets
+  // a thin lighter sliver at its top edge, like the top of a book catching
+  // faint light — this is what actually reads as "a book" instead of a
+  // random dark bar.
+  (function fillShelves(){
+    function fill(selector, ys, xStart, xEnd) {
+      const g = document.querySelector(selector);
+      if (!g) return;
+      ys.forEach(y => {
+        let x = xStart;
+        while (x < xEnd - 3) {
+          const w = 4 + Math.random() * 5;
+          if (x + w > xEnd) break;
+          const h = 20 + Math.random() * 14;
+          const spine = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          spine.setAttribute('x', x);
+          spine.setAttribute('y', y - h);
+          spine.setAttribute('width', w);
+          spine.setAttribute('height', h);
+          spine.setAttribute('rx', 0.5);
+          spine.setAttribute('fill', 'rgba(4,4,7,1)');
+          g.appendChild(spine);
+
+          const cap = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          cap.setAttribute('x', x + 0.4);
+          cap.setAttribute('y', y - h);
+          cap.setAttribute('width', w - 0.8);
+          cap.setAttribute('height', 1.4);
+          cap.setAttribute('fill', 'rgba(70,70,80,0.55)');
+          g.appendChild(cap);
+
+          x += w + (1.2 + Math.random() * 1.8);
+        }
+      });
+    }
+    fill('#w-tl .library-silhouette #shelf-tl', [58,94,130,166,202], 24, 122);
+    fill('#w-bl .library-silhouette #shelf-bl', [56,94,132,170,208], 22, 148);
+    fill('#w-br .library-silhouette #shelf-br', [56,94,132,170,208], 160, 240);
+  })();
+</script>
+
+<header class="page-header">
+  <a href="/" class="back-arrow" aria-label="Back to main page">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+  </a>
+  <h1 class="page-title">Products</h1>
+  <nav class="page-nav">
+    <a href="/products" class="plaque active"><span class="plaque-text">Products</span></a>
+    <a href="/programs" class="plaque"><span class="plaque-text">Programs</span></a>
+  </nav>
+  <p class="visually-hidden">Digital products by Barb the Builder, including Jana (a private encrypted notepad app), Will Wheel (a KPI dashboard), and The Bible (a paper technology story).</p>
+</header>
+
+<main>
+  <div class="filter-tags" id="filter-tags">
+    <!-- BARBPH-AUTOGEN:PRODUCTS-FILTERS-START -->
+    <button class="filter-tag active" data-filter="all">All</button>
+    <!-- BARBPH-AUTOGEN:PRODUCTS-FILTERS-END -->
+  </div>
+
+  <section class="grid" id="products-grid">
+    <!-- BARBPH-AUTOGEN:PRODUCTS-START -->
+    <div class="empty-note">Currently building — check back soon.</div>
+    <!-- BARBPH-AUTOGEN:PRODUCTS-END -->
+  </section>
+</main>
+
+<script>
+  // Category filtering
+  document.getElementById('filter-tags').addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-tag');
+    if (!btn) return;
+    document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.card').forEach(card => {
+      const cat = card.dataset.category || '';
+      card.classList.toggle('hidden-by-filter', filter !== 'all' && cat !== filter);
+    });
+  });
+
+  // Voice-on-hover (desktop) / voice-on-tap (mobile)
+  document.querySelectorAll('[data-voice-card]').forEach(card => {
+    const audio = card.querySelector('[data-voice-audio]');
+    const badge = card.querySelector('[data-sound-badge]');
+    if (!audio || !audio.querySelector('source')?.getAttribute('src')) { if (badge) badge.style.display = 'none'; return; }
+    const isTouchDevice = window.matchMedia('(hover: none)').matches;
+    function play() {
+      document.querySelectorAll('audio').forEach(a => { if (a !== audio) { a.pause(); a.currentTime = 0; } });
+      document.querySelectorAll('.sound-badge.playing').forEach(b => { if (b !== badge) b.classList.remove('playing'); });
+      audio.currentTime = 0; audio.play().catch(() => {}); badge.classList.add('playing');
+    }
+    function stop() { audio.pause(); audio.currentTime = 0; badge.classList.remove('playing'); }
+    if (isTouchDevice) {
+      card.addEventListener('click', (e) => { if (e.target.closest('a')) return; audio.paused ? play() : stop(); });
+    } else {
+      card.addEventListener('mouseenter', play);
+      card.addEventListener('mouseleave', stop);
+    }
+    audio.addEventListener('ended', () => badge.classList.remove('playing'));
+  });
+
+  // ---- Secret corner weather ----
+  // Every ~8 seconds, one random corner gets a brief rain shower. Sometimes
+  // that's paired with a thunder flash — and when it thunders, the glass
+  // "fogs up" with clinging water droplets, and a faint library silhouette
+  // (curtain, chair) flickers into view for a split second, like a window
+  // lit by lightning from inside a room.
+  const corners = ['w-tl', 'w-tr', 'w-bl', 'w-br'];
+
+  function spawnRain(el, duration) {
+    let layer = el.querySelector('.rain-layer');
+    if (!layer) { layer = document.createElement('div'); layer.className = 'rain-layer'; el.insertBefore(layer, el.firstChild); }
+    for (let i = 0; i < 14; i++) {
+      const drop = document.createElement('div');
+      drop.className = 'raindrop';
+      drop.style.left = Math.random() * 100 + '%';
+      drop.style.animationDuration = (0.6 + Math.random() * 0.6) + 's';
+      drop.style.animationDelay = (Math.random() * duration) + 's';
+      layer.appendChild(drop);
+    }
+    return layer;
+  }
+
+  function spawnDroplets(el, duration) {
+    let layer = el.querySelector('.rain-layer');
+    if (!layer) { layer = document.createElement('div'); layer.className = 'rain-layer'; el.insertBefore(layer, el.firstChild); }
+    for (let i = 0; i < 4; i++) {
+      const wrap = document.createElement('div');
+      wrap.className = 'droplet-wrap';
+
+      // Varied sizes: small, medium, or occasionally larger
+      const sizeRoll = Math.random();
+      const size = sizeRoll < 0.45 ? (3 + Math.random() * 3) : sizeRoll < 0.8 ? (7 + Math.random() * 5) : (13 + Math.random() * 6);
+
+      // Some droplets crawl slowly and linger, most trickle a bit faster
+      const isSlowCrawler = Math.random() < 0.4;
+      wrap.style.animation = isSlowCrawler
+        ? `trickleSlow ${4 + Math.random() * 3}s ease-in-out forwards`
+        : `trickleFast ${2.2 + Math.random() * 1.8}s linear forwards`;
+
+      wrap.style.left = Math.random() * 100 + '%';
+      wrap.style.top = (Math.random() * 55) + 'px';
+      wrap.style.animationDelay = (Math.random() * (duration * 0.45)) + 's';
+
+      const bead = document.createElement('div');
+      bead.className = 'droplet';
+      bead.style.width = size + 'px';
+      bead.style.height = (size * (0.75 + Math.random() * 0.4)) + 'px';
+      // More pronounced irregular blobby shape — wider range, real water-bead asymmetry
+      const r1 = 30 + Math.random() * 35, r2 = 30 + Math.random() * 35, r3 = 30 + Math.random() * 35, r4 = 30 + Math.random() * 35;
+      bead.style.borderRadius = `${r1}% ${100-r1}% ${r3}% ${100-r3}% / ${r2}% ${r4}% ${100-r4}% ${100-r2}%`;
+      bead.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+      wrap.appendChild(bead);
+      layer.appendChild(wrap);
+    }
+  }
+
+  function triggerWeatherEvent() {
+    const cornerId = corners[Math.floor(Math.random() * corners.length)];
+    const el = document.getElementById(cornerId);
+    const withThunder = Math.random() < 0.4;
+
+    el.classList.add('raining');
+    spawnRain(el, 6);
+
+    if (withThunder) {
+      setTimeout(() => {
+        el.classList.add('thundering');
+        spawnDroplets(el, 6);
+      }, 800);
+    }
+
+    setTimeout(() => {
+      el.classList.remove('raining', 'thundering');
+      el.querySelectorAll('.raindrop,.droplet-wrap').forEach(d => d.remove());
+    }, 6800);
+  }
+
+  function scheduleNextWeather() {
+    const delay = 6000 + Math.random() * 4000; // roughly every 8 seconds
+    setTimeout(() => {
+      triggerWeatherEvent();
+      scheduleNextWeather();
+    }, delay);
+  }
+  scheduleNextWeather();
+</script>
+
+</body>
+</html>
