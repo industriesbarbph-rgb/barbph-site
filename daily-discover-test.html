@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>BarbPH Daily Discover — Step 3 Proof</title>
+  <style>
+    :root{
+      --glass: rgba(12,14,18,.56);
+      --line: rgba(255,255,255,.16);
+      --text: rgba(255,255,255,.94);
+      --muted: rgba(255,255,255,.68);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:#101216;
+      color:var(--text);
+      overflow:hidden;
+    }
+    .stage{
+      position:fixed;inset:0;
+      background:
+        radial-gradient(circle at 25% 20%,rgba(255,255,255,.10),transparent 35%),
+        linear-gradient(145deg,#222834,#0f1116 60%,#07080a);
+      overflow:hidden;
+    }
+    .art{
+      position:absolute;inset:-2%;
+      width:104%;height:104%;
+      object-fit:cover;
+      opacity:0;
+      transform:scale(1.025);
+      transition:opacity 900ms ease;
+      filter:saturate(.96) contrast(1.03) brightness(.78);
+    }
+    .art.ready{opacity:1}
+    .veil{
+      position:absolute;inset:0;
+      background:
+        linear-gradient(to top,rgba(0,0,0,.44),rgba(0,0,0,.08) 55%,rgba(0,0,0,.25)),
+        radial-gradient(circle at 50% 30%,transparent 25%,rgba(0,0,0,.18) 100%);
+      pointer-events:none;
+    }
+    .status{
+      position:absolute;left:16px;top:16px;
+      max-width:min(680px,calc(100vw - 32px));
+      padding:14px 16px;border:1px solid var(--line);
+      background:var(--glass);backdrop-filter:blur(14px);
+      border-radius:18px;box-shadow:0 12px 36px rgba(0,0,0,.20);
+    }
+    .status h1{font-size:15px;margin:0 0 8px;font-weight:700;letter-spacing:.02em}
+    .status p{font-size:12px;line-height:1.45;margin:4px 0;color:var(--muted)}
+    .status strong{color:var(--text);font-weight:650}
+    .meta{
+      position:absolute;left:16px;right:16px;bottom:16px;
+      display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;
+    }
+    .card{
+      flex:1 1 340px;min-width:0;
+      padding:14px 16px;border:1px solid var(--line);
+      background:var(--glass);backdrop-filter:blur(14px);
+      border-radius:18px;box-shadow:0 12px 36px rgba(0,0,0,.20);
+    }
+    .title{font-size:17px;font-weight:750;line-height:1.25;margin:0 0 4px}
+    .sub{font-size:12px;color:var(--muted);line-height:1.45;margin:0}
+    .pill{
+      display:inline-block;margin-top:8px;margin-right:6px;padding:5px 8px;
+      border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--muted)
+    }
+    .actions{
+      display:flex;gap:8px;flex-wrap:wrap;margin-top:10px
+    }
+    button,a.btn{
+      appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.08);
+      color:var(--text);padding:8px 10px;border-radius:10px;font-size:12px;
+      text-decoration:none;cursor:pointer
+    }
+    button:hover,a.btn:hover{background:rgba(255,255,255,.13)}
+    .loading{
+      position:absolute;inset:0;display:grid;place-items:center;
+      font-size:13px;letter-spacing:.04em;color:rgba(255,255,255,.76);
+      pointer-events:none
+    }
+    .loading.hide{display:none}
+    @media (max-width:640px){
+      .status{left:10px;right:10px;top:10px;max-width:none}
+      .meta{left:10px;right:10px;bottom:10px}
+      .title{font-size:15px}
+      .status p,.sub{font-size:11px}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .art{transition:none;transform:none}
+    }
+  </style>
+</head>
+<body>
+  <main class="stage" id="stage">
+    <img class="art" id="art" alt="" />
+    <div class="veil"></div>
+    <div class="loading" id="loading">Finding today’s Daily Discover…</div>
+
+    <section class="status" aria-live="polite">
+      <h1>BARBPH DAILY DISCOVER — STEP 3 PROOF</h1>
+      <p><strong>Manila date:</strong> <span id="manilaDate">—</span></p>
+      <p><strong>Selection state:</strong> <span id="selectionState">starting…</span></p>
+      <p><strong>Proof target:</strong> same eligible Met artwork all day in Asia/Manila, cached across refreshes, with safe fallback.</p>
+    </section>
+
+    <section class="meta">
+      <div class="card">
+        <p class="title" id="title">Waiting for selection…</p>
+        <p class="sub" id="creator"></p>
+        <span class="pill" id="objectIdPill">Object ID —</span>
+        <span class="pill" id="rightsPill">Rights —</span>
+        <div class="actions">
+          <a class="btn" id="sourceLink" href="#" target="_blank" rel="noopener noreferrer">Open Met source</a>
+          <button id="refetchBtn" type="button">Re-test today</button>
+          <button id="clearBtn" type="button">Clear local proof history</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  (() => {
+    "use strict";
+
+    const CONFIG = {
+      timeZone: "Asia/Manila",
+      sourceName: "The Met Open Access",
+      searchUrl: "https://collectionapi.metmuseum.org/public/collection/v1/search?hasImages=true&q=art",
+      objectUrl: id => `https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}`,
+      cachePrefix: "barbph_daily_discover_selection_",
+      historyKey: "barbph_daily_discover_history_v1",
+      maxCandidateChecks: 24,
+      noRepeatDays: 365
+    };
+
+    const el = {
+      art: document.getElementById("art"),
+      loading: document.getElementById("loading"),
+      manilaDate: document.getElementById("manilaDate"),
+      selectionState: document.getElementById("selectionState"),
+      title: document.getElementById("title"),
+      creator: document.getElementById("creator"),
+      objectIdPill: document.getElementById("objectIdPill"),
+      rightsPill: document.getElementById("rightsPill"),
+      sourceLink: document.getElementById("sourceLink"),
+      refetchBtn: document.getElementById("refetchBtn"),
+      clearBtn: document.getElementById("clearBtn")
+    };
+
+    function manilaDateKey(date = new Date()) {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: CONFIG.timeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).formatToParts(date);
+      const get = type => parts.find(p => p.type === type)?.value;
+      return `${get("year")}-${get("month")}-${get("day")}`;
+    }
+
+    function hashString(input) {
+      let h = 2166136261;
+      for (let i = 0; i < input.length; i++) {
+        h ^= input.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+
+    function getHistory() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(CONFIG.historyKey) || "[]");
+        return Array.isArray(raw) ? raw : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveHistory(history) {
+      localStorage.setItem(CONFIG.historyKey, JSON.stringify(history.slice(-CONFIG.noRepeatDays)));
+    }
+
+    function recordLocalHistory(selection, dateKey) {
+      const history = getHistory().filter(row => row && row.date !== dateKey);
+      history.push({
+        date: dateKey,
+        source_name: CONFIG.sourceName,
+        asset_id: String(selection.objectID),
+        title: selection.title || "",
+        creator: selection.artistDisplayName || "",
+        family: selection.classification || selection.objectName || "Art",
+        media_url: selection.primaryImage || "",
+        source_url: selection.objectURL || "",
+        rights: selection.isPublicDomain ? "Public Domain" : "",
+        credit_line: selection.creditLine || "",
+        status: "selected"
+      });
+      saveHistory(history);
+    }
+
+    function recentObjectIds() {
+      return new Set(getHistory().map(row => String(row.asset_id)));
+    }
+
+    function validObject(o) {
+      return !!(
+        o &&
+        o.objectID &&
+        o.isPublicDomain === true &&
+        typeof o.primaryImage === "string" &&
+        o.primaryImage.startsWith("http")
+      );
+    }
+
+    async function getJson(url, timeoutMs = 12000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, { signal: controller.signal, cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function chooseMetObject(dateKey) {
+      const search = await getJson(CONFIG.searchUrl);
+      const ids = Array.isArray(search.objectIDs) ? search.objectIDs : [];
+      if (!ids.length) throw new Error("Met search returned no objects.");
+
+      const used = recentObjectIds();
+      const start = hashString(`barbph|${dateKey}|met`) % ids.length;
+
+      for (let step = 0; step < Math.min(CONFIG.maxCandidateChecks, ids.length); step++) {
+        const index = (start + step * 7919) % ids.length;
+        const id = ids[index];
+        if (used.has(String(id))) continue;
+
+        try {
+          const obj = await getJson(CONFIG.objectUrl(id));
+          if (validObject(obj)) return obj;
+        } catch (err) {
+          console.warn("Candidate skipped:", id, err);
+        }
+      }
+
+      // If local history happened to exclude every candidate we checked,
+      // make a second deterministic pass without the local-history exclusion.
+      for (let step = 0; step < Math.min(CONFIG.maxCandidateChecks, ids.length); step++) {
+        const index = (start + step * 3571) % ids.length;
+        try {
+          const obj = await getJson(CONFIG.objectUrl(ids[index]));
+          if (validObject(obj)) return obj;
+        } catch {}
+      }
+
+      throw new Error("No eligible public-domain Met image found in deterministic candidate window.");
+    }
+
+    function render(selection, state) {
+      el.title.textContent = selection.title || "Untitled";
+      el.creator.textContent = [
+        selection.artistDisplayName || selection.culture || "Creator not listed",
+        selection.objectDate || "",
+        selection.medium || ""
+      ].filter(Boolean).join(" · ");
+
+      el.objectIdPill.textContent = `Object ID ${selection.objectID}`;
+      el.rightsPill.textContent = selection.isPublicDomain ? "Public Domain" : "Rights check failed";
+      el.sourceLink.href = selection.objectURL || "#";
+      el.selectionState.textContent = state;
+
+      el.art.onload = () => {
+        el.art.classList.add("ready");
+        el.loading.classList.add("hide");
+      };
+      el.art.onerror = () => applyFallback("Selected image failed to load.");
+      el.art.src = selection.primaryImage;
+    }
+
+    function applyFallback(reason) {
+      el.art.removeAttribute("src");
+      el.art.classList.remove("ready");
+      el.loading.classList.add("hide");
+      el.title.textContent = "Safe fallback active";
+      el.creator.textContent = reason || "The external source was unavailable.";
+      el.objectIdPill.textContent = "No external asset";
+      el.rightsPill.textContent = "No unverified image shown";
+      el.sourceLink.href = "https://www.metmuseum.org/about-the-met/policies-and-documents/open-access";
+      el.selectionState.textContent = "fallback — page remains usable";
+    }
+
+    async function run({ force = false } = {}) {
+      const dateKey = manilaDateKey();
+      el.manilaDate.textContent = `${dateKey} (${CONFIG.timeZone})`;
+      el.loading.classList.remove("hide");
+      el.art.classList.remove("ready");
+
+      const cacheKey = CONFIG.cachePrefix + dateKey;
+
+      if (!force) {
+        try {
+          const cached = JSON.parse(localStorage.getItem(cacheKey) || "null");
+          if (validObject(cached)) {
+            render(cached, "cached selection — refresh-stable");
+            recordLocalHistory(cached, dateKey);
+            return;
+          }
+        } catch {}
+      }
+
+      el.selectionState.textContent = "fetching deterministic eligible selection…";
+
+      try {
+        const selection = await chooseMetObject(dateKey);
+        localStorage.setItem(cacheKey, JSON.stringify(selection));
+        recordLocalHistory(selection, dateKey);
+        render(selection, force ? "re-tested — deterministic daily selection" : "new daily selection cached");
+      } catch (err) {
+        console.error(err);
+        applyFallback(err?.message || "External source unavailable.");
+      }
+    }
+
+    el.refetchBtn.addEventListener("click", () => run({ force: true }));
+    el.clearBtn.addEventListener("click", () => {
+      Object.keys(localStorage)
+        .filter(k => k.startsWith(CONFIG.cachePrefix) || k === CONFIG.historyKey)
+        .forEach(k => localStorage.removeItem(k));
+      run({ force: true });
+    });
+
+    run();
+  })();
+  </script>
+</body>
+</html>
