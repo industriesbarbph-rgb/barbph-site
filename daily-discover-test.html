@@ -10,10 +10,11 @@
     *{box-sizing:border-box} html,body{height:100%;margin:0}
     body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#101216;color:var(--text);overflow:hidden}
     .stage{position:fixed;inset:0;background:radial-gradient(circle at 25% 20%,rgba(255,255,255,.10),transparent 35%),linear-gradient(145deg,#222834,#0f1116 60%,#07080a);overflow:hidden}
-    .art{position:absolute;inset:-2%;width:104%;height:104%;object-fit:cover;opacity:0;transform:scale(1.025);transition:opacity 900ms ease;filter:saturate(.96) contrast(1.03) brightness(.78)}
-    .art.ready{opacity:1}.veil{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.44),rgba(0,0,0,.08) 55%,rgba(0,0,0,.25)),radial-gradient(circle at 50% 30%,transparent 25%,rgba(0,0,0,.18) 100%);pointer-events:none}
+    .art{position:absolute;inset:-2%;width:104%;height:104%;object-fit:cover;opacity:0;transform:scale(1.025);transition:opacity 1400ms ease;filter:saturate(.96) contrast(1.03) brightness(.78)}
+    .art.active{opacity:1}
+    .veil{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.44),rgba(0,0,0,.08) 55%,rgba(0,0,0,.25)),radial-gradient(circle at 50% 30%,transparent 25%,rgba(0,0,0,.18) 100%);pointer-events:none}
     .status,.card{border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(14px);border-radius:18px;box-shadow:0 12px 36px rgba(0,0,0,.20)}
-    .status{position:absolute;left:16px;top:16px;max-width:min(680px,calc(100vw - 32px));padding:14px 16px}
+    .status{position:absolute;left:16px;top:16px;max-width:min(720px,calc(100vw - 32px));padding:14px 16px}
     .status h1{font-size:15px;margin:0 0 8px;font-weight:700;letter-spacing:.02em}.status p{font-size:12px;line-height:1.45;margin:4px 0;color:var(--muted)}.status strong{color:var(--text)}
     .meta{position:absolute;left:16px;right:16px;bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}.card{flex:1 1 340px;min-width:0;padding:14px 16px}
     .title{font-size:17px;font-weight:750;line-height:1.25;margin:0 0 4px}.sub{font-size:12px;color:var(--muted);line-height:1.45;margin:0}.pill{display:inline-block;margin-top:8px;margin-right:6px;padding:5px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--muted)}
@@ -25,115 +26,256 @@
 </head>
 <body>
 <main class="stage">
-  <img class="art" id="art" alt="" decoding="async" fetchpriority="high" />
+  <img class="art" id="artA" alt="" decoding="async" fetchpriority="high" />
+  <img class="art" id="artB" alt="" decoding="async" />
   <div class="veil"></div>
-  <div class="loading" id="loading">Finding today’s Daily Discover…</div>
+  <div class="loading" id="loading">Finding today’s Daily Discover set…</div>
   <section class="status" aria-live="polite">
     <h1>BARBPH DAILY DISCOVER — STEP 3 PROOF</h1>
     <p><strong>Manila date:</strong> <span id="manilaDate">—</span></p>
+    <p><strong>Source of the day:</strong> <span id="sourceOfDay">The Met Open Access</span></p>
     <p><strong>Selection state:</strong> <span id="selectionState">starting…</span></p>
-    <p><strong>Proof target:</strong> same eligible Met artwork all day in Asia/Manila, cached across refreshes, with safe fallback.</p>
+    <p><strong>Proof target:</strong> one stable source-of-the-day with a deterministic set of multiple eligible assets that rotate gently during the Manila day.</p>
   </section>
   <section class="meta"><div class="card">
     <p class="title" id="title">Waiting for selection…</p>
     <p class="sub" id="creator"></p>
-    <span class="pill" id="objectIdPill">Object ID —</span><span class="pill" id="rightsPill">Rights —</span>
+    <span class="pill" id="rotationPill">Asset — of —</span>
+    <span class="pill" id="objectIdPill">Object ID —</span>
+    <span class="pill" id="rightsPill">Rights —</span>
     <div class="actions"><a class="btn" id="sourceLink" href="#" target="_blank" rel="noopener noreferrer">Open Met source</a><button id="refetchBtn" type="button">Re-test today</button><button id="clearBtn" type="button">Clear local proof history</button></div>
   </div></section>
 </main>
 <script>
 (() => {
   "use strict";
+
   const CONFIG={
-    timeZone:"Asia/Manila",sourceName:"The Met Open Access",
+    timeZone:"Asia/Manila",
+    sourceName:"The Met Open Access",
     searchTerms:["painting","landscape","portrait","flowers","nature","textile","sculpture","drawing","ceramic","design"],
     searchUrl:q=>`https://collectionapi.metmuseum.org/public/collection/v1/search?hasImages=true&isHighlight=true&q=${encodeURIComponent(q)}`,
     objectUrl:id=>`https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}`,
-    cachePrefix:"barbph_daily_discover_selection_",historyKey:"barbph_daily_discover_history_v1",noRepeatDays:365,
-    maxCandidateChecks:12,batchSize:6,requestTimeoutMs:7000,overallTimeoutMs:16000,imageTimeoutMs:22000
+    cachePrefix:"barbph_daily_discover_set_v2_",
+    oldCachePrefix:"barbph_daily_discover_selection_",
+    historyKey:"barbph_daily_discover_history_v1",
+    noRepeatDays:365,
+    dailyAssetCount:3,
+    rotationMs:14000,
+    maxCandidateChecks:18,
+    batchSize:6,
+    requestTimeoutMs:7000,
+    overallTimeoutMs:22000,
+    imageTimeoutMs:22000
   };
-  const el={art:document.getElementById("art"),loading:document.getElementById("loading"),manilaDate:document.getElementById("manilaDate"),selectionState:document.getElementById("selectionState"),title:document.getElementById("title"),creator:document.getElementById("creator"),objectIdPill:document.getElementById("objectIdPill"),rightsPill:document.getElementById("rightsPill"),sourceLink:document.getElementById("sourceLink"),refetchBtn:document.getElementById("refetchBtn"),clearBtn:document.getElementById("clearBtn")};
+
+  const el={
+    artA:document.getElementById("artA"),artB:document.getElementById("artB"),loading:document.getElementById("loading"),
+    manilaDate:document.getElementById("manilaDate"),sourceOfDay:document.getElementById("sourceOfDay"),selectionState:document.getElementById("selectionState"),
+    title:document.getElementById("title"),creator:document.getElementById("creator"),rotationPill:document.getElementById("rotationPill"),
+    objectIdPill:document.getElementById("objectIdPill"),rightsPill:document.getElementById("rightsPill"),sourceLink:document.getElementById("sourceLink"),
+    refetchBtn:document.getElementById("refetchBtn"),clearBtn:document.getElementById("clearBtn")
+  };
+
   let runId=0;
+  let dailySet=[];
+  let currentIndex=-1;
+  let activeLayer=0;
+  let rotationTimer=null;
 
-  function manilaDateKey(date=new Date()){const parts=new Intl.DateTimeFormat("en-CA",{timeZone:CONFIG.timeZone,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);const get=t=>parts.find(p=>p.type===t)?.value;return `${get("year")}-${get("month")}-${get("day")}`}
-  function hashString(input){let h=2166136261;for(let i=0;i<input.length;i++){h^=input.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
-  function getHistory(){try{const raw=JSON.parse(localStorage.getItem(CONFIG.historyKey)||"[]");return Array.isArray(raw)?raw:[]}catch{return []}}
-  function saveHistory(h){localStorage.setItem(CONFIG.historyKey,JSON.stringify(h.slice(-CONFIG.noRepeatDays)))}
-  function recentObjectIds(){return new Set(getHistory().map(r=>String(r.asset_id)))}
-  function displayImage(s){return (typeof s?.primaryImageSmall==="string"&&s.primaryImageSmall.startsWith("http"))?s.primaryImageSmall:s?.primaryImage||""}
-  function recordLocalHistory(s,dateKey){const h=getHistory().filter(r=>r&&r.date!==dateKey);h.push({date:dateKey,source_name:CONFIG.sourceName,asset_id:String(s.objectID),title:s.title||"",creator:s.artistDisplayName||"",family:s.classification||s.objectName||"Art",media_url:s.primaryImage||displayImage(s),source_url:s.objectURL||"",rights:s.isPublicDomain?"Public Domain":"",credit_line:s.creditLine||"",status:"selected"});saveHistory(h)}
-  function validObject(o){return !!(o&&o.objectID&&o.isPublicDomain===true&&displayImage(o).startsWith("http"))}
-
-  async function getJson(url,timeoutMs=CONFIG.requestTimeoutMs){const c=new AbortController();const t=setTimeout(()=>c.abort(),timeoutMs);try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.json()}finally{clearTimeout(t)}}
-  function deadline(promise,ms){return Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error("Daily Discover source timed out.")),ms))])}
-
-  async function firstValid(ids,used){
-    const candidates=ids.filter(id=>!used.has(String(id))).slice(0,CONFIG.maxCandidateChecks);
-    for(let i=0;i<candidates.length;i+=CONFIG.batchSize){
-      const batch=candidates.slice(i,i+CONFIG.batchSize);
-      const results=await Promise.all(batch.map(id=>getJson(CONFIG.objectUrl(id)).catch(()=>null)));
-      for(const obj of results) if(validObject(obj)) return obj;
-    }
-    return null;
+  function manilaDateKey(date=new Date()){
+    const parts=new Intl.DateTimeFormat("en-CA",{timeZone:CONFIG.timeZone,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);
+    const get=t=>parts.find(p=>p.type===t)?.value;
+    return `${get("year")}-${get("month")}-${get("day")}`;
   }
 
-  async function chooseMetObject(dateKey){
-    const used=recentObjectIds();
+  function hashString(input){let h=2166136261;for(let i=0;i<input.length;i++){h^=input.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+  function getHistory(){try{const raw=JSON.parse(localStorage.getItem(CONFIG.historyKey)||"[]");return Array.isArray(raw)?raw:[]}catch{return []}}
+  function saveHistory(h){localStorage.setItem(CONFIG.historyKey,JSON.stringify(h.slice(-(CONFIG.noRepeatDays*5))))}
+  function recentObjectIds(excludeDate){return new Set(getHistory().filter(r=>r?.date!==excludeDate).map(r=>String(r.asset_id)))}
+  function displayImage(s){return (typeof s?.primaryImageSmall==="string"&&s.primaryImageSmall.startsWith("http"))?s.primaryImageSmall:s?.primaryImage||""}
+  function validObject(o){return !!(o&&o.objectID&&o.isPublicDomain===true&&displayImage(o).startsWith("http"))}
+  function validSet(set){return Array.isArray(set)&&set.length>=2&&set.every(validObject)}
+
+  function recordLocalHistorySet(set,dateKey){
+    const history=getHistory().filter(r=>r&&r.date!==dateKey);
+    set.forEach((s,index)=>history.push({
+      date:dateKey,source_name:CONFIG.sourceName,asset_id:String(s.objectID),slot:index+1,
+      title:s.title||"",creator:s.artistDisplayName||"",family:s.classification||s.objectName||"Art",
+      media_url:s.primaryImage||displayImage(s),source_url:s.objectURL||"",rights:s.isPublicDomain?"Public Domain":"",
+      credit_line:s.creditLine||"",status:"selected"
+    }));
+    saveHistory(history);
+  }
+
+  async function getJson(url,timeoutMs=CONFIG.requestTimeoutMs){
+    const c=new AbortController();const t=setTimeout(()=>c.abort(),timeoutMs);
+    try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.json()}
+    finally{clearTimeout(t)}
+  }
+
+  function deadline(promise,ms){return Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error("Daily Discover source timed out.")),ms))])}
+
+  async function collectValid(ids,used,already,needed){
+    const candidates=ids.filter(id=>!used.has(String(id))&&!already.has(String(id))).slice(0,CONFIG.maxCandidateChecks);
+    const found=[];
+    for(let i=0;i<candidates.length&&found.length<needed;i+=CONFIG.batchSize){
+      const batch=candidates.slice(i,i+CONFIG.batchSize);
+      const results=await Promise.all(batch.map(id=>getJson(CONFIG.objectUrl(id)).catch(()=>null)));
+      for(const obj of results){
+        if(validObject(obj)&&!already.has(String(obj.objectID))){
+          found.push(obj);already.add(String(obj.objectID));
+          if(found.length>=needed)break;
+        }
+      }
+    }
+    return found;
+  }
+
+  async function chooseMetSet(dateKey){
+    const used=recentObjectIds(dateKey);
+    const chosen=[];
+    const already=new Set();
     const termStart=hashString(`barbph|${dateKey}|met-query`)%CONFIG.searchTerms.length;
-    for(let attempt=0;attempt<3;attempt++){
+
+    for(let attempt=0;attempt<CONFIG.searchTerms.length&&chosen.length<CONFIG.dailyAssetCount;attempt++){
       const term=CONFIG.searchTerms[(termStart+attempt)%CONFIG.searchTerms.length];
-      el.selectionState.textContent=`checking The Met: ${term}…`;
-      const search=await getJson(CONFIG.searchUrl(term));
+      el.selectionState.textContent=`building today’s Met set: ${chosen.length}/${CONFIG.dailyAssetCount}…`;
+      let search;
+      try{search=await getJson(CONFIG.searchUrl(term))}catch{continue}
       const ids=Array.isArray(search.objectIDs)?search.objectIDs:[];
       if(!ids.length)continue;
       const start=hashString(`barbph|${dateKey}|${term}`)%ids.length;
       const ordered=[];
       for(let step=0;step<Math.min(CONFIG.maxCandidateChecks,ids.length);step++)ordered.push(ids[(start+step*7919)%ids.length]);
-      const found=await firstValid(ordered,used);
-      if(found)return found;
+      const more=await collectValid(ordered,used,already,CONFIG.dailyAssetCount-chosen.length);
+      chosen.push(...more);
     }
-    throw new Error("No eligible public-domain Met image found quickly enough.");
+
+    if(chosen.length<2)throw new Error("Could not build a multi-asset public-domain Met set quickly enough.");
+    return chosen.slice(0,CONFIG.dailyAssetCount);
   }
 
-  function applyFallback(reason,myRun=runId){if(myRun!==runId)return;el.art.removeAttribute("src");el.art.classList.remove("ready");el.loading.classList.add("hide");el.title.textContent="Safe fallback active";el.creator.textContent=reason||"The external source was unavailable.";el.objectIdPill.textContent="No external asset";el.rightsPill.textContent="No unverified image shown";el.sourceLink.href="https://www.metmuseum.org/about-the-met/policies-and-documents/open-access";el.selectionState.textContent="fallback — page remains usable"}
-
-  function render(s,state,myRun){
-    if(myRun!==runId)return;
+  function updateMeta(s,index){
     el.title.textContent=s.title||"Untitled";
     el.creator.textContent=[s.artistDisplayName||s.culture||"Creator not listed",s.objectDate||"",s.medium||""].filter(Boolean).join(" · ");
+    el.rotationPill.textContent=`Asset ${index+1} of ${dailySet.length}`;
     el.objectIdPill.textContent=`Object ID ${s.objectID}`;
     el.rightsPill.textContent=s.isPublicDomain?"Public Domain":"Rights check failed";
     el.sourceLink.href=s.objectURL||"#";
-    el.selectionState.textContent=state;
-    el.loading.textContent="Loading today’s selected artwork…";
+  }
 
+  function loadUrl(url){
+    return new Promise((resolve,reject)=>{
+      if(!url)return reject(new Error("Missing image URL"));
+      const img=new Image();
+      const timer=setTimeout(()=>{img.onload=null;img.onerror=null;reject(new Error("Image timeout"))},CONFIG.imageTimeoutMs);
+      img.onload=()=>{clearTimeout(timer);resolve(url)};
+      img.onerror=()=>{clearTimeout(timer);reject(new Error("Image load failed"))};
+      img.src=url;
+    });
+  }
+
+  async function preflightAsset(s){
     const small=displayImage(s);
     const full=(typeof s.primaryImage==="string"&&s.primaryImage.startsWith("http"))?s.primaryImage:"";
-    let triedFull=false;
-    let imageTimer;
+    try{return await loadUrl(small)}catch{
+      if(full&&full!==small)return await loadUrl(full);
+      throw new Error("Selected Met image failed to load.");
+    }
+  }
 
-    const armTimer=()=>{clearTimeout(imageTimer);imageTimer=setTimeout(()=>applyFallback("The selected Met image took too long to load.",myRun),CONFIG.imageTimeoutMs)};
-    el.art.onload=()=>{if(myRun!==runId)return;clearTimeout(imageTimer);el.art.classList.add("ready");el.loading.classList.add("hide")};
-    el.art.onerror=()=>{
-      clearTimeout(imageTimer);
-      if(!triedFull&&full&&full!==small){triedFull=true;el.loading.textContent="Trying alternate Met image…";armTimer();el.art.src=full;return;}
-      applyFallback("Selected image failed to load.",myRun);
-    };
-    armTimer();
-    el.art.src=small||full;
+  function stopRotation(){if(rotationTimer){clearTimeout(rotationTimer);rotationTimer=null}}
+
+  async function showAsset(index,myRun,{initial=false,attempts=0}={}){
+    if(myRun!==runId||!dailySet.length)return;
+    const normalized=((index%dailySet.length)+dailySet.length)%dailySet.length;
+    const s=dailySet[normalized];
+
+    if(initial)el.loading.textContent="Loading today’s first Met asset…";
+
+    try{
+      const url=await preflightAsset(s);
+      if(myRun!==runId)return;
+      const nextLayer=activeLayer===0?el.artB:el.artA;
+      const currentLayer=activeLayer===0?el.artA:el.artB;
+      nextLayer.src=url;
+      nextLayer.classList.add("active");
+      currentLayer.classList.remove("active");
+      activeLayer=activeLayer===0?1:0;
+      currentIndex=normalized;
+      updateMeta(s,normalized);
+      el.loading.classList.add("hide");
+      el.selectionState.textContent=`stable Met set cached — rotating ${dailySet.length} assets`;
+      stopRotation();
+      rotationTimer=setTimeout(()=>showAsset(normalized+1,myRun,{attempts:0}),CONFIG.rotationMs);
+    }catch(err){
+      if(myRun!==runId)return;
+      if(attempts+1<dailySet.length){
+        showAsset(normalized+1,myRun,{initial,attempts:attempts+1});
+      }else if(initial){
+        applyFallback("Today’s Met set was selected, but none of its images loaded on this device.",myRun);
+      }else{
+        stopRotation();
+        rotationTimer=setTimeout(()=>showAsset(currentIndex+1,myRun,{attempts:0}),CONFIG.rotationMs);
+      }
+    }
+  }
+
+  function applyFallback(reason,myRun=runId){
+    if(myRun!==runId)return;
+    stopRotation();dailySet=[];currentIndex=-1;
+    el.artA.removeAttribute("src");el.artB.removeAttribute("src");el.artA.classList.remove("active");el.artB.classList.remove("active");
+    el.loading.classList.add("hide");el.title.textContent="Safe fallback active";el.creator.textContent=reason||"The external source was unavailable.";
+    el.rotationPill.textContent="No daily set";el.objectIdPill.textContent="No external asset";el.rightsPill.textContent="No unverified image shown";
+    el.sourceLink.href="https://www.metmuseum.org/about-the-met/policies-and-documents/open-access";el.selectionState.textContent="fallback — page remains usable";
   }
 
   async function run({force=false}={}){
-    const myRun=++runId,dateKey=manilaDateKey(),cacheKey=CONFIG.cachePrefix+dateKey;
-    el.manilaDate.textContent=`${dateKey} (${CONFIG.timeZone})`;el.loading.textContent="Finding today’s Daily Discover…";el.loading.classList.remove("hide");el.art.classList.remove("ready");
-    if(!force){try{const cached=JSON.parse(localStorage.getItem(cacheKey)||"null");if(validObject(cached)){render(cached,"cached selection — refresh-stable",myRun);recordLocalHistory(cached,dateKey);return}}catch{}}
-    el.selectionState.textContent="fetching deterministic eligible selection…";
-    try{const s=await deadline(chooseMetObject(dateKey),CONFIG.overallTimeoutMs);if(myRun!==runId)return;localStorage.setItem(cacheKey,JSON.stringify(s));recordLocalHistory(s,dateKey);render(s,force?"re-tested — deterministic daily selection":"new daily selection cached",myRun)}
-    catch(err){console.error(err);applyFallback(err?.message||"External source unavailable.",myRun)}
+    const myRun=++runId;
+    stopRotation();
+    const dateKey=manilaDateKey(),cacheKey=CONFIG.cachePrefix+dateKey;
+    el.manilaDate.textContent=`${dateKey} (${CONFIG.timeZone})`;
+    el.sourceOfDay.textContent=CONFIG.sourceName;
+    el.loading.textContent="Finding today’s Daily Discover set…";
+    el.loading.classList.remove("hide");
+    el.selectionState.textContent="building deterministic same-source set…";
+
+    if(!force){
+      try{
+        const cached=JSON.parse(localStorage.getItem(cacheKey)||"null");
+        if(validSet(cached)){
+          dailySet=cached;
+          recordLocalHistorySet(dailySet,dateKey);
+          el.selectionState.textContent=`cached Met set — ${dailySet.length} assets`;
+          showAsset(0,myRun,{initial:true});
+          return;
+        }
+      }catch{}
+    }
+
+    try{
+      const set=await deadline(chooseMetSet(dateKey),CONFIG.overallTimeoutMs);
+      if(myRun!==runId)return;
+      dailySet=set;
+      localStorage.setItem(cacheKey,JSON.stringify(set));
+      recordLocalHistorySet(set,dateKey);
+      el.selectionState.textContent=`new Met set cached — ${set.length} assets`;
+      showAsset(0,myRun,{initial:true});
+    }catch(err){
+      console.error(err);
+      applyFallback(err?.message||"External source unavailable.",myRun);
+    }
   }
 
   el.refetchBtn.addEventListener("click",()=>run({force:true}));
-  el.clearBtn.addEventListener("click",()=>{Object.keys(localStorage).filter(k=>k.startsWith(CONFIG.cachePrefix)||k===CONFIG.historyKey).forEach(k=>localStorage.removeItem(k));run({force:true})});
+  el.clearBtn.addEventListener("click",()=>{
+    Object.keys(localStorage)
+      .filter(k=>k.startsWith(CONFIG.cachePrefix)||k.startsWith(CONFIG.oldCachePrefix)||k===CONFIG.historyKey)
+      .forEach(k=>localStorage.removeItem(k));
+    run({force:true});
+  });
+
   run();
 })();
 </script>
