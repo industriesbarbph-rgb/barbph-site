@@ -25,7 +25,7 @@
 </head>
 <body>
 <main class="stage">
-  <img class="art" id="art" alt="" />
+  <img class="art" id="art" alt="" decoding="async" fetchpriority="high" />
   <div class="veil"></div>
   <div class="loading" id="loading">Finding today’s Daily Discover…</div>
   <section class="status" aria-live="polite">
@@ -50,7 +50,7 @@
     searchUrl:q=>`https://collectionapi.metmuseum.org/public/collection/v1/search?hasImages=true&isHighlight=true&q=${encodeURIComponent(q)}`,
     objectUrl:id=>`https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}`,
     cachePrefix:"barbph_daily_discover_selection_",historyKey:"barbph_daily_discover_history_v1",noRepeatDays:365,
-    maxCandidateChecks:12,batchSize:6,requestTimeoutMs:7000,overallTimeoutMs:16000,imageTimeoutMs:10000
+    maxCandidateChecks:12,batchSize:6,requestTimeoutMs:7000,overallTimeoutMs:16000,imageTimeoutMs:22000
   };
   const el={art:document.getElementById("art"),loading:document.getElementById("loading"),manilaDate:document.getElementById("manilaDate"),selectionState:document.getElementById("selectionState"),title:document.getElementById("title"),creator:document.getElementById("creator"),objectIdPill:document.getElementById("objectIdPill"),rightsPill:document.getElementById("rightsPill"),sourceLink:document.getElementById("sourceLink"),refetchBtn:document.getElementById("refetchBtn"),clearBtn:document.getElementById("clearBtn")};
   let runId=0;
@@ -60,8 +60,9 @@
   function getHistory(){try{const raw=JSON.parse(localStorage.getItem(CONFIG.historyKey)||"[]");return Array.isArray(raw)?raw:[]}catch{return []}}
   function saveHistory(h){localStorage.setItem(CONFIG.historyKey,JSON.stringify(h.slice(-CONFIG.noRepeatDays)))}
   function recentObjectIds(){return new Set(getHistory().map(r=>String(r.asset_id)))}
-  function recordLocalHistory(s,dateKey){const h=getHistory().filter(r=>r&&r.date!==dateKey);h.push({date:dateKey,source_name:CONFIG.sourceName,asset_id:String(s.objectID),title:s.title||"",creator:s.artistDisplayName||"",family:s.classification||s.objectName||"Art",media_url:s.primaryImage||"",source_url:s.objectURL||"",rights:s.isPublicDomain?"Public Domain":"",credit_line:s.creditLine||"",status:"selected"});saveHistory(h)}
-  function validObject(o){return !!(o&&o.objectID&&o.isPublicDomain===true&&typeof o.primaryImage==="string"&&o.primaryImage.startsWith("http"))}
+  function displayImage(s){return (typeof s?.primaryImageSmall==="string"&&s.primaryImageSmall.startsWith("http"))?s.primaryImageSmall:s?.primaryImage||""}
+  function recordLocalHistory(s,dateKey){const h=getHistory().filter(r=>r&&r.date!==dateKey);h.push({date:dateKey,source_name:CONFIG.sourceName,asset_id:String(s.objectID),title:s.title||"",creator:s.artistDisplayName||"",family:s.classification||s.objectName||"Art",media_url:s.primaryImage||displayImage(s),source_url:s.objectURL||"",rights:s.isPublicDomain?"Public Domain":"",credit_line:s.creditLine||"",status:"selected"});saveHistory(h)}
+  function validObject(o){return !!(o&&o.objectID&&o.isPublicDomain===true&&displayImage(o).startsWith("http"))}
 
   async function getJson(url,timeoutMs=CONFIG.requestTimeoutMs){const c=new AbortController();const t=setTimeout(()=>c.abort(),timeoutMs);try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.json()}finally{clearTimeout(t)}}
   function deadline(promise,ms){return Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error("Daily Discover source timed out.")),ms))])}
@@ -96,10 +97,30 @@
 
   function applyFallback(reason,myRun=runId){if(myRun!==runId)return;el.art.removeAttribute("src");el.art.classList.remove("ready");el.loading.classList.add("hide");el.title.textContent="Safe fallback active";el.creator.textContent=reason||"The external source was unavailable.";el.objectIdPill.textContent="No external asset";el.rightsPill.textContent="No unverified image shown";el.sourceLink.href="https://www.metmuseum.org/about-the-met/policies-and-documents/open-access";el.selectionState.textContent="fallback — page remains usable"}
 
-  function render(s,state,myRun){if(myRun!==runId)return;el.title.textContent=s.title||"Untitled";el.creator.textContent=[s.artistDisplayName||s.culture||"Creator not listed",s.objectDate||"",s.medium||""].filter(Boolean).join(" · ");el.objectIdPill.textContent=`Object ID ${s.objectID}`;el.rightsPill.textContent=s.isPublicDomain?"Public Domain":"Rights check failed";el.sourceLink.href=s.objectURL||"#";el.selectionState.textContent=state;el.loading.textContent="Loading today’s selected artwork…";
-    const imageTimer=setTimeout(()=>applyFallback("The selected Met image took too long to load.",myRun),CONFIG.imageTimeoutMs);
+  function render(s,state,myRun){
+    if(myRun!==runId)return;
+    el.title.textContent=s.title||"Untitled";
+    el.creator.textContent=[s.artistDisplayName||s.culture||"Creator not listed",s.objectDate||"",s.medium||""].filter(Boolean).join(" · ");
+    el.objectIdPill.textContent=`Object ID ${s.objectID}`;
+    el.rightsPill.textContent=s.isPublicDomain?"Public Domain":"Rights check failed";
+    el.sourceLink.href=s.objectURL||"#";
+    el.selectionState.textContent=state;
+    el.loading.textContent="Loading today’s selected artwork…";
+
+    const small=displayImage(s);
+    const full=(typeof s.primaryImage==="string"&&s.primaryImage.startsWith("http"))?s.primaryImage:"";
+    let triedFull=false;
+    let imageTimer;
+
+    const armTimer=()=>{clearTimeout(imageTimer);imageTimer=setTimeout(()=>applyFallback("The selected Met image took too long to load.",myRun),CONFIG.imageTimeoutMs)};
     el.art.onload=()=>{if(myRun!==runId)return;clearTimeout(imageTimer);el.art.classList.add("ready");el.loading.classList.add("hide")};
-    el.art.onerror=()=>{clearTimeout(imageTimer);applyFallback("Selected image failed to load.",myRun)};el.art.src=s.primaryImage;
+    el.art.onerror=()=>{
+      clearTimeout(imageTimer);
+      if(!triedFull&&full&&full!==small){triedFull=true;el.loading.textContent="Trying alternate Met image…";armTimer();el.art.src=full;return;}
+      applyFallback("Selected image failed to load.",myRun);
+    };
+    armTimer();
+    el.art.src=small||full;
   }
 
   async function run({force=false}={}){
