@@ -2,9 +2,32 @@
   "task": "BarbPH Truth Sync",
   "timezone": "Asia/Manila",
   "actual_start": "2026-08-21T05:14:09+08:00",
-  "actual_finish": null,
-  "status": "in_progress",
-  "documents_changed": [],
-  "facts_synchronized": [],
-  "intentionally_pending": []
+  "actual_finish": "2026-08-21T05:15:27+08:00",
+  "status": "complete",
+  "documents_changed": [
+    "BARBPH-SOURCE-OF-TRUTH.md",
+    "DAILY-DISCOVER-PRODUCTION-READINESS.md",
+    "DAILY-DISCOVER-PRODUCTION-ENGINE.md",
+    "overnight-work-log/03-truth-sync.json"
+  ],
+  "facts_synchronized": [
+    "NASA is production-armed; no additional Daily Discover source was armed by this pass.",
+    "Barb Originals reserve is ready and remains emergency-only, never a weighted public source.",
+    "The first real production state and shared history are working.",
+    "The real Manila midnight rollover from Aug 20 to Aug 21 passed.",
+    "A separate/incognito request returned the same Aug 21 NASA Mars set and daily_set_id with cache_hit true, proving persisted daily-lock reads.",
+    "Ticker pre-birthday shell is working in the prototype; Ticker birthday remains separate from homepage launch.",
+    "Headless newsletter capture works in the prototype and the Newsletter mirror formula is recorded as fixed.",
+    "Coach Doll Patrollers are a separate project track; Patroller birthdays remain separate from BarbPH homepage launch and Ticker birthday.",
+    "The official root homepage remains intentionally unlaunched; index.html and production launch state were not changed."
+  ],
+  "intentionally_pending": [
+    "Official BarbPH root homepage launch/index.html.",
+    "Ticker birthday/launch milestone.",
+    "Coach Doll Patroller birthday/launch milestones.",
+    "Final Alive FAB skin and decorative footer globe artwork.",
+    "Global Sky / World Time / Seasons implementation.",
+    "Additional Daily Discover source arming beyond NASA.",
+    "Google Search Console hands-on checkpoint."
+  ]
 }
