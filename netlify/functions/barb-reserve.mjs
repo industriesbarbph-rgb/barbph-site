@@ -5,7 +5,7 @@ function normalizeImageURL(value){const v=String(value||"").trim();if(!v)return"
 
 export default async request=>{
   if(request.method!=="GET")return json({error:"Method not allowed"},405);
-  const url=new URL(request.url),count=Math.max(3,Math.min(5,Number(url.searchParams.get("count"))||3)),seed=Math.abs(Number(url.searchParams.get("seed"))||1);
+  const url=new URL(request.url),requestedCount=Math.max(3,Math.min(12,Number(url.searchParams.get("count"))||3)),minimumReady=3,seed=Math.abs(Number(url.searchParams.get("seed"))||1);
   const sheet="https://docs.google.com/spreadsheets/d/1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM/gviz/tq?tqx=out:csv&sheet=Barb%20Originals&headers=0";
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
   let raw;
@@ -17,7 +17,7 @@ export default async request=>{
   const records=rows.slice(headerIndex+1).filter(r=>r.some(Boolean)).map(r=>Object.fromEntries(headers.map((k,i)=>[k,String(r[i]||"").trim()])));
   const seen=new Set(),items=[];
   for(const r of records){if(String(r.enabled||"").toLowerCase()!=="yes")continue;const image=normalizeImageURL(r.media_url);if(!image||seen.has(image))continue;seen.add(image);items.push({id:`barb:${hash(image)}`,title:r.asset_name||"Barb Original",creator:"Barb Originals",family:r.family||"original",image,thumbnail:image,sourceURL:image,rightsLabel:"User-owned material · Barb Originals"})}
-  if(items.length<count)return json({error:`PARKED: Barb Originals emergency reserve needs at least ${count} enabled image assets; currently found ${items.length}.`},503);
-  const start=seed%items.length,ordered=items.slice(start).concat(items.slice(0,start));
-  return json({source:"Barb Originals",role:"emergency_reserve",count,items:ordered.slice(0,count)});
+  if(items.length<minimumReady)return json({error:`PARKED: Barb Originals emergency reserve needs at least ${minimumReady} enabled unique image assets; currently found ${items.length}.`,minimum_ready:minimumReady,available_count:items.length},503);
+  const start=seed%items.length,ordered=items.slice(start).concat(items.slice(0,start)),selected=ordered.slice(0,Math.min(requestedCount,ordered.length));
+  return json({source:"Barb Originals",role:"emergency_reserve",minimum_ready:minimumReady,requested_count:requestedCount,available_count:items.length,count:selected.length,items:selected});
 };
