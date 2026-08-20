@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Internal diagnostic labs are useful to us, not search results.
+Disallow: /daily-discover-test.html
+Disallow: /daily-discover-production-test.html
+Disallow: /homepage-priority-test.html
+
+# Serverless endpoints are application infrastructure, not indexable pages.
+Disallow: /.netlify/functions/
+
+Sitemap: https://barbph.com/sitemap.xml
