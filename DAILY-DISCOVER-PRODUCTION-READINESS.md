@@ -3,7 +3,7 @@
 Status: implemented as a read-only Netlify diagnostic in `netlify/functions/daily-discover-readiness.mjs`.
 
 ## Purpose
-This gate answers one question without changing production state: **what is still blocking Daily Discover from being safely armed?**
+This gate reports the safety/readiness state of Daily Discover without itself changing production state.
 
 The readiness endpoint does not enable any source, write history, create a Daily Discover set, or modify spreadsheet controls.
 
@@ -25,8 +25,19 @@ The readiness endpoint does not enable any source, write history, create a Daily
 - `READY_TO_ARM` — reserve is ready, but no confirmed source is enabled yet.
 - `ARMED_WITH_RESERVE` — at least one confirmed source is enabled and Barb Originals is ready.
 
-## Expected current state
-At the time this gate was added, production remained intentionally unarmed and Barb Originals was still waiting for at least 3 enabled user-owned images. Therefore the expected state is `WAITING_FOR_RESERVE_AND_ARMING` until those two deliberate gates are changed.
+## Verified current state — 2026-08-21 Manila
+
+The earlier `WAITING_FOR_RESERVE_AND_ARMING` expectation is historical and no longer describes production.
+
+- NASA is deliberately production-armed as a confirmed source.
+- Barb Originals reserve is ready for the automatic fallback path.
+- The first real production set was created before the Aug 20→21 rollover.
+- Shared history is working.
+- The real Manila-midnight rollover passed: Aug 21 created a new NASA/Mars daily set while loading Aug 20 history.
+- A separate-session request returned the same Aug 21 daily set with `cache_hit:true`, proving the persisted daily lock was read.
+- No additional source was armed by this documentation update.
+
+The readiness gate remains diagnostic only; runtime source controls remain the authority for its exact live status value.
 
 ## Endpoint
 `/.netlify/functions/daily-discover-readiness`
