@@ -1,31 +1,196 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><title>BarbPH Daily Discover — Source Engine Lab</title><style>*{box-sizing:border-box}html,body{height:100%;margin:0}body{font:13px system-ui;background:#101216;color:#fff;overflow:hidden}.stage{position:fixed;inset:0;background:linear-gradient(145deg,#252b38,#07080a);overflow:hidden}.art{position:absolute;inset:-2%;width:104%;height:104%;object-fit:cover;opacity:0;transition:opacity 1.3s;filter:brightness(.78)}.art.on{opacity:1}.veil{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.5),rgba(0,0,0,.08),rgba(0,0,0,.25))}.box{position:absolute;left:16px;right:16px;padding:14px 16px;border:1px solid #ffffff29;background:#0c0e1299;backdrop-filter:blur(14px);border-radius:18px}.top{top:16px;right:auto;max-width:820px}.bottom{bottom:16px}.muted{color:#ffffffb3}.title{font-size:17px;font-weight:750}.pill{display:inline-block;margin:8px 6px 0 0;padding:5px 8px;border:1px solid #ffffff29;border-radius:999px;color:#ffffffb3}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}button,a{border:1px solid #ffffff29;background:#ffffff14;color:#fff;padding:8px 10px;border-radius:10px;text-decoration:none;cursor:pointer}button.active{background:#ffffff38}.loading{position:absolute;inset:0;display:grid;place-items:center;color:#ffffffd0}.hide{display:none}@media(max-width:700px){.box{left:10px;right:10px}.top{right:10px}.actions button,.actions a{font-size:11px;padding:7px 8px}}@media(prefers-reduced-motion:reduce){.art{transition:none}}</style></head><body><main class="stage"><img id="a" class="art"><img id="b" class="art"><div class="veil"></div><div id="loading" class="loading">Reading BarbPH source controls…</div><section class="box top"><b>BARBPH DAILY DISCOVER — SOURCE ENGINE LAB</b><div class="muted">Manila date: <span id="date">—</span></div><div class="muted">Source of the day: <span id="source">—</span></div><div class="muted">Spreadsheet control: <span id="sheet">—</span></div><div class="muted">Daily settings: <span id="settings">—</span></div><div class="muted">Selection state: <span id="state">starting…</span></div><div class="muted">Diagnostic page only — not the future BarbPH homepage.</div></section><section class="box bottom"><div id="title" class="title">Waiting for source…</div><div id="creator" class="muted"></div><span id="slot" class="pill">Asset —</span><span id="id" class="pill">ID —</span><span id="rights" class="pill">Rights —</span><div class="actions"><a id="link" href="#" target="_blank" rel="noopener">Open source</a><button id="retry">Re-test</button><button id="met">Test Met</button><button id="nasa">Test NASA</button><button id="smith">Test Smithsonian</button><button id="auto">Spreadsheet mode</button></div></section></main><script>(()=>{"use strict";
-const SID="1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM",THEME_GID="342757810",CSV_URLS=[`https://docs.google.com/spreadsheets/d/${SID}/export?format=csv&gid=${THEME_GID}`,`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("Theme Sources")}&headers=0`],TZ="Asia/Manila";
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>BarbPH Daily Discover — Source Engine Lab</title>
+<style>
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{font:13px system-ui;background:#101216;color:#fff;overflow:hidden}
+.stage{position:fixed;inset:0;background:linear-gradient(145deg,#252b38,#07080a);overflow:hidden}
+.art{position:absolute;inset:-2%;width:104%;height:104%;object-fit:cover;opacity:0;transition:opacity 1.3s;filter:brightness(.78)}
+.art.on{opacity:1}.veil{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.5),rgba(0,0,0,.08),rgba(0,0,0,.25))}
+.box{position:absolute;left:16px;right:16px;padding:14px 16px;border:1px solid #ffffff29;background:#0c0e1299;backdrop-filter:blur(14px);border-radius:18px}
+.top{top:16px;right:auto;max-width:840px}.bottom{bottom:16px}.muted{color:#ffffffb3}.title{font-size:17px;font-weight:750}
+.pill{display:inline-block;margin:8px 6px 0 0;padding:5px 8px;border:1px solid #ffffff29;border-radius:999px;color:#ffffffb3}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+button,a{border:1px solid #ffffff29;background:#ffffff14;color:#fff;padding:8px 10px;border-radius:10px;text-decoration:none;cursor:pointer}
+button.active{background:#ffffff38}.loading{position:absolute;inset:0;display:grid;place-items:center;color:#ffffffd0}.hide{display:none}
+@media(max-width:700px){.box{left:10px;right:10px}.top{right:10px}.actions button,.actions a{font-size:11px;padding:7px 8px}}
+@media(prefers-reduced-motion:reduce){.art{transition:none}}
+</style>
+</head>
+<body>
+<main class="stage">
+<img id="a" class="art" alt="">
+<img id="b" class="art" alt="">
+<div class="veil"></div>
+<div id="loading" class="loading">Reading BarbPH source controls…</div>
+<section class="box top">
+<b>BARBPH DAILY DISCOVER — SOURCE ENGINE LAB</b>
+<div class="muted">Manila date: <span id="date">—</span></div>
+<div class="muted">Source of the day: <span id="source">—</span></div>
+<div class="muted">Spreadsheet control: <span id="sheet">—</span></div>
+<div class="muted">Daily settings: <span id="settings">—</span></div>
+<div class="muted">Selection state: <span id="state">starting…</span></div>
+<div class="muted">Diagnostic page only — not the future BarbPH homepage.</div>
+</section>
+<section class="box bottom">
+<div id="title" class="title">Waiting for source…</div>
+<div id="creator" class="muted"></div>
+<span id="slot" class="pill">Asset —</span>
+<span id="id" class="pill">ID —</span>
+<span id="rights" class="pill">Rights —</span>
+<div class="actions">
+<a id="link" href="#" target="_blank" rel="noopener">Open source</a>
+<button id="retry">Re-test</button>
+<button id="met">Test Met</button>
+<button id="nasa">Test NASA</button>
+<button id="smith">Test Smithsonian</button>
+<button id="europeana">Test Europeana</button>
+<button id="auto">Spreadsheet mode</button>
+</div>
+</section>
+</main>
+<script>
+(()=>{
+"use strict";
+const SID="1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM";
+const THEME_GID="342757810";
+const CSV_URLS=[
+  `https://docs.google.com/spreadsheets/d/${SID}/export?format=csv&gid=${THEME_GID}`,
+  `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("Theme Sources")}&headers=0`
+];
+const TZ="Asia/Manila";
 const MET={name:"The Met Open Access",terms:["painting","landscape","portrait","flowers","nature","textile","sculpture","drawing"],search:q=>`https://collectionapi.metmuseum.org/public/collection/v1/search?hasImages=true&isHighlight=true&q=${encodeURIComponent(q)}`,item:id=>`https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}`};
 const NASA={name:"NASA",terms:["Earth","Mars","Jupiter","Saturn","nebula","galaxy","aurora","Moon"],search:q=>`https://images-api.nasa.gov/search?q=${encodeURIComponent(q)}&media_type=image&page_size=50`};
 const SI={name:"Smithsonian Open Access",terms:["flowers","birds","minerals","painting","design","textile","ocean","space","insects","maps"],search:q=>`https://api.si.edu/openaccess/api/v1.0/search?q=${encodeURIComponent(q)}&rows=50&sort=random&api_key=DEMO_KEY`};
-const $=id=>document.getElementById(id),E={a:$("a"),b:$("b"),loading:$("loading"),date:$("date"),source:$("source"),sheet:$("sheet"),settings:$("settings"),state:$("state"),title:$("title"),creator:$("creator"),slot:$("slot"),id:$("id"),rights:$("rights"),link:$("link"),retry:$("retry"),met:$("met"),nasa:$("nasa"),smith:$("smith"),auto:$("auto")};
-let mode="auto",rows=[],set=[],idx=-1,layer=0,timer=null,runId=0,active="",cfg={count:3,seconds:18};
+const EU={name:"Europeana",terms:["painting","botanical","maps","photography","fashion","manuscript","archaeology","nature","design","portrait"],search:(q,seed)=>`/.netlify/functions/europeana?q=${encodeURIComponent(q)}&seed=${encodeURIComponent(seed)}&rows=60`};
+const $=id=>document.getElementById(id);
+const E={a:$("a"),b:$("b"),loading:$("loading"),date:$("date"),source:$("source"),sheet:$("sheet"),settings:$("settings"),state:$("state"),title:$("title"),creator:$("creator"),slot:$("slot"),id:$("id"),rights:$("rights"),link:$("link"),retry:$("retry"),met:$("met"),nasa:$("nasa"),smith:$("smith"),europeana:$("europeana"),auto:$("auto")};
+let mode="auto",rows=[],set=[],layer=0,timer=null,runId=0,active="",cfg={count:3,seconds:18};
+
 const dateKey=()=>{const p=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),g=t=>p.find(x=>x.type===t)?.value;return`${g("year")}-${g("month")}-${g("day")}`};
 const hash=s=>{let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0};
-async function get(url,ms=12000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});if(!r.ok){const e=new Error(`HTTP ${r.status}`);e.status=r.status;throw e}return await r.json()}finally{clearTimeout(t)}}
-async function text(url,ms=12000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.text()}finally{clearTimeout(t)}}
-function parseCSV(s){const out=[];let r=[],f="",q=false;for(let i=0;i<s.length;i++){const c=s[i];if(q){if(c==='"'&&s[i+1]==='"'){f+='"';i++}else if(c==='"')q=false;else f+=c}else if(c==='"')q=true;else if(c===','){r.push(f);f=""}else if(c==='\n'){r.push(f);out.push(r);r=[];f=""}else if(c!=='\r')f+=c}if(f||r.length){r.push(f);out.push(r)}return out}
-async function readSheet(){let last="";for(const url of CSV_URLS){try{const raw=await text(url);if(/<html|accounts\.google\.com|sign in/i.test(raw)){last="sheet is not anonymously readable";continue}const rr=parseCSV(raw),h=rr.findIndex(r=>String(r[0]||"").trim().toLowerCase()==="source_name");if(h<0){last="Theme Sources header not found";continue}const heads=rr[h].map(x=>String(x).trim());return rr.slice(h+1).filter(r=>r.some(Boolean)).map(r=>Object.fromEntries(heads.map((k,i)=>[k,String(r[i]||"").trim()]))) }catch(e){last=e.message||"sheet fetch failed"}}throw new Error(last||"Theme Sources unavailable") }
-function settings(name){const r=rows.find(x=>x.source_name===name)||{};return{count:Math.max(2,Math.min(6,+r.daily_asset_count||3)),seconds:Math.max(8,Math.min(120,+r.rotation_seconds||18))}}
-function choose(d){const forced=new URLSearchParams(location.search).get("source")?.toLowerCase()||mode;if(forced==="met")return MET.name;if(forced==="nasa")return NASA.name;if(forced==="smithsonian")return SI.name;const ok=rows.filter(r=>r.enabled.toLowerCase()==="yes"&&[MET.name,NASA.name,SI.name].includes(r.source_name)&&+r.weight>0);if(!ok.length)return MET.name;const total=ok.reduce((a,r)=>a+(+r.weight),0);let p=(hash(`barbph|${d}|source`)/4294967296)*total;for(const r of ok){p-=+r.weight;if(p<0)return r.source_name}return ok.at(-1).source_name}
-function history(){try{return JSON.parse(localStorage.getItem("barbph_dd_history_v6")||"[]")}catch{return[]}}
-function used(source,d){return new Set(history().filter(x=>x.source===source&&x.date!==d).map(x=>x.id))}
-function save(source,d,items){const h=history().filter(x=>!(x.source===source&&x.date===d));items.forEach(x=>h.push({source,date:d,id:x.id}));localStorage.setItem("barbph_dd_history_v6",JSON.stringify(h.slice(-2500)))}
-function metItem(o){const image=o?.primaryImageSmall||o?.primaryImage||"";return{id:`met:${o.objectID}`,raw:String(o.objectID),title:o.title||"Untitled",creator:o.artistDisplayName||o.culture||"The Met",image,alt:o.primaryImage||"",url:o.objectURL||"https://www.metmuseum.org/",rights:"Public Domain",ok:!!(o?.objectID&&o.isPublicDomain===true&&/^https:/.test(image))}}
+
+async function get(url,ms=12000){
+  const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);
+  try{
+    const r=await fetch(url,{signal:c.signal,cache:"no-store"});
+    let payload=null; try{payload=await r.json()}catch{}
+    if(!r.ok){const e=new Error(payload?.error||payload?.message||`HTTP ${r.status}`);e.status=r.status;throw e}
+    return payload;
+  }finally{clearTimeout(t)}
+}
+async function text(url,ms=12000){
+  const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);
+  try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.text()}
+  finally{clearTimeout(t)}
+}
+function parseCSV(s){
+  const out=[];let r=[],f="",q=false;
+  for(let i=0;i<s.length;i++){const c=s[i];if(q){if(c==='"'&&s[i+1]==='"'){f+='"';i++}else if(c==='"')q=false;else f+=c}else if(c==='"')q=true;else if(c===','){r.push(f);f=""}else if(c==='\n'){r.push(f);out.push(r);r=[];f=""}else if(c!=='\r')f+=c}
+  if(f||r.length){r.push(f);out.push(r)}return out;
+}
+async function readSheet(){
+  let last="";
+  for(const url of CSV_URLS){
+    try{
+      const raw=await text(url);
+      if(/<html|accounts\.google\.com|sign in/i.test(raw)){last="sheet is not anonymously readable";continue}
+      const rr=parseCSV(raw),h=rr.findIndex(r=>String(r[0]||"").trim().toLowerCase()==="source_name");
+      if(h<0){last="Theme Sources header not found";continue}
+      const heads=rr[h].map(x=>String(x).trim());
+      return rr.slice(h+1).filter(r=>r.some(Boolean)).map(r=>Object.fromEntries(heads.map((k,i)=>[k,String(r[i]||"").trim()])));
+    }catch(e){last=e.message||"sheet fetch failed"}
+  }
+  throw new Error(last||"Theme Sources unavailable");
+}
+function settings(name){const r=rows.find(x=>x.source_name===name)||{};return{count:Math.max(2,Math.min(5,+r.daily_asset_count||3)),seconds:Math.max(5,Math.min(120,+r.rotation_seconds||18))}}
+function choose(d){
+  const forced=new URLSearchParams(location.search).get("source")?.toLowerCase()||mode;
+  if(forced==="met")return MET.name;if(forced==="nasa")return NASA.name;if(forced==="smithsonian")return SI.name;if(forced==="europeana")return EU.name;
+  const supported=[MET.name,NASA.name,SI.name,EU.name];
+  const ok=rows.filter(r=>String(r.enabled).toLowerCase()==="yes"&&supported.includes(r.source_name)&&+r.weight>0);
+  if(!ok.length)return MET.name;
+  const total=ok.reduce((a,r)=>a+(+r.weight),0);let p=(hash(`barbph|${d}|source`)/4294967296)*total;
+  for(const r of ok){p-=+r.weight;if(p<0)return r.source_name}
+  return ok.at(-1).source_name;
+}
+function historyItems(){try{return JSON.parse(localStorage.getItem("barbph_dd_history_v7")||"[]")}catch{return[]}}
+function used(source,d){return new Set(historyItems().filter(x=>x.source===source&&x.date!==d).map(x=>x.id))}
+function save(source,d,items){const h=historyItems().filter(x=>!(x.source===source&&x.date===d));items.forEach(x=>h.push({source,date:d,id:x.id}));localStorage.setItem("barbph_dd_history_v7",JSON.stringify(h.slice(-2500)))}
+
+function metItem(o){const image=o?.primaryImageSmall||o?.primaryImage||"";return{id:`met:${o?.objectID}`,raw:String(o?.objectID||""),title:o?.title||"Untitled",creator:o?.artistDisplayName||o?.culture||"The Met",image,alt:o?.primaryImage||"",url:o?.objectURL||"https://www.metmuseum.org/",rights:"Public Domain",ok:!!(o?.objectID&&o?.isPublicDomain===true&&/^https:/.test(image))}}
 function nasaItem(x){const d=x?.data?.[0]||{},l=(x?.links||[]).find(v=>v.render==="image")||{},id=String(d.nasa_id||""),image=String(l.href||""),bad=/copyright|all rights reserved|licensed|permission required|courtesy of (?!nasa)/i.test(`${d.title||""} ${d.description||""}`);return{id:`nasa:${id}`,raw:id,title:d.title||"Untitled NASA image",creator:d.photographer||d.center||"NASA",image,alt:"",url:id?`https://images.nasa.gov/details/${encodeURIComponent(id)}`:"https://images.nasa.gov/",rights:"NASA media guidelines · lab candidate",ok:!!(id&&/^https:/.test(image)&&!bad)}}
 function siItem(r){const c=r?.content||{},d=c.descriptiveNonRepeating||{},m=(d?.online_media?.media||[]).find(x=>String(x?.usage?.access||"").toUpperCase()==="CC0"&&/^https:/.test(String(x?.content||x?.thumbnail||""))),image=String(m?.content||m?.thumbnail||""),id=String(r?.id||d?.record_ID||"");return{id:`smith:${id}`,raw:id,title:r?.title||"Untitled Smithsonian object",creator:"Smithsonian Open Access",image,alt:String(m?.thumbnail||""),url:/^https?:/.test(String(r?.url||""))?r.url:"https://www.si.edu/openaccess",rights:"CC0 · Smithsonian Open Access",ok:!!(id&&image&&String(m?.usage?.access||"").toUpperCase()==="CC0")}}
-async function collectMet(d,n){const u=used(MET.name,d),out=[],seen=new Set(),st=hash(`met|${d}`)%MET.terms.length;for(let k=0;k<MET.terms.length&&out.length<n;k++){const q=MET.terms[(st+k)%MET.terms.length];E.state.textContent=`Met: ${out.length}/${n} found…`;let s;try{s=await get(MET.search(q))}catch{continue}const ids=s.objectIDs||[];for(let i=0;i<Math.min(24,ids.length)&&out.length<n;i++){const id=ids[(hash(`${d}|${q}`)+i*7919)%ids.length];if(u.has(`met:${id}`)||seen.has(id))continue;const a=metItem(await get(MET.item(id)).catch(()=>null));if(a.ok){out.push(a);seen.add(id)}}}if(out.length<2)throw new Error("Met could not build a usable set.");return out.slice(0,n)}
-async function collectNASA(d,n){const u=used(NASA.name,d),out=[],seen=new Set(),st=hash(`nasa|${d}`)%NASA.terms.length;for(let k=0;k<NASA.terms.length&&out.length<n;k++){const q=NASA.terms[(st+k)%NASA.terms.length];E.state.textContent=`NASA: ${out.length}/${n} found…`;let s;try{s=await get(NASA.search(q))}catch{continue}for(const x of s?.collection?.items||[]){const a=nasaItem(x);if(a.ok&&!u.has(a.id)&&!seen.has(a.id)){out.push(a);seen.add(a.id);if(out.length>=n)break}}}if(out.length<2)throw new Error("NASA could not build a usable set.");return out.slice(0,n)}
-async function collectSI(d,n){const u=used(SI.name,d),out=[],seen=new Set(),st=hash(`si|${d}`)%SI.terms.length;for(let k=0;k<SI.terms.length&&out.length<n;k++){const q=SI.terms[(st+k)%SI.terms.length];E.state.textContent=`Smithsonian: ${out.length}/${n} CC0 found…`;let s;try{s=await get(SI.search(q))}catch(e){if(e.status===403||e.status===429)throw new Error(`Smithsonian DEMO_KEY unavailable or rate-limited (HTTP ${e.status}).`);continue}for(const r of s?.response?.rows||s?.rows||[]){const a=siItem(r);if(a.ok&&!u.has(a.id)&&!seen.has(a.id)){out.push(a);seen.add(a.id);if(out.length>=n)break}}}if(out.length<2)throw new Error("Smithsonian could not find two CC0 image assets.");return out.slice(0,n)}
+function euItem(x){const id=String(x?.id||"");return{id:`eu:${id}`,raw:id,title:x?.title||"Untitled Europeana object",creator:x?.creator||x?.dataProvider||"Europeana",image:String(x?.image||""),alt:String(x?.thumbnail||""),url:String(x?.sourceURL||"https://www.europeana.eu/"),rights:String(x?.rightsLabel||"PDM/CC0 · Europeana"),ok:!!(id&&/^https:/.test(String(x?.image||""))&&["PDM","CC0"].includes(String(x?.rightsCode||"")))}}
+
+async function collectMet(d,n){
+  const u=used(MET.name,d),out=[],seen=new Set(),st=hash(`met|${d}`)%MET.terms.length;
+  for(let k=0;k<MET.terms.length&&out.length<n;k++){const q=MET.terms[(st+k)%MET.terms.length];E.state.textContent=`Met: ${out.length}/${n} found…`;let s;try{s=await get(MET.search(q))}catch{continue}const ids=s?.objectIDs||[];for(let i=0;i<Math.min(24,ids.length)&&out.length<n;i++){const id=ids[(hash(`${d}|${q}`)+i*7919)%ids.length];if(u.has(`met:${id}`)||seen.has(id))continue;const a=metItem(await get(MET.item(id)).catch(()=>null));if(a.ok){out.push(a);seen.add(id)}}}
+  if(out.length<2)throw new Error("Met could not build a usable set.");return out.slice(0,n);
+}
+async function collectNASA(d,n){
+  const u=used(NASA.name,d),out=[],seen=new Set(),st=hash(`nasa|${d}`)%NASA.terms.length;
+  for(let k=0;k<NASA.terms.length&&out.length<n;k++){const q=NASA.terms[(st+k)%NASA.terms.length];E.state.textContent=`NASA: ${out.length}/${n} found…`;let s;try{s=await get(NASA.search(q))}catch{continue}for(const x of s?.collection?.items||[]){const a=nasaItem(x);if(a.ok&&!u.has(a.id)&&!seen.has(a.id)){out.push(a);seen.add(a.id);if(out.length>=n)break}}}
+  if(out.length<2)throw new Error("NASA could not build a usable set.");return out.slice(0,n);
+}
+async function collectSI(d,n){
+  const u=used(SI.name,d),out=[],seen=new Set(),st=hash(`si|${d}`)%SI.terms.length;
+  for(let k=0;k<SI.terms.length&&out.length<n;k++){const q=SI.terms[(st+k)%SI.terms.length];E.state.textContent=`Smithsonian: ${out.length}/${n} CC0 found…`;let s;try{s=await get(SI.search(q))}catch(e){if(e.status===403||e.status===429)throw new Error(`Smithsonian DEMO_KEY unavailable or rate-limited (HTTP ${e.status}).`);continue}for(const r of s?.response?.rows||s?.rows||[]){const a=siItem(r);if(a.ok&&!u.has(a.id)&&!seen.has(a.id)){out.push(a);seen.add(a.id);if(out.length>=n)break}}}
+  if(out.length<2)throw new Error("Smithsonian could not find two CC0 image assets.");return out.slice(0,n);
+}
+async function collectEU(d,n){
+  const u=used(EU.name,d),out=[],seen=new Set(),st=hash(`eu|${d}`)%EU.terms.length;
+  for(let k=0;k<EU.terms.length&&out.length<n;k++){
+    const q=EU.terms[(st+k)%EU.terms.length];E.state.textContent=`Europeana: ${out.length}/${n} PDM/CC0 found…`;
+    let s;try{s=await get(EU.search(q,hash(`${d}|${q}`)),16000)}catch(e){
+      if(e.status===503&&/API key/i.test(e.message))throw new Error("Europeana adapter is ready, but EUROPEANA_API_KEY is not configured in Netlify yet.");
+      if(e.status===401)throw new Error("Europeana API key was rejected. Check the Netlify EUROPEANA_API_KEY value.");
+      if(e.status===429)throw new Error("Europeana API key is temporarily rate-limited.");
+      continue;
+    }
+    for(const x of s?.items||[]){const a=euItem(x);if(a.ok&&!u.has(a.id)&&!seen.has(a.id)){out.push(a);seen.add(a.id);if(out.length>=n)break}}
+  }
+  if(out.length<2)throw new Error("Europeana could not find two usable PDM/CC0 image assets.");
+  return out.slice(0,n);
+}
+
 function load(url){return new Promise((ok,bad)=>{const i=new Image(),t=setTimeout(()=>bad(new Error("Image timeout")),22000);i.onload=()=>{clearTimeout(t);ok(url)};i.onerror=()=>{clearTimeout(t);bad(new Error("Image failed"))};i.src=url})}
-async function show(i,r,tries=0){if(r!==runId||!set.length)return;const n=((i%set.length)+set.length)%set.length,x=set[n];try{const url=await load(x.image).catch(()=>x.alt?load(x.alt):Promise.reject(new Error("Image failed")));if(r!==runId)return;const next=layer?E.a:E.b,old=layer?E.b:E.a;next.src=url;next.classList.add("on");old.classList.remove("on");layer=layer?0:1;idx=n;E.title.textContent=x.title;E.creator.textContent=x.creator;E.slot.textContent=`Asset ${n+1} of ${set.length}`;E.id.textContent=`ID ${x.raw}`;E.rights.textContent=x.rights;E.link.href=x.url;E.loading.classList.add("hide");E.state.textContent=`SUCCESS — ${active} rotating ${set.length} assets`;clearTimeout(timer);timer=setTimeout(()=>show(n+1,r),cfg.seconds*1000)}catch(e){if(tries+1<set.length)return show(n+1,r,tries+1);fail(`${active}: ${e.message}`,r)}}
+async function show(i,r,tries=0){
+  if(r!==runId||!set.length)return;const n=((i%set.length)+set.length)%set.length,x=set[n];
+  try{
+    const url=await load(x.image).catch(()=>x.alt?load(x.alt):Promise.reject(new Error("Image failed")));
+    if(r!==runId)return;const next=layer?E.a:E.b,old=layer?E.b:E.a;next.src=url;next.classList.add("on");old.classList.remove("on");layer=layer?0:1;
+    E.title.textContent=x.title;E.creator.textContent=x.creator;E.slot.textContent=`Asset ${n+1} of ${set.length}`;E.id.textContent=`ID ${x.raw}`;E.rights.textContent=x.rights;E.link.href=x.url;E.loading.classList.add("hide");E.state.textContent=`SUCCESS — ${active} rotating ${set.length} assets`;
+    clearTimeout(timer);timer=setTimeout(()=>show(n+1,r),cfg.seconds*1000);
+  }catch(e){if(tries+1<set.length)return show(n+1,r,tries+1);fail(`${active}: ${e.message}`,r)}
+}
 function fail(msg,r=runId){if(r!==runId)return;clearTimeout(timer);set=[];E.a.classList.remove("on");E.b.classList.remove("on");E.loading.classList.add("hide");E.title.textContent="Safe fallback active";E.creator.textContent=msg;E.state.textContent=`FAILED — ${msg}`}
-function buttons(){E.met.classList.toggle("active",mode==="met");E.nasa.classList.toggle("active",mode==="nasa");E.smith.classList.toggle("active",mode==="smithsonian");E.auto.classList.toggle("active",mode==="auto")}
-async function run(force=false){const r=++runId,d=dateKey();clearTimeout(timer);buttons();E.date.textContent=`${d} (${TZ})`;E.loading.classList.remove("hide");try{try{rows=await readSheet();E.sheet.textContent=`Theme Sources loaded · ${rows.filter(x=>x.enabled.toLowerCase()==="yes").length} production enabled`}catch(e){rows=[];E.sheet.textContent=`Sheet read failed · lab defaults (${e.message})`}active=choose(d);cfg=settings(active);E.source.textContent=`${active}${mode==="auto"&&rows.some(x=>x.enabled.toLowerCase()==="yes")?"":" · LAB/TEST MODE"}`;E.settings.textContent=`${cfg.count} assets · ${cfg.seconds}s rotation`;const key=`barbph_dd_v8_${d}_${active}`;if(!force){try{const c=JSON.parse(localStorage.getItem(key)||"null");if(c?.length>=2){set=c;return show(0,r)}}catch{}}E.state.textContent=`Contacting ${active}…`;set=await Promise.race([(active===NASA.name?collectNASA(d,cfg.count):active===SI.name?collectSI(d,cfg.count):collectMet(d,cfg.count)),new Promise((_,rej)=>setTimeout(()=>rej(new Error("Source request timed out.")),32000))]);localStorage.setItem(key,JSON.stringify(set));save(active,d,set);show(0,r)}catch(e){fail(e.message||"Source unavailable",r)}}
+function buttons(){E.met.classList.toggle("active",mode==="met");E.nasa.classList.toggle("active",mode==="nasa");E.smith.classList.toggle("active",mode==="smithsonian");E.europeana.classList.toggle("active",mode==="europeana");E.auto.classList.toggle("active",mode==="auto")}
+
+async function run(force=false){
+  const r=++runId,d=dateKey();clearTimeout(timer);buttons();E.date.textContent=`${d} (${TZ})`;E.loading.classList.remove("hide");
+  try{
+    try{rows=await readSheet();E.sheet.textContent=`Theme Sources loaded · ${rows.filter(x=>String(x.enabled).toLowerCase()==="yes").length} production enabled`}
+    catch(e){rows=[];E.sheet.textContent=`Sheet read failed · lab defaults (${e.message})`}
+    active=choose(d);cfg=settings(active);
+    const production=mode==="auto"&&rows.some(x=>String(x.enabled).toLowerCase()==="yes");
+    E.source.textContent=`${active}${production?"":" · LAB/TEST MODE"}`;E.settings.textContent=`${cfg.count} assets · ${cfg.seconds}s rotation`;
+    const key=`barbph_dd_v9_${d}_${active}`;
+    if(!force){try{const c=JSON.parse(localStorage.getItem(key)||"null");if(c?.length>=2){set=c;return show(0,r)}}catch{}}
+    E.state.textContent=`Contacting ${active}…`;
+    const collector=active===NASA.name?collectNASA:active===SI.name?collectSI:active===EU.name?collectEU:collectMet;
+    set=await Promise.race([collector(d,cfg.count),new Promise((_,rej)=>setTimeout(()=>rej(new Error("Source request timed out.")),36000))]);
+    localStorage.setItem(key,JSON.stringify(set));save(active,d,set);show(0,r);
+  }catch(e){fail(e.message||"Source unavailable",r)}
+}
 function select(m){mode=m;window.history.replaceState(null,"",m==="auto"?location.pathname:`${location.pathname}?source=${m}`);run(true)}
-E.retry.onclick=()=>run(true);E.met.onclick=()=>select("met");E.nasa.onclick=()=>select("nasa");E.smith.onclick=()=>select("smithsonian");E.auto.onclick=()=>select("auto");const initial=new URLSearchParams(location.search).get("source");if(["met","nasa","smithsonian"].includes(initial))mode=initial;run();})();</script></body></html>
+E.retry.onclick=()=>run(true);E.met.onclick=()=>select("met");E.nasa.onclick=()=>select("nasa");E.smith.onclick=()=>select("smithsonian");E.europeana.onclick=()=>select("europeana");E.auto.onclick=()=>select("auto");
+const initial=new URLSearchParams(location.search).get("source");if(["met","nasa","smithsonian","europeana"].includes(initial))mode=initial;
+run();
+})();
+</script>
+</body>
+</html>
