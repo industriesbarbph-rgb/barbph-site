@@ -2,10 +2,42 @@
   "task": "BarbPH Launch Hardening",
   "timezone": "Asia/Manila",
   "actual_start": "2026-08-21T03:13:09+08:00",
-  "actual_finish": null,
-  "work_completed": [],
-  "files_changed": [],
-  "tests_run": [],
-  "results": [],
-  "unresolved_issues": []
+  "actual_finish": "2026-08-21T03:23:18+08:00",
+  "work_completed": [
+    "Hardened Daily Discover prototype rendering by preloading image candidates and excluding unloadable assets before rotation.",
+    "Added graceful sponsor-media fallback behavior so failed video media leaves the approved generic visual world visible.",
+    "Added newsletter input trimming, a 12-second abort timeout, explicit timeout feedback, and alert semantics for errors.",
+    "Hardened Ticker pointer capture/release, interrupted-drag cleanup, orientation/visibility/pagehide handling, and compatible focus restoration.",
+    "Hardened Alive FAB keyboard/focus behavior with aria-controls, safe focus movement, close-on-focus-leave, and state-transition-only events.",
+    "Documented the complete hardening pass and preserved all launch guardrails."
+  ],
+  "files_changed": [
+    "assets/ticker-bones.js",
+    "assets/alive-fab.js",
+    "homepage-launch-test.html",
+    "BARBPH-LAUNCH-HARDENING-2026-08-21.md",
+    "overnight-work-log/02-launch-hardening.json"
+  ],
+  "tests_run": [
+    "Reviewed prior prototype audit before changing runtime prototype code.",
+    "Reviewed GitHub commit diff for ticker-bones hardening commit 8e6a0ef76ead05058f901d38d9111d319fcc0a3a.",
+    "Reviewed GitHub commit diff for Alive FAB hardening commit a2177ff653adb7d9af3d7a3b265fc18543044c7e.",
+    "Reviewed GitHub commit diff for homepage launch prototype hardening commit e51fdbe87d6faf54468b1f638686eb1a7aac4fa1.",
+    "Confirmed a ready Netlify production-context deploy for the shared asset hardening, with the existing 11 functions present and no deployment error.",
+    "Verified hardening commits did not modify index.html, Products, Programs, Daily Discover source arming, sponsor controls, or spreadsheet permissions."
+  ],
+  "results": [
+    "Ticker interruption paths now clean up drag state instead of risking a stranded transform/body lock.",
+    "Alive FAB now has stronger keyboard/menu relationships and closes when focus leaves it.",
+    "Daily Discover prototype rotation no longer admits known-unloadable image candidates.",
+    "Newsletter UI can recover from stalled requests and always restores the Join button.",
+    "Prototype hardening remains isolated from the root homepage launch and protected product/program pages."
+  ],
+  "unresolved_issues": [
+    "Footer clock timezone/location labeling remains a product decision and was not changed.",
+    "Decorative footer globe remains a prototype placeholder rather than launch-locked artwork.",
+    "Priority-controller sheet readability remains a fail-closed availability dependency.",
+    "Same-URL browser edge caching can still obscure cache_hit diagnostics; uncached/separate-session verification remains preferred.",
+    "No real-device iOS/Android/Safari browser matrix was available inside this automated run."
+  ]
 }
