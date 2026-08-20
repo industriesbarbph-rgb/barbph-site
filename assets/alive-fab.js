@@ -3,6 +3,12 @@
     root.dispatchEvent(new CustomEvent(name,{bubbles:true,detail:detail||{}}));
   }
 
+  function safeFocus(element){
+    if(!element)return;
+    try{element.focus({preventScroll:true});}
+    catch{try{element.focus();}catch{}}
+  }
+
   function makeItem(label,href,disabled){
     const a=document.createElement('a');
     a.className='alive-fab__item';
@@ -31,6 +37,7 @@
 
     const fan=document.createElement('div');
     fan.className='alive-fab__fan';
+    fan.id='alive-fab-menu';
     fan.setAttribute('role','menu');
     fan.setAttribute('aria-label','Products, Programs and Partnerships');
     fan.setAttribute('aria-hidden','true');
@@ -46,6 +53,7 @@
     main.setAttribute('aria-label','Open Products, Programs and Partnerships');
     main.setAttribute('aria-expanded','false');
     main.setAttribute('aria-haspopup','menu');
+    main.setAttribute('aria-controls',fan.id);
 
     root.append(fan,main);
     mount.appendChild(root);
@@ -59,10 +67,11 @@
       if(!items.length)return;
       const normalized=(index+items.length)%items.length;
       items.forEach((item,i)=>item.setAttribute('tabindex',i===normalized?'0':'-1'));
-      items[normalized].focus({preventScroll:true});
+      safeFocus(items[normalized]);
     }
 
     function setOpen(next,reason,focusIndex){
+      const wasOpen=open;
       open=Boolean(next);
       root.classList.toggle('is-open',open);
       main.setAttribute('aria-expanded',String(open));
@@ -72,11 +81,11 @@
         const items=enabledItems();
         items.forEach((item,i)=>item.setAttribute('tabindex',i===0?'0':'-1'));
         partnerships.setAttribute('tabindex',partnershipsHref?(partnerships.getAttribute('tabindex')||'-1'):'-1');
-        emit(root,'alivefab:open',{reason:reason||'api'});
-        if(Number.isInteger(focusIndex)) requestAnimationFrame(()=>focusItem(focusIndex));
+        if(!wasOpen)emit(root,'alivefab:open',{reason:reason||'api'});
+        if(Number.isInteger(focusIndex))requestAnimationFrame(()=>focusItem(focusIndex));
       }else{
         [products,programs,partnerships].forEach(item=>item.setAttribute('tabindex','-1'));
-        emit(root,'alivefab:close',{reason:reason||'api'});
+        if(wasOpen)emit(root,'alivefab:close',{reason:reason||'api'});
       }
     }
 
@@ -128,7 +137,7 @@
       }else if(event.key==='End'){
         event.preventDefault();focusItem(items.length-1);
       }else if(event.key==='Escape'){
-        event.preventDefault();setOpen(false,'escape');main.focus({preventScroll:true});
+        event.preventDefault();setOpen(false,'escape');safeFocus(main);
       }
     });
 
@@ -136,10 +145,15 @@
       if(open&&!root.contains(event.target))setOpen(false,'outside');
     });
 
+    document.addEventListener('focusin',function(event){
+      if(open&&!root.contains(event.target))setOpen(false,'focus-left');
+    });
+
     document.addEventListener('keydown',function(event){
       if(event.key==='Escape'&&open){
+        event.preventDefault();
         setOpen(false,'escape');
-        main.focus({preventScroll:true});
+        safeFocus(main);
       }
     });
 
@@ -158,7 +172,7 @@
         if(partnershipsHref){
           partnerships.href=partnershipsHref;
           partnerships.removeAttribute('aria-disabled');
-          partnerships.setAttribute('tabindex',open?'-1':'-1');
+          partnerships.setAttribute('tabindex','-1');
           if(open){const items=enabledItems();items.forEach((item,i)=>item.setAttribute('tabindex',i===0?'0':'-1'));}
         }else{
           partnerships.href='#';
