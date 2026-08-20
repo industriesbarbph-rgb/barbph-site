@@ -48,6 +48,7 @@ button.active{background:#ffffff38}.loading{position:absolute;inset:0;display:gr
 <button id="nasa">Test NASA</button>
 <button id="smith">Test Smithsonian</button>
 <button id="europeana">Test Europeana</button>
+<button id="loc">Test Library of Congress</button>
 <button id="auto">Spreadsheet mode</button>
 </div>
 </section>
@@ -66,8 +67,9 @@ const MET={name:"The Met Open Access",terms:["painting","landscape","portrait","
 const NASA={name:"NASA",terms:["Earth","Mars","Jupiter","Saturn","nebula","galaxy","aurora","Moon"],search:q=>`https://images-api.nasa.gov/search?q=${encodeURIComponent(q)}&media_type=image&page_size=50`};
 const SI={name:"Smithsonian Open Access",terms:["flowers","birds","minerals","painting","design","textile","ocean","space","insects","maps"],search:q=>`https://api.si.edu/openaccess/api/v1.0/search?q=${encodeURIComponent(q)}&rows=50&sort=random&api_key=DEMO_KEY`};
 const EU={name:"Europeana",terms:["painting","botanical","maps","photography","fashion","manuscript","archaeology","nature","design","portrait"],search:(q,seed)=>`/.netlify/functions/europeana?q=${encodeURIComponent(q)}&seed=${encodeURIComponent(seed)}&rows=60`};
+const LOC={name:"Library of Congress",search:(seed,count)=>`/.netlify/functions/library-of-congress?seed=${encodeURIComponent(seed)}&count=${encodeURIComponent(count)}`};
 const $=id=>document.getElementById(id);
-const E={a:$("a"),b:$("b"),loading:$("loading"),date:$("date"),source:$("source"),sheet:$("sheet"),settings:$("settings"),state:$("state"),title:$("title"),creator:$("creator"),slot:$("slot"),id:$("id"),rights:$("rights"),link:$("link"),retry:$("retry"),met:$("met"),nasa:$("nasa"),smith:$("smith"),europeana:$("europeana"),auto:$("auto")};
+const E={a:$("a"),b:$("b"),loading:$("loading"),date:$("date"),source:$("source"),sheet:$("sheet"),settings:$("settings"),state:$("state"),title:$("title"),creator:$("creator"),slot:$("slot"),id:$("id"),rights:$("rights"),link:$("link"),retry:$("retry"),met:$("met"),nasa:$("nasa"),smith:$("smith"),europeana:$("europeana"),loc:$("loc"),auto:$("auto")};
 let mode="auto",rows=[],set=[],layer=0,timer=null,runId=0,active="",cfg={count:3,seconds:18};
 
 const dateKey=()=>{const p=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),g=t=>p.find(x=>x.type===t)?.value;return`${g("year")}-${g("month")}-${g("day")}`};
@@ -109,8 +111,8 @@ async function readSheet(){
 function settings(name){const r=rows.find(x=>x.source_name===name)||{};return{count:Math.max(2,Math.min(5,+r.daily_asset_count||3)),seconds:Math.max(5,Math.min(120,+r.rotation_seconds||18))}}
 function choose(d){
   const forced=new URLSearchParams(location.search).get("source")?.toLowerCase()||mode;
-  if(forced==="met")return MET.name;if(forced==="nasa")return NASA.name;if(forced==="smithsonian")return SI.name;if(forced==="europeana")return EU.name;
-  const supported=[MET.name,NASA.name,SI.name,EU.name];
+  if(forced==="met")return MET.name;if(forced==="nasa")return NASA.name;if(forced==="smithsonian")return SI.name;if(forced==="europeana")return EU.name;if(forced==="loc")return LOC.name;
+  const supported=[MET.name,NASA.name,SI.name,EU.name,LOC.name];
   const ok=rows.filter(r=>String(r.enabled).toLowerCase()==="yes"&&supported.includes(r.source_name)&&+r.weight>0);
   if(!ok.length)return MET.name;
   const total=ok.reduce((a,r)=>a+(+r.weight),0);let p=(hash(`barbph|${d}|source`)/4294967296)*total;
@@ -125,6 +127,7 @@ function metItem(o){const image=o?.primaryImageSmall||o?.primaryImage||"";return
 function nasaItem(x){const d=x?.data?.[0]||{},l=(x?.links||[]).find(v=>v.render==="image")||{},id=String(d.nasa_id||""),image=String(l.href||""),bad=/copyright|all rights reserved|licensed|permission required|courtesy of (?!nasa)/i.test(`${d.title||""} ${d.description||""}`);return{id:`nasa:${id}`,raw:id,title:d.title||"Untitled NASA image",creator:d.photographer||d.center||"NASA",image,alt:"",url:id?`https://images.nasa.gov/details/${encodeURIComponent(id)}`:"https://images.nasa.gov/",rights:"NASA media guidelines · lab candidate",ok:!!(id&&/^https:/.test(image)&&!bad)}}
 function siItem(r){const c=r?.content||{},d=c.descriptiveNonRepeating||{},m=(d?.online_media?.media||[]).find(x=>String(x?.usage?.access||"").toUpperCase()==="CC0"&&/^https:/.test(String(x?.content||x?.thumbnail||""))),image=String(m?.content||m?.thumbnail||""),id=String(r?.id||d?.record_ID||"");return{id:`smith:${id}`,raw:id,title:r?.title||"Untitled Smithsonian object",creator:"Smithsonian Open Access",image,alt:String(m?.thumbnail||""),url:/^https?:/.test(String(r?.url||""))?r.url:"https://www.si.edu/openaccess",rights:"CC0 · Smithsonian Open Access",ok:!!(id&&image&&String(m?.usage?.access||"").toUpperCase()==="CC0")}}
 function euItem(x){const id=String(x?.id||"");return{id:`eu:${id}`,raw:id,title:x?.title||"Untitled Europeana object",creator:x?.creator||x?.dataProvider||"Europeana",image:String(x?.image||""),alt:String(x?.thumbnail||""),url:String(x?.sourceURL||"https://www.europeana.eu/"),rights:String(x?.rightsLabel||"PDM/CC0 · Europeana"),ok:!!(id&&/^https:/.test(String(x?.image||""))&&["PDM","CC0"].includes(String(x?.rightsCode||"")))}}
+function locItem(x){const id=String(x?.id||"");return{id:`loc:${id}`,raw:id,title:x?.title||"Untitled Library of Congress item",creator:x?.creator||"Library of Congress",image:String(x?.image||""),alt:String(x?.thumbnail||""),url:String(x?.sourceURL||"https://www.loc.gov/free-to-use/"),rights:"Free to Use and Reuse · Library of Congress",ok:!!(id&&/^https:/.test(String(x?.image||"")))}}
 
 async function collectMet(d,n){
   const u=used(MET.name,d),out=[],seen=new Set(),st=hash(`met|${d}`)%MET.terms.length;
@@ -157,6 +160,15 @@ async function collectEU(d,n){
   return out.slice(0,n);
 }
 
+async function collectLOC(d,n){
+  const u=used(LOC.name,d),out=[],seen=new Set();
+  E.state.textContent=`Library of Congress: 0/${n} free-to-use found…`;
+  const s=await get(LOC.search(hash(`loc|${d}`),Math.max(8,n*3)),24000);
+  for(const x of s?.items||[]){const a=locItem(x);if(a.ok&&!u.has(a.id)&&!seen.has(a.id)){out.push(a);seen.add(a.id);E.state.textContent=`Library of Congress: ${out.length}/${n} free-to-use found…`;if(out.length>=n)break}}
+  if(out.length<2)throw new Error(s?.error||"Library of Congress could not build a usable free-to-use set.");
+  return out.slice(0,n);
+}
+
 function load(url){return new Promise((ok,bad)=>{const i=new Image(),t=setTimeout(()=>bad(new Error("Image timeout")),22000);i.onload=()=>{clearTimeout(t);ok(url)};i.onerror=()=>{clearTimeout(t);bad(new Error("Image failed"))};i.src=url})}
 async function show(i,r,tries=0){
   if(r!==runId||!set.length)return;const n=((i%set.length)+set.length)%set.length,x=set[n];
@@ -168,7 +180,7 @@ async function show(i,r,tries=0){
   }catch(e){if(tries+1<set.length)return show(n+1,r,tries+1);fail(`${active}: ${e.message}`,r)}
 }
 function fail(msg,r=runId){if(r!==runId)return;clearTimeout(timer);set=[];E.a.classList.remove("on");E.b.classList.remove("on");E.loading.classList.add("hide");E.title.textContent="Safe fallback active";E.creator.textContent=msg;E.state.textContent=`FAILED — ${msg}`}
-function buttons(){E.met.classList.toggle("active",mode==="met");E.nasa.classList.toggle("active",mode==="nasa");E.smith.classList.toggle("active",mode==="smithsonian");E.europeana.classList.toggle("active",mode==="europeana");E.auto.classList.toggle("active",mode==="auto")}
+function buttons(){E.met.classList.toggle("active",mode==="met");E.nasa.classList.toggle("active",mode==="nasa");E.smith.classList.toggle("active",mode==="smithsonian");E.europeana.classList.toggle("active",mode==="europeana");E.loc.classList.toggle("active",mode==="loc");E.auto.classList.toggle("active",mode==="auto")}
 
 async function run(force=false){
   const r=++runId,d=dateKey();clearTimeout(timer);buttons();E.date.textContent=`${d} (${TZ})`;E.loading.classList.remove("hide");
@@ -178,17 +190,17 @@ async function run(force=false){
     active=choose(d);cfg=settings(active);
     const production=mode==="auto"&&rows.some(x=>String(x.enabled).toLowerCase()==="yes");
     E.source.textContent=`${active}${production?"":" · LAB/TEST MODE"}`;E.settings.textContent=`${cfg.count} assets · ${cfg.seconds}s rotation`;
-    const key=`barbph_dd_v9_${d}_${active}`;
+    const key=`barbph_dd_v10_${d}_${active}`;
     if(!force){try{const c=JSON.parse(localStorage.getItem(key)||"null");if(c?.length>=2){set=c;return show(0,r)}}catch{}}
     E.state.textContent=`Contacting ${active}…`;
-    const collector=active===NASA.name?collectNASA:active===SI.name?collectSI:active===EU.name?collectEU:collectMet;
+    const collector=active===NASA.name?collectNASA:active===SI.name?collectSI:active===EU.name?collectEU:active===LOC.name?collectLOC:collectMet;
     set=await Promise.race([collector(d,cfg.count),new Promise((_,rej)=>setTimeout(()=>rej(new Error("Source request timed out.")),36000))]);
     localStorage.setItem(key,JSON.stringify(set));save(active,d,set);show(0,r);
   }catch(e){fail(e.message||"Source unavailable",r)}
 }
 function select(m){mode=m;window.history.replaceState(null,"",m==="auto"?location.pathname:`${location.pathname}?source=${m}`);run(true)}
-E.retry.onclick=()=>run(true);E.met.onclick=()=>select("met");E.nasa.onclick=()=>select("nasa");E.smith.onclick=()=>select("smithsonian");E.europeana.onclick=()=>select("europeana");E.auto.onclick=()=>select("auto");
-const initial=new URLSearchParams(location.search).get("source");if(["met","nasa","smithsonian","europeana"].includes(initial))mode=initial;
+E.retry.onclick=()=>run(true);E.met.onclick=()=>select("met");E.nasa.onclick=()=>select("nasa");E.smith.onclick=()=>select("smithsonian");E.europeana.onclick=()=>select("europeana");E.loc.onclick=()=>select("loc");E.auto.onclick=()=>select("auto");
+const initial=new URLSearchParams(location.search).get("source");if(["met","nasa","smithsonian","europeana","loc"].includes(initial))mode=initial;
 run();
 })();
 </script>
