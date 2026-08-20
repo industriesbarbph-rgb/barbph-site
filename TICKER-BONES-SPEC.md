@@ -1,90 +1,57 @@
 # BarbPH Ticker Bones — Locked Interaction Spec
 
-Status: functional ticker skeleton implemented as a standalone prototype. It is **not** integrated into the official homepage yet.
+Status: Ticker Bones v2 prototype implemented. It is **not** integrated into the official homepage yet.
 
-## Purpose
+## Current panel geometry
 
-Build the permanent ticker mechanics now so the real content feeds can be switched on later without rebuilding the triangle, glass panel, gesture system, content zones, or homepage layout.
+- The ticker opens from the top and stops at about **48% of the viewport**, rather than covering the full screen.
+- **Testimonials own the top 37.5% of the ticker panel.**
+- The remaining **62.5%** is a six-line exchange board.
+- Publications and The Bulletin have been removed from Ticker Bones and are now reserved for future Patroller responsibilities.
 
-Full feed activation remains targeted for **around December 2026**.
+## Exchange-board identity
 
-## Locked trigger
+The six scrolling rows use a stock-market / terminal visual language rather than cards.
 
-- A **self-drawing triangle** sits at the top center of the future homepage hero.
-- The triangle itself carries no visible instructional words.
-- Click/tap toggles the ticker for discoverability and accessibility.
-- Pull/drag downward opens the ticker.
-- When open, dragging upward closes it.
+- Primary ticker font: **VT323**.
+- Base board background: **black**.
+- Supported visual treatments:
+  - blue text on black
+  - green text on black
+  - white text on black
+  - black text on white
+- Product and Program names are followed by short descriptions inside continuous horizontal streams.
+- Rows may move in alternating directions and at slightly different speeds to create a living-market-board effect.
+- The prototype uses three Product rows and three Program rows.
+
+## Triangle / pull interaction
+
+- The triangle remains the top-center trigger.
+- It self-draws with a luminous trace.
+- It performs a small downward tug while closed, creating a visual invitation to pull.
+- On open, the triangle rides down with the panel to its lower edge, making the control feel like it physically pulled the board into view.
+- Click/tap still toggles the ticker.
+- Pull/drag downward still opens it.
+- Drag upward while open still closes it.
 - Escape closes the ticker and returns focus to the triangle.
-- Pointer Events provide one gesture path for mouse, pen, and touch.
+- Pointer Events provide the shared mouse/pen/touch gesture path.
 
-## Locked panel behavior
+## Testimonials
 
-- Opens into a **frosted-glass full-screen panel**.
-- The panel occupies the full viewport rather than appearing as a card or drawer inside another frame.
-- Body scrolling is locked while the panel is open.
-- Motion respects `prefers-reduced-motion`.
-- The triangle reverses orientation while the panel is open so the same control visually communicates closing.
+Testimonials remain the calmest portion of the board and sit above the six moving lanes. They retain crossfade support for future live testimonial content.
 
-## Permanent content-zone proportions
+## Feed policy
 
-The full-screen panel uses three permanent vertical bands:
-
-1. **Top ~1/8 — Testimonials**
-   - one item at a time
-   - gentle crossfade socket
-
-2. **Middle ~5/8 — Products + Programs**
-   - two long horizontal streams
-   - opposite movement directions
-   - Products moves one way; Programs moves the other
-
-3. **Bottom ~1/4 — Publications + The Bulletin**
-   - two permanent sockets
-   - gentle crossfade behavior when multiple items exist
-
-These five named zones are permanent:
-
-- Testimonials
-- Products
-- Programs
-- Publications
-- The Bulletin
-
-## Current placeholder policy
-
-The prototype uses restrained `Coming soon` placeholders only to prove layout and motion.
-
-The component does **not** fetch production content, read feeds, or activate any December feed system yet.
-
-Empty-zone collapse support is prepared in the component API so future feeds can suppress genuinely empty sockets without changing the core panel.
+The prototype is visual/interaction infrastructure only. Real spreadsheet/feed wiring remains off for now and can be connected later without rebuilding the panel mechanics.
 
 ## Accessibility
 
-- Main triangle is a real button with an accessible label.
+- Triangle is a real button with an accessible label.
 - `aria-expanded` reflects open/closed state.
 - Panel exposes `aria-hidden` state.
-- Enter/Space toggles from the focused triangle.
+- Enter/Space toggles the ticker.
 - Escape closes and returns focus.
-- Reduced-motion preferences stop self-drawing and stream motion.
-- Mobile and desktop share the same Pointer Events gesture logic.
-
-## Integration hooks
-
-The component exposes:
-
-- `window.BarbTickerBones.open()`
-- `window.BarbTickerBones.close()`
-- `window.BarbTickerBones.toggle()`
-- `window.BarbTickerBones.syncEmptyZones()`
-- `window.BarbTickerBones.isOpen`
-
-It also emits bubbling DOM events:
-
-- `barb:ticker-open`
-- `barb:ticker-close`
-
-These hooks allow future Patroller/homepage behavior to coordinate with the ticker without rewriting the ticker mechanics.
+- `prefers-reduced-motion` disables the self-drawing invitation and ticker motion.
 
 ## Prototype files
 
@@ -92,8 +59,8 @@ These hooks allow future Patroller/homepage behavior to coordinate with the tick
 - `/assets/ticker-bones.js`
 - `/ticker-bones-test.html`
 
-The prototype page is diagnostic-only and must remain `noindex,nofollow` and outside the sitemap.
+The prototype stays `noindex,nofollow` and outside the sitemap.
 
 ## Homepage guardrail
 
-Do not create or modify `index.html` merely to test Ticker Bones. The component should be inserted only when the official homepage shell phase begins.
+Do not create or modify `index.html` merely to test Ticker Bones. Integrate this component only during the official homepage-shell phase.

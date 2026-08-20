@@ -4,153 +4,94 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>Ticker Bones Lab — BarbPH</title>
+  <title>Ticker Bones Exchange Lab — BarbPH</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=VT323&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/ticker-bones.css">
   <style>
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
-    body {
-      min-height: 100dvh;
-      overflow: hidden;
-      color: white;
-      font-family: 'Work Sans', sans-serif;
-      background:
-        radial-gradient(circle at 18% 20%, rgba(56, 88, 166, .78), transparent 34%),
-        radial-gradient(circle at 79% 30%, rgba(157, 62, 96, .62), transparent 32%),
-        radial-gradient(circle at 62% 82%, rgba(22, 115, 105, .58), transparent 32%),
-        linear-gradient(145deg, #070811, #121629 44%, #090b13);
-    }
-    .lab-stage {
-      min-height: 100dvh;
-      position: relative;
-      isolation: isolate;
-      overflow: hidden;
-    }
-    .lab-stage::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image:
-        radial-gradient(circle at 20% 30%, rgba(255,255,255,.9) 0 1px, transparent 1.5px),
-        radial-gradient(circle at 72% 63%, rgba(255,255,255,.7) 0 1px, transparent 1.5px),
-        radial-gradient(circle at 44% 78%, rgba(255,255,255,.6) 0 1px, transparent 1.5px);
-      background-size: 190px 190px, 250px 250px, 330px 330px;
-      opacity: .5;
-      pointer-events: none;
-    }
-    .lab-copy {
-      position: absolute;
-      left: clamp(22px, 5vw, 72px);
-      bottom: clamp(26px, 6vh, 70px);
-      z-index: 2;
-      max-width: 520px;
-      padding-right: 22px;
-    }
-    .lab-kicker {
-      margin: 0 0 10px;
-      font-size: 10px;
-      letter-spacing: .24em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.52);
-    }
-    .lab-copy h1 {
-      margin: 0 0 12px;
-      font: 400 clamp(27px, 5vw, 56px)/1.02 'Marcellus', serif;
-      letter-spacing: .03em;
-    }
-    .lab-copy p {
-      margin: 0;
-      max-width: 480px;
-      color: rgba(255,255,255,.7);
-      line-height: 1.65;
-      font-size: 13px;
-    }
-    .lab-note {
-      display: inline-block;
-      margin-top: 14px;
-      padding: 7px 10px;
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 999px;
-      background: rgba(255,255,255,.055);
-      color: rgba(255,255,255,.56);
-      font-size: 10px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
+    *{box-sizing:border-box} html,body{margin:0;min-height:100%}
+    body{min-height:100dvh;overflow:hidden;color:white;font-family:'Work Sans',sans-serif;background:radial-gradient(circle at 18% 20%,rgba(56,88,166,.78),transparent 34%),radial-gradient(circle at 79% 30%,rgba(157,62,96,.62),transparent 32%),radial-gradient(circle at 62% 82%,rgba(22,115,105,.58),transparent 32%),linear-gradient(145deg,#070811,#121629 44%,#090b13)}
+    .lab-stage{min-height:100dvh;position:relative;isolation:isolate;overflow:hidden}
+    .lab-stage::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 20% 30%,rgba(255,255,255,.9) 0 1px,transparent 1.5px),radial-gradient(circle at 72% 63%,rgba(255,255,255,.7) 0 1px,transparent 1.5px),radial-gradient(circle at 44% 78%,rgba(255,255,255,.6) 0 1px,transparent 1.5px);background-size:190px 190px,250px 250px,330px 330px;opacity:.5;pointer-events:none}
+    .lab-copy{position:absolute;left:clamp(22px,5vw,72px);bottom:clamp(26px,6vh,70px);z-index:2;max-width:560px;padding-right:22px}
+    .lab-kicker{margin:0 0 10px;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.52)}
+    .lab-copy h1{margin:0 0 12px;font:400 clamp(27px,5vw,56px)/1.02 'Marcellus',serif;letter-spacing:.03em}
+    .lab-copy p{margin:0;max-width:520px;color:rgba(255,255,255,.7);line-height:1.65;font-size:13px}
+    .lab-note{display:inline-block;margin-top:14px;padding:7px 10px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.055);color:rgba(255,255,255,.56);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
   </style>
 </head>
 <body>
-  <main class="lab-stage" aria-label="Ticker Bones prototype stage">
+  <main class="lab-stage" aria-label="Ticker Bones exchange prototype stage">
     <div class="lab-copy">
-      <p class="lab-kicker">BarbPH / interaction lab</p>
-      <h1>Ticker Bones</h1>
-      <p>Use the self-drawing triangle at the top center. Click it, or pull/drag it downward. When the glass is open, tap the triangle again or drag upward to close. Press Escape anytime.</p>
-      <span class="lab-note">Feed sockets only — full feeds stay asleep until around Dec 2026</span>
+      <p class="lab-kicker">BarbPH / exchange-board lab</p>
+      <h1>Ticker Bones v2</h1>
+      <p>Watch the triangle draw itself, glow and tug downward. Click it or drag it. The board now stops at roughly half the screen: testimonials above, six terminal-style ticker lanes below.</p>
+      <span class="lab-note">VT323 / black board / six ticker lanes</span>
     </div>
   </main>
 
   <div class="barb-ticker" data-barb-ticker>
-    <section class="barb-ticker__panel" data-ticker-panel aria-hidden="true" aria-label="BarbPH ticker panel">
-      <section class="barb-ticker__zone barb-ticker__testimonials" data-ticker-zone="testimonials">
+    <section class="barb-ticker__panel" id="barb-ticker-panel" data-ticker-panel aria-hidden="true" aria-label="BarbPH ticker panel">
+      <section class="barb-ticker__testimonials" data-ticker-zone="testimonials">
         <h2 class="barb-ticker__zone-label">Testimonials</h2>
-        <div class="barb-ticker__crossfade" data-crossfade data-zone-content>
-          <div class="barb-ticker__crossfade-item is-active" data-crossfade-item>Coming soon</div>
+        <div class="barb-ticker__crossfade" data-crossfade>
+          <div class="barb-ticker__crossfade-item is-active" data-crossfade-item>Testimonials stay here — this band now owns 37.5% of the ticker panel.</div>
         </div>
       </section>
 
-      <section class="barb-ticker__zone barb-ticker__middle" aria-label="Products and Programs streams">
-        <div class="barb-ticker__stream" data-ticker-zone="products" data-direction="left">
-          <h2 class="barb-ticker__zone-label">Products</h2>
-          <div class="barb-ticker__track" data-zone-content>
-            <div class="barb-ticker__stream-card">Coming soon</div>
-            <div class="barb-ticker__stream-card" aria-hidden="true">Coming soon</div>
-            <div class="barb-ticker__stream-card" aria-hidden="true">Coming soon</div>
-            <div class="barb-ticker__stream-card" aria-hidden="true">Coming soon</div>
-            <div class="barb-ticker__stream-card" aria-hidden="true">Coming soon</div>
+      <section class="barb-ticker__board" aria-label="Products and Programs exchange board">
+        <div class="barb-ticker__lane barb-ticker__lane--blue" data-direction="left" data-speed="fast">
+          <div class="barb-ticker__marquee">
+            <div class="barb-ticker__run"><span class="barb-ticker__type">PRODUCTS</span><span class="barb-ticker__name">JANA</span><span class="barb-ticker__desc">private notepad system</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">WILL WHEEL</span><span class="barb-ticker__desc">KPI dashboard and planning tool</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">ORANGE ENGINE</span><span class="barb-ticker__desc">visual utility engine</span><span class="barb-ticker__sep">◆</span></div>
+            <div class="barb-ticker__run" aria-hidden="true"><span class="barb-ticker__type">PRODUCTS</span><span class="barb-ticker__name">JANA</span><span class="barb-ticker__desc">private notepad system</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">WILL WHEEL</span><span class="barb-ticker__desc">KPI dashboard and planning tool</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">ORANGE ENGINE</span><span class="barb-ticker__desc">visual utility engine</span><span class="barb-ticker__sep">◆</span></div>
           </div>
         </div>
 
-        <div class="barb-ticker__stream" data-ticker-zone="programs" data-direction="right">
-          <h2 class="barb-ticker__zone-label">Programs</h2>
-          <div class="barb-ticker__track" data-zone-content>
-            <div class="barb-ticker__stream-card">Coming soon</div>
-            <div class="barb-ticker__stream-card" aria-hidden="true">Coming soon</div>
-            <div class="barb-ticker__stream-card" aria-hidden="true">Coming soon</div>
-            <div class="barb-ticker__stream-card" aria-hidden="true">Coming soon</div>
-            <div class="barb-ticker__stream-card" aria-hidden="true">Coming soon</div>
+        <div class="barb-ticker__lane barb-ticker__lane--green" data-direction="right" data-speed="slow">
+          <div class="barb-ticker__marquee">
+            <div class="barb-ticker__run"><span class="barb-ticker__type">PROGRAMS</span><span class="barb-ticker__name">CAREER NAVIGATION</span><span class="barb-ticker__desc">guided career direction and planning</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">JOB INTERVIEW PRACTICE</span><span class="barb-ticker__desc">focused interview preparation</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">COACH DOLL 1:1</span><span class="barb-ticker__desc">personal mentorship sessions</span><span class="barb-ticker__sep">◆</span></div>
+            <div class="barb-ticker__run" aria-hidden="true"><span class="barb-ticker__type">PROGRAMS</span><span class="barb-ticker__name">CAREER NAVIGATION</span><span class="barb-ticker__desc">guided career direction and planning</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">JOB INTERVIEW PRACTICE</span><span class="barb-ticker__desc">focused interview preparation</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">COACH DOLL 1:1</span><span class="barb-ticker__desc">personal mentorship sessions</span><span class="barb-ticker__sep">◆</span></div>
           </div>
         </div>
-      </section>
 
-      <section class="barb-ticker__zone barb-ticker__bottom" aria-label="Publications and The Bulletin">
-        <div class="barb-ticker__bottom-cell" data-ticker-zone="publications">
-          <h2 class="barb-ticker__zone-label">Publications</h2>
-          <div class="barb-ticker__crossfade" data-crossfade data-zone-content>
-            <div class="barb-ticker__crossfade-item is-active" data-crossfade-item>Coming soon</div>
+        <div class="barb-ticker__lane barb-ticker__lane--white" data-direction="left">
+          <div class="barb-ticker__marquee">
+            <div class="barb-ticker__run"><span class="barb-ticker__type">PRODUCTS</span><span class="barb-ticker__name">THE BIBLE</span><span class="barb-ticker__desc">day and night reading experience</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">LUNA ROSA</span><span class="barb-ticker__desc">interactive digital world</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">DUPLITRON 526</span><span class="barb-ticker__desc">BarbPH original build</span><span class="barb-ticker__sep">◆</span></div>
+            <div class="barb-ticker__run" aria-hidden="true"><span class="barb-ticker__type">PRODUCTS</span><span class="barb-ticker__name">THE BIBLE</span><span class="barb-ticker__desc">day and night reading experience</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">LUNA ROSA</span><span class="barb-ticker__desc">interactive digital world</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">DUPLITRON 526</span><span class="barb-ticker__desc">BarbPH original build</span><span class="barb-ticker__sep">◆</span></div>
           </div>
         </div>
-        <div class="barb-ticker__bottom-cell" data-ticker-zone="bulletin">
-          <h2 class="barb-ticker__zone-label">The Bulletin</h2>
-          <div class="barb-ticker__crossfade" data-crossfade data-zone-content>
-            <div class="barb-ticker__crossfade-item is-active" data-crossfade-item>Coming soon</div>
+
+        <div class="barb-ticker__lane barb-ticker__lane--inverse" data-direction="right" data-speed="fast">
+          <div class="barb-ticker__marquee">
+            <div class="barb-ticker__run"><span class="barb-ticker__type">PROGRAMS</span><span class="barb-ticker__name">RESEARCH + DEFEND</span><span class="barb-ticker__desc">self-paced framework research and defense format</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">PRACTICAL LEARNING</span><span class="barb-ticker__desc">new offerings appear as they are published</span><span class="barb-ticker__sep">◆</span></div>
+            <div class="barb-ticker__run" aria-hidden="true"><span class="barb-ticker__type">PROGRAMS</span><span class="barb-ticker__name">RESEARCH + DEFEND</span><span class="barb-ticker__desc">self-paced framework research and defense format</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">PRACTICAL LEARNING</span><span class="barb-ticker__desc">new offerings appear as they are published</span><span class="barb-ticker__sep">◆</span></div>
+          </div>
+        </div>
+
+        <div class="barb-ticker__lane barb-ticker__lane--blue" data-direction="left" data-speed="slow">
+          <div class="barb-ticker__marquee">
+            <div class="barb-ticker__run"><span class="barb-ticker__type">PRODUCTS</span><span class="barb-ticker__name">PENDANT LOUNGE</span><span class="barb-ticker__desc">interactive BarbPH experience</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">NO HUMAN CONVERSATION</span><span class="barb-ticker__desc">experimental digital experience</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">SECOND FLOOR MARKETPLACE</span><span class="barb-ticker__desc">marketplace environment</span><span class="barb-ticker__sep">◆</span></div>
+            <div class="barb-ticker__run" aria-hidden="true"><span class="barb-ticker__type">PRODUCTS</span><span class="barb-ticker__name">PENDANT LOUNGE</span><span class="barb-ticker__desc">interactive BarbPH experience</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">NO HUMAN CONVERSATION</span><span class="barb-ticker__desc">experimental digital experience</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">SECOND FLOOR MARKETPLACE</span><span class="barb-ticker__desc">marketplace environment</span><span class="barb-ticker__sep">◆</span></div>
+          </div>
+        </div>
+
+        <div class="barb-ticker__lane barb-ticker__lane--green" data-direction="right">
+          <div class="barb-ticker__marquee">
+            <div class="barb-ticker__run"><span class="barb-ticker__type">PROGRAMS</span><span class="barb-ticker__name">MENTORSHIP</span><span class="barb-ticker__desc">one-on-one guidance</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">CAREER PRACTICE</span><span class="barb-ticker__desc">practical skill sessions</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">NEW PROGRAMS</span><span class="barb-ticker__desc">published offerings join this live board automatically later</span><span class="barb-ticker__sep">◆</span></div>
+            <div class="barb-ticker__run" aria-hidden="true"><span class="barb-ticker__type">PROGRAMS</span><span class="barb-ticker__name">MENTORSHIP</span><span class="barb-ticker__desc">one-on-one guidance</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">CAREER PRACTICE</span><span class="barb-ticker__desc">practical skill sessions</span><span class="barb-ticker__sep">◆</span><span class="barb-ticker__name">NEW PROGRAMS</span><span class="barb-ticker__desc">published offerings join this live board automatically later</span><span class="barb-ticker__sep">◆</span></div>
           </div>
         </div>
       </section>
     </section>
 
     <button class="barb-ticker__handle" type="button" data-ticker-handle aria-label="Open BarbPH ticker" aria-expanded="false" aria-controls="barb-ticker-panel">
-      <svg class="barb-ticker__triangle" viewBox="0 0 32 24" aria-hidden="true">
-        <path d="M4 5 L28 5 L16 20 Z"></path>
-      </svg>
+      <span class="barb-ticker__triangle-wrap" aria-hidden="true">
+        <svg class="barb-ticker__triangle" viewBox="0 0 32 24"><path d="M4 5 L28 5 L16 20 Z"></path></svg>
+      </span>
     </button>
   </div>
 
-  <script>
-    document.querySelector('[data-ticker-panel]').id = 'barb-ticker-panel';
-  </script>
   <script src="/assets/ticker-bones.js"></script>
 </body>
 </html>
