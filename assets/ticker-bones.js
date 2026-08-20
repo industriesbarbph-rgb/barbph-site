@@ -12,9 +12,21 @@
   const viewportHeight = () => Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 1);
   const panelHeight = () => Math.max(1, panel.getBoundingClientRect().height || viewportHeight() * .48);
   const openThreshold = () => Math.min(110, Math.max(62, panelHeight() * .22));
+  const firstPanelFocusable = () => panel.querySelector('input:not([disabled]),button:not([disabled]),a[href],select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])');
 
   function emit(name) {
     root.dispatchEvent(new CustomEvent(name,{bubbles:true}));
+  }
+
+  function setPanelAccessibility(open) {
+    panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+    if (open) {
+      panel.removeAttribute('inert');
+      try { panel.inert = false; } catch {}
+    } else {
+      panel.setAttribute('inert','');
+      try { panel.inert = true; } catch {}
+    }
   }
 
   function setPanelDrag(px) {
@@ -35,30 +47,35 @@
     handle.style.top = '';
   }
 
-  function openTicker({focus=false}={}) {
-    if (state.open) return;
+  function openTicker({focus=false,focusPanel=false}={}) {
+    if (state.open) {
+      if (focusPanel) firstPanelFocusable()?.focus({preventScroll:true});
+      return;
+    }
     state.open = true;
     clearPanelDrag();
     root.classList.add('is-open');
     root.classList.remove('is-dragging');
     handle.setAttribute('aria-expanded','true');
     handle.setAttribute('aria-label','Close BarbPH ticker');
-    panel.setAttribute('aria-hidden','false');
+    setPanelAccessibility(true);
     document.body.classList.add('barb-ticker-lock');
-    if (focus) handle.focus({preventScroll:true});
+    if (focusPanel) requestAnimationFrame(() => firstPanelFocusable()?.focus({preventScroll:true}));
+    else if (focus) handle.focus({preventScroll:true});
     emit('barb:ticker-open');
   }
 
   function closeTicker({focus=false}={}) {
     if (!state.open && !root.classList.contains('is-open')) return;
+    const focusWasInside = panel.contains(document.activeElement);
     state.open = false;
     clearPanelDrag();
     root.classList.remove('is-open','is-dragging');
     handle.setAttribute('aria-expanded','false');
     handle.setAttribute('aria-label','Open BarbPH ticker');
-    panel.setAttribute('aria-hidden','true');
+    setPanelAccessibility(false);
     document.body.classList.remove('barb-ticker-lock');
-    if (focus) handle.focus({preventScroll:true});
+    if (focus || focusWasInside) handle.focus({preventScroll:true});
     emit('barb:ticker-close');
   }
 
@@ -99,11 +116,10 @@
 
     if (!state.open && delta >= openThreshold()) openTicker();
     else if (state.open && delta <= -openThreshold() * .7) closeTicker();
-    else state.open ? openTicker() : closeTicker();
   }
 
   function cancelDrag(event) {
-    if (!state.dragging || event.pointerId !== state.pointerId) return;
+    if (!state.dragging || (event && event.pointerId !== state.pointerId)) return;
     state.dragging = false;
     state.pointerId = null;
     root.classList.remove('is-dragging');
@@ -114,11 +130,14 @@
   handle.addEventListener('pointermove',moveDrag);
   handle.addEventListener('pointerup',finishDrag);
   handle.addEventListener('pointercancel',cancelDrag);
+  window.addEventListener('blur',() => cancelDrag());
+  window.addEventListener('resize',() => cancelDrag(),{passive:true});
 
   handle.addEventListener('keydown',(event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      toggleTicker();
+      if (state.open) closeTicker({focus:true});
+      else openTicker({focusPanel:true});
     }
   });
 
@@ -133,16 +152,23 @@
     const items = Array.from(container.querySelectorAll('[data-crossfade-item]'));
     if (!items.length) return;
     let index = Math.max(0,items.findIndex(item => item.classList.contains('is-active')));
-    items.forEach((item,i) => item.classList.toggle('is-active',i === index));
+    items.forEach((item,i) => {
+      item.classList.toggle('is-active',i === index);
+      item.setAttribute('aria-hidden', i === index ? 'false' : 'true');
+    });
     if (items.length < 2 || reduceMotion.matches) return;
     window.setInterval(() => {
       items[index].classList.remove('is-active');
+      items[index].setAttribute('aria-hidden','true');
       index = (index + 1) % items.length;
       items[index].classList.add('is-active');
+      items[index].setAttribute('aria-hidden','false');
     },6200);
   }
 
+  setPanelAccessibility(false);
   root.querySelectorAll('[data-crossfade]').forEach(initCrossfade);
+  window.addEventListener('pagehide',() => document.body.classList.remove('barb-ticker-lock'),{once:true});
 
   window.BarbTickerBones = Object.freeze({
     open:() => openTicker(),
