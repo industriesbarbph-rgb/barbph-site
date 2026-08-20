@@ -1,4 +1,4 @@
-const clean=v=>String(Array.isArray(v)?v[0]||"":v||"").replace(/<[^>]+>/g," ").replace(/&amp;/g,"&").replace(/&#39;/g,"'").replace(/&quot;/g,'"').replace(/\s+/g," ").trim();
+const clean=v=>String(Array.isArray(v)?v[0]||"":v||"").replace(/<[^>]+>/g," ").replace(/&amp;/g,"&").replace(/&#39;/g,"'").replace(/&quot;/g,'"').replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();
 const asHttps=(v,base="")=>{try{const u=new URL(String(v||""),base||undefined);if(!/^https?:$/.test(u.protocol))return"";u.protocol="https:";return u.href}catch{return""}};
 const hash=s=>{let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0};
 const out=(body,status=200)=>Response.json(body,{status,headers:{"cache-control":status===200?"public, max-age=300, s-maxage=1800":"no-store"}});
@@ -6,13 +6,26 @@ async function getJSON(url,ms=14000){const c=new AbortController(),t=setTimeout(
 async function getText(url,ms=14000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{const r=await fetch(url,{signal:c.signal,headers:{Accept:"text/html,*/*;q=.8","User-Agent":"BarbPH-Daily-Discover/1.0"}});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.text()}finally{clearTimeout(t)}}
 function imagesFromHTML(html,base,label,rights,seed){const items=[],seen=new Set();const tags=String(html).match(/<img\b[^>]*>/gi)||[];for(const tag of tags){const alt=clean(tag.match(/\balt=["']([^"']*)["']/i)?.[1]||"");const srcset=tag.match(/\bsrcset=["']([^"']+)["']/i)?.[1]||"";const src=tag.match(/\b(?:data-src|data-original|src)=["']([^"']+)["']/i)?.[1]||"";let candidate=src;if(srcset){const parts=srcset.split(",").map(x=>x.trim().split(/\s+/)[0]).filter(Boolean);candidate=parts.at(-1)||candidate}const image=asHttps(candidate,base);if(!image||seen.has(image)||/logo|icon|avatar|sprite|seal|favicon|placeholder|loading/i.test(image))continue;if(/copyright|all rights reserved|courtesy of (?!noaa|usgs)|shutterstock|getty images|istock/i.test(`${tag} ${alt}`))continue;if(/\b(person|people|man |woman |child|crew|staff|scientist|portrait)\b/i.test(alt))continue;seen.add(image);items.push({id:`${label.toLowerCase().replace(/\W+/g,"-")}:${hash(image)}`,title:alt||`${label} discovery`,creator:label,image,thumbnail:image,sourceURL:base,rightsLabel:rights})}if(items.length>1){const start=seed%items.length;return items.slice(start).concat(items.slice(0,start))}return items}
 
-async function noaa(seed){const pages=[
-"https://www.noaa.gov/noaa-collections/collections/photo-library/4617",
-"https://www.noaa.gov/noaa-collections/collections/photo-library/4163",
-"https://www.noaa.gov/noaa-collections/collections/photo-library/2327",
-"https://www.noaa.gov/noaa-collections/collections/photo-library/2412",
-"https://www.noaa.gov/noaa-collections/collections/photo-library"
-];let all=[];for(let k=0;k<pages.length&&all.length<12;k++){const url=pages[(seed+k)%pages.length];try{const html=await getText(url);if(/verify you are human|captcha|access denied/i.test(html))continue;all.push(...imagesFromHTML(html,url,"NOAA","Public domain unless otherwise noted · NOAA",seed+k))}catch{}}const uniq=[...new Map(all.map(x=>[x.image,x])).values()];if(uniq.length<2)return out({error:"NOAA lab adapter reached the official gallery but could not extract two conservative image candidates. Keep this source parked until we refine the gallery parser."},503);return out({source:"NOAA",items:uniq.slice(0,12)});}
+function htmlAttr(tag,name){const m=String(tag).match(new RegExp(`\\b${name}=["']([^"']+)["']`,`i`));return clean(m?.[1]||"")}
+function metaValue(html,key){const tags=String(html).match(/<meta\b[^>]*>/gi)||[];for(const tag of tags){const prop=htmlAttr(tag,"property")||htmlAttr(tag,"name");if(prop.toLowerCase()===String(key).toLowerCase())return clean(htmlAttr(tag,"content"))}return""}
+function noaaDetailLinks(html,base){const links=[];for(const tag of String(html).match(/<a\b[^>]*href=["'][^"']+["'][^>]*>/gi)||[]){const u=asHttps(htmlAttr(tag,"href"),base);if(!u)continue;try{const x=new URL(u);if(x.hostname!=="oceanexplorer.noaa.gov")continue;if(!x.pathname.startsWith("/multimedia/"))continue;if(x.pathname==="/multimedia/"||/\/(?:topics?|collections?|wallpapers?|videos?|images?)\/?$/i.test(x.pathname))continue;links.push(x.origin+x.pathname)}catch{}}return[...new Set(links)]}
+function noaaItemFromPage(html,url){const plain=clean(html);const title=metaValue(html,"og:title")||clean(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1]||"")||"NOAA Ocean Exploration discovery";if(/\b(team|crew|scientist|researcher|person|people|portrait|student|staff|diver)\b/i.test(title))return null;const creditMatch=plain.match(/\bCredit\b\s*(.{0,700}?)(?:\bDownload\b|\bAvailable Downloads\b|\bRelated (?:Content|Expedition)\b|$)/i);const credit=clean(creditMatch?.[1]||"");if(/copyright|©|all rights reserved/i.test(credit))return null;const candidates=[];for(const m of String(html).matchAll(/<a\b[^>]*href=["']([^"']+\.(?:jpe?g|png|webp)(?:\?[^"']*)?)["'][^>]*>([\s\S]{0,220}?)<\/a>/gi)){const image=asHttps(m[1],url);if(!image||/logo|icon|seal|favicon|sprite|thumbnail/i.test(image))continue;const label=clean(m[2]);const score=(/largest|download|1920|full/i.test(label)?1000:0)+(/\.jpe?g(?:\?|$)/i.test(image)?100:0);candidates.push({image,score})}const og=asHttps(metaValue(html,"og:image"),url);if(og&&!/logo|icon|seal|favicon|sprite/i.test(og))candidates.push({image:og,score:100});candidates.sort((a,b)=>b.score-a.score);const image=candidates[0]?.image||"";if(!image)return null;const id=`noaa:${hash(url)}`;return{id,title,creator:credit||"NOAA Ocean Exploration",image,thumbnail:og||image,sourceURL:url,rightsLabel:"NOAA Ocean Exploration media guidance · no copyright notice in caption"}}
+async function noaa(seed){
+  const listings=[
+    "https://oceanexplorer.noaa.gov/multimedia/",
+    "https://oceanexplorer.noaa.gov/expedition-ex2503-multimedia/",
+    "https://oceanexplorer.noaa.gov/expedition-ex2306-multimedia/",
+    "https://oceanexplorer.noaa.gov/expedition-ex2604-multimedia/"
+  ];
+  const candidateLinks=[];
+  for(const url of listings){try{const html=await getText(url,10000);candidateLinks.push(...noaaDetailLinks(html,url))}catch{}}
+  const uniq=[...new Set(candidateLinks)];
+  if(!uniq.length)return out({error:"NOAA Ocean Exploration listings were reachable but exposed no usable multimedia detail links. Keep this source parked."},503);
+  const start=seed%uniq.length,ordered=uniq.slice(start).concat(uniq.slice(0,start)),items=[];
+  for(let i=0;i<Math.min(ordered.length,30)&&items.length<12;i+=6){const batch=await Promise.all(ordered.slice(i,i+6).map(async u=>{try{return noaaItemFromPage(await getText(u,10000),u)}catch{return null}}));for(const x of batch){if(x&&!items.some(y=>y.id===x.id||y.image===x.image))items.push(x)}}
+  if(items.length<2)return out({error:"NOAA Ocean Exploration was reached, but fewer than two non-copyrighted, non-people image candidates passed the conservative caption check. Keep this source parked and refine again."},503);
+  return out({source:"NOAA",items:items.slice(0,12)});
+}
 
 async function usgs(seed){const pages=[
 "https://www.usgs.gov/products/multimedia-gallery/images",
