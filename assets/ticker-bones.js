@@ -13,6 +13,11 @@
   const panelHeight = () => Math.max(1, panel.getBoundingClientRect().height || viewportHeight() * .48);
   const openThreshold = () => Math.min(110, Math.max(62, panelHeight() * .22));
   const firstPanelFocusable = () => panel.querySelector('input:not([disabled]),button:not([disabled]),a[href],select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])');
+  const safeFocus = element => {
+    if (!element) return;
+    try { element.focus({preventScroll:true}); }
+    catch { try { element.focus(); } catch {} }
+  };
 
   function emit(name) {
     root.dispatchEvent(new CustomEvent(name,{bubbles:true}));
@@ -49,7 +54,7 @@
 
   function openTicker({focus=false,focusPanel=false}={}) {
     if (state.open) {
-      if (focusPanel) firstPanelFocusable()?.focus({preventScroll:true});
+      if (focusPanel) safeFocus(firstPanelFocusable());
       return;
     }
     state.open = true;
@@ -60,8 +65,8 @@
     handle.setAttribute('aria-label','Close BarbPH ticker');
     setPanelAccessibility(true);
     document.body.classList.add('barb-ticker-lock');
-    if (focusPanel) requestAnimationFrame(() => firstPanelFocusable()?.focus({preventScroll:true}));
-    else if (focus) handle.focus({preventScroll:true});
+    if (focusPanel) requestAnimationFrame(() => safeFocus(firstPanelFocusable()));
+    else if (focus) safeFocus(handle);
     emit('barb:ticker-open');
   }
 
@@ -75,11 +80,18 @@
     handle.setAttribute('aria-label','Open BarbPH ticker');
     setPanelAccessibility(false);
     document.body.classList.remove('barb-ticker-lock');
-    if (focus || focusWasInside) handle.focus({preventScroll:true});
+    if (focus || focusWasInside) safeFocus(handle);
     emit('barb:ticker-close');
   }
 
   function toggleTicker() { state.open ? closeTicker() : openTicker(); }
+
+  function releasePointerCapture() {
+    if (state.pointerId == null) return;
+    try {
+      if (handle.hasPointerCapture?.(state.pointerId)) handle.releasePointerCapture(state.pointerId);
+    } catch {}
+  }
 
   function beginDrag(event) {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
@@ -89,7 +101,7 @@
     state.lastY = event.clientY;
     state.handleStartTop = parseFloat(getComputedStyle(handle).top) || 16;
     root.classList.add('is-dragging');
-    handle.setPointerCapture?.(event.pointerId);
+    try { handle.setPointerCapture?.(event.pointerId); } catch {}
   }
 
   function moveDrag(event) {
@@ -104,6 +116,7 @@
     const delta = state.lastY - state.startY;
     const meaningfulDrag = Math.abs(delta) >= 8;
 
+    releasePointerCapture();
     state.dragging = false;
     state.pointerId = null;
     root.classList.remove('is-dragging');
@@ -119,7 +132,8 @@
   }
 
   function cancelDrag(event) {
-    if (!state.dragging || (event && event.pointerId !== state.pointerId)) return;
+    if (!state.dragging || (event && event.pointerId != null && event.pointerId !== state.pointerId)) return;
+    releasePointerCapture();
     state.dragging = false;
     state.pointerId = null;
     root.classList.remove('is-dragging');
@@ -130,8 +144,13 @@
   handle.addEventListener('pointermove',moveDrag);
   handle.addEventListener('pointerup',finishDrag);
   handle.addEventListener('pointercancel',cancelDrag);
+  handle.addEventListener('lostpointercapture',event => {
+    if (state.dragging && event.pointerId === state.pointerId) cancelDrag(event);
+  });
   window.addEventListener('blur',() => cancelDrag());
   window.addEventListener('resize',() => cancelDrag(),{passive:true});
+  window.addEventListener('orientationchange',() => cancelDrag(),{passive:true});
+  document.addEventListener('visibilitychange',() => { if (document.hidden) cancelDrag(); });
 
   handle.addEventListener('keydown',(event) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -168,7 +187,10 @@
 
   setPanelAccessibility(false);
   root.querySelectorAll('[data-crossfade]').forEach(initCrossfade);
-  window.addEventListener('pagehide',() => document.body.classList.remove('barb-ticker-lock'),{once:true});
+  window.addEventListener('pagehide',() => {
+    cancelDrag();
+    document.body.classList.remove('barb-ticker-lock');
+  },{once:true});
 
   window.BarbTickerBones = Object.freeze({
     open:() => openTicker(),
