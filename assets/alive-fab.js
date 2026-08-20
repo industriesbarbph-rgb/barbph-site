@@ -8,7 +8,7 @@
     a.className='alive-fab__item';
     a.textContent=label;
     a.setAttribute('role','menuitem');
-    a.setAttribute('tabindex',disabled?'-1':'0');
+    a.setAttribute('tabindex','-1');
     if(disabled){
       a.setAttribute('aria-disabled','true');
       a.href='#';
@@ -33,6 +33,7 @@
     fan.className='alive-fab__fan';
     fan.setAttribute('role','menu');
     fan.setAttribute('aria-label','Products, Programs and Partnerships');
+    fan.setAttribute('aria-hidden','true');
 
     const products=makeItem('Products',productsHref,false);
     const programs=makeItem('Programs',programsHref,false);
@@ -51,21 +52,30 @@
 
     let open=false;
     let nudgeTimer=null;
+    const enabledItems=()=>[products,programs,partnerships].filter(item=>item.getAttribute('aria-disabled')!=='true');
 
-    function setOpen(next,reason){
+    function focusItem(index){
+      const items=enabledItems();
+      if(!items.length)return;
+      const normalized=(index+items.length)%items.length;
+      items.forEach((item,i)=>item.setAttribute('tabindex',i===normalized?'0':'-1'));
+      items[normalized].focus({preventScroll:true});
+    }
+
+    function setOpen(next,reason,focusIndex){
       open=Boolean(next);
       root.classList.toggle('is-open',open);
       main.setAttribute('aria-expanded',String(open));
       main.setAttribute('aria-label',open?'Close Products, Programs and Partnerships':'Open Products, Programs and Partnerships');
+      fan.setAttribute('aria-hidden',open?'false':'true');
       if(open){
-        products.setAttribute('tabindex','0');
-        programs.setAttribute('tabindex','0');
-        partnerships.setAttribute('tabindex',partnershipsHref?'0':'-1');
+        const items=enabledItems();
+        items.forEach((item,i)=>item.setAttribute('tabindex',i===0?'0':'-1'));
+        partnerships.setAttribute('tabindex',partnershipsHref?(partnerships.getAttribute('tabindex')||'-1'):'-1');
         emit(root,'alivefab:open',{reason:reason||'api'});
+        if(Number.isInteger(focusIndex)) requestAnimationFrame(()=>focusItem(focusIndex));
       }else{
-        products.setAttribute('tabindex','-1');
-        programs.setAttribute('tabindex','-1');
-        partnerships.setAttribute('tabindex','-1');
+        [products,programs,partnerships].forEach(item=>item.setAttribute('tabindex','-1'));
         emit(root,'alivefab:close',{reason:reason||'api'});
       }
     }
@@ -80,6 +90,13 @@
     }
 
     main.addEventListener('click',function(){setOpen(!open,'main-button');});
+    main.addEventListener('keydown',function(event){
+      if(event.key==='ArrowUp'||event.key==='ArrowDown'){
+        event.preventDefault();
+        const items=enabledItems();
+        setOpen(true,'keyboard',event.key==='ArrowUp'?items.length-1:0);
+      }
+    });
 
     [products,programs].forEach(function(item){
       item.addEventListener('click',function(){
@@ -98,6 +115,23 @@
       setOpen(false,'navigate');
     });
 
+    fan.addEventListener('keydown',function(event){
+      const items=enabledItems();
+      const current=items.indexOf(document.activeElement);
+      if(current<0)return;
+      if(event.key==='ArrowDown'||event.key==='ArrowRight'){
+        event.preventDefault();focusItem(current+1);
+      }else if(event.key==='ArrowUp'||event.key==='ArrowLeft'){
+        event.preventDefault();focusItem(current-1);
+      }else if(event.key==='Home'){
+        event.preventDefault();focusItem(0);
+      }else if(event.key==='End'){
+        event.preventDefault();focusItem(items.length-1);
+      }else if(event.key==='Escape'){
+        event.preventDefault();setOpen(false,'escape');main.focus({preventScroll:true});
+      }
+    });
+
     document.addEventListener('pointerdown',function(event){
       if(open&&!root.contains(event.target))setOpen(false,'outside');
     });
@@ -105,7 +139,7 @@
     document.addEventListener('keydown',function(event){
       if(event.key==='Escape'&&open){
         setOpen(false,'escape');
-        main.focus();
+        main.focus({preventScroll:true});
       }
     });
 
@@ -124,7 +158,8 @@
         if(partnershipsHref){
           partnerships.href=partnershipsHref;
           partnerships.removeAttribute('aria-disabled');
-          partnerships.setAttribute('tabindex',open?'0':'-1');
+          partnerships.setAttribute('tabindex',open?'-1':'-1');
+          if(open){const items=enabledItems();items.forEach((item,i)=>item.setAttribute('tabindex',i===0?'0':'-1'));}
         }else{
           partnerships.href='#';
           partnerships.setAttribute('aria-disabled','true');
