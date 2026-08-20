@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Alive FAB Prototype Lab — BarbPH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/alive-fab.css">
+<style>
+  *{box-sizing:border-box}
+  html,body{min-height:100%}
+  body{
+    margin:0;
+    min-height:100vh;
+    color:#f5f5f7;
+    background:
+      radial-gradient(circle at 20% 10%,rgba(104,65,101,.24),transparent 28%),
+      radial-gradient(circle at 84% 28%,rgba(48,67,106,.18),transparent 24%),
+      linear-gradient(180deg,#0d0d14,#07070b 72%);
+    font-family:'Work Sans',sans-serif;
+    overflow-x:hidden;
+  }
+  .lab{
+    min-height:100vh;
+    display:grid;
+    place-items:center;
+    padding:48px 24px 150px;
+  }
+  .lab-card{
+    width:min(660px,100%);
+    padding:34px;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:28px;
+    background:rgba(255,255,255,.035);
+    box-shadow:0 30px 80px rgba(0,0,0,.28);
+    backdrop-filter:blur(12px);
+  }
+  .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#a9a9b2;margin-bottom:14px}
+  h1{font-family:'Marcellus',serif;font-size:clamp(30px,6vw,48px);font-weight:400;margin:0 0 14px;letter-spacing:.03em}
+  p{color:#bdbdc6;line-height:1.7;margin:0 0 20px}
+  .rule{height:1px;background:rgba(255,255,255,.09);margin:26px 0}
+  .lab-actions{display:flex;gap:10px;flex-wrap:wrap}
+  .lab-actions button{
+    border:1px solid rgba(255,255,255,.15);
+    background:rgba(255,255,255,.045);
+    color:#eeeef2;
+    border-radius:999px;
+    padding:10px 15px;
+    font:500 12px 'Work Sans',sans-serif;
+    cursor:pointer;
+  }
+  .lab-actions button:hover{background:rgba(255,255,255,.09)}
+  .note{font-size:12px;color:#85858f;margin-top:18px}
+  code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#d7c4cf}
+</style>
+</head>
+<body>
+<main class="lab">
+  <section class="lab-card">
+    <div class="eyebrow">BarbPH internal prototype</div>
+    <h1>Alive FAB</h1>
+    <p>The orb itself carries no visible words. Click the round object at the bottom-right and the three P buttons fan out. Products and Programs are live. Partnerships is visible but intentionally inactive until its real page exists.</p>
+    <div class="rule"></div>
+    <p>This page also tests the future Patroller handoff. Patroller can mention the “round thing at the bottom-right” and trigger a small visual nudge without adding instructions to the homepage.</p>
+    <div class="lab-actions">
+      <button type="button" id="open-fab">Open fan</button>
+      <button type="button" id="close-fab">Close fan</button>
+      <button type="button" id="nudge-fab">Simulate Patroller nudge</button>
+    </div>
+    <div class="note">Prototype only. Final homepage styling can change later without changing the locked interaction model.</div>
+  </section>
+</main>
+<script src="/assets/alive-fab.js"></script>
+<script>
+  const fab=initAliveFab({
+    productsHref:'/products',
+    programsHref:'/programs',
+    partnershipsHref:''
+  });
+  document.getElementById('open-fab').addEventListener('click',()=>fab.open());
+  document.getElementById('close-fab').addEventListener('click',()=>fab.close());
+  document.getElementById('nudge-fab').addEventListener('click',()=>fab.nudge());
+</script>
+</body>
+</html>

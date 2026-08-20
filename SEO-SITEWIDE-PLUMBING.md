@@ -27,6 +27,7 @@ Intentionally not included yet:
 - Partnerships — parked/not built yet.
 - Daily Discover lab pages — diagnostics only.
 - Homepage Priority lab — diagnostics only.
+- Alive FAB prototype lab — diagnostics only.
 - Netlify Functions — infrastructure endpoints, not content pages.
 
 When the official homepage is created, add `https://barbph.com/` to the sitemap in the same release.
@@ -58,4 +59,4 @@ Once the custom domain is ready to be verified in Google Search Console:
 
 ## Guardrail
 
-Do not add unfinished, diagnostic, parked, or placeholder URLs to the sitemap just to make it look larger. The sitemap is a clean list of pages BarbPH actually wants search engines to discover and index.
+Do not add unfinished, diagnostic, parked, prototype, or placeholder URLs to the sitemap just to make it look larger. The sitemap is a clean list of pages BarbPH actually wants search engines to discover and index.
