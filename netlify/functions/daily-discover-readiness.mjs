@@ -18,8 +18,10 @@ const PARKED = {
   "New York Public Library": "credential required; live proof pending",
   "Biodiversity Heritage Library": "credential required; live proof pending",
   "Getty Open Content": "rights-safe retrieval needs refinement",
+  "Barb Originals": "emergency reserve only; not an ordinary rotation source",
   "Wildcard": "pre-approved rights-safe pool not defined",
 };
+const EXPECTED_WORLD_COUNT = 15;
 
 function dateManila(){
   const p=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
@@ -64,7 +66,7 @@ function prodContext(){return Netlify.context?.deploy?.context==="production"}
 
 export default async request=>{
   if(request.method!=="GET")return response({error:"Method not allowed"},405);
-  const date=dateManila(),checks={theme_sources:{ok:false,error:null},barb_originals:{ok:false,error:null},shared_store:{ok:false,error:null}};
+  const checkedAt=new Date().toISOString(),date=dateManila(),checks={theme_sources:{ok:false,error:null},barb_originals:{ok:false,error:null},shared_store:{ok:false,error:null}};
   let themeRows=[],barbRows=[];
   try{themeRows=await readSheet("Theme Sources","source_name","342757810");checks.theme_sources.ok=true}catch(e){checks.theme_sources.error=e.message}
   try{barbRows=await readSheet("Barb Originals","asset_name");checks.barb_originals.ok=true}catch(e){checks.barb_originals.error=e.message}
@@ -84,11 +86,29 @@ export default async request=>{
   if(sources.unsafe_enabled.length)blockers.push("At least one unverified/parked source is enabled");
   if(!reserve.ready)blockers.push(`Barb Originals reserve has ${reserve.enabled_unique_images}/3 enabled unique images`);
   if(!sources.production_enabled.length)blockers.push("No confirmed source is production-enabled yet");
+  const sourceInventory={
+    expected_total:EXPECTED_WORLD_COUNT,
+    sheet_configured_rows:sources.configured.length,
+    confirmed_passed:PASSED.size,
+    parked_waiting:Object.keys(PARKED).length,
+    accounted:PASSED.size+Object.keys(PARKED).length,
+    complete:PASSED.size+Object.keys(PARKED).length===EXPECTED_WORLD_COUNT&&sources.configured.length===EXPECTED_WORLD_COUNT,
+    parked_sources:Object.entries(PARKED).map(([source_name,reason])=>({source_name,reason})),
+  };
+  const productionArmed=sources.production_enabled.length>0;
   return response({
     system:"BARBPH DAILY DISCOVER — PRODUCTION READINESS",
+    checked_at:checkedAt,
+    timezone:TZ,
     date_manila:date,
     state,
-    production_armed:sources.production_enabled.length>0,
+    production_armed:productionArmed,
+    safety_guards:{
+      daily_discover_intentionally_off:!productionArmed,
+      no_unverified_source_enabled:sources.unsafe_enabled.length===0,
+      reserve_required_before_arm:true,
+    },
+    source_inventory:sourceInventory,
     production_enabled_sources:sources.production_enabled.map(x=>x.source_name),
     confirmed_passed_sources:[...PASSED],
     armable_confirmed_sources:sources.armable.map(x=>x.source_name),

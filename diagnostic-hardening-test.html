@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>BarbPH — Safe System Diagnostics</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#090b10;color:#f6f8fb;font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{max-width:1120px;margin:auto;padding:20px}.card{border:1px solid #ffffff1c;background:#11151d;border-radius:18px;padding:16px;margin-bottom:14px}.top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}h1{font-size:21px;margin:0 0 4px}h2{font-size:15px;margin:0 0 10px}.muted{color:#aeb7c6}.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}.check{border:1px solid #ffffff17;background:#0c1016;border-radius:14px;padding:12px}.check b{display:block;font-size:12px;color:#adb6c5;margin-bottom:5px}.state{font-size:16px;font-weight:800}.pass{color:#a6f4b7}.warn{color:#ffd28a}.fail{color:#ff9d9d}.wait{color:#aeb7c6}.meta{margin-top:7px;font-size:12px;color:#8f9aac;word-break:break-word}.links{display:flex;gap:8px;flex-wrap:wrap}.links a,button{appearance:none;border:1px solid #ffffff24;background:#ffffff0f;color:#fff;padding:9px 11px;border-radius:11px;text-decoration:none;cursor:pointer}.links a:hover,button:hover{background:#ffffff18}button:disabled{opacity:.45;cursor:wait}.summary{font-weight:800;font-size:17px}.json{white-space:pre-wrap;word-break:break-word;background:#07090d;border-radius:13px;padding:12px;max-height:300px;overflow:auto;color:#cbd4e3}.tiny{font-size:11px;color:#7f8998}@media(max-width:600px){.wrap{padding:12px}}
+</style>
+</head>
+<body><main class="wrap">
+<section class="card"><div class="top"><div><h1>BARBPH — SAFE SYSTEM DIAGNOSTICS</h1><div class="muted">Read-only checks only. This page does not arm Daily Discover, write history, change spreadsheet controls, or create the homepage.</div></div><button id="run">Run safe diagnostics</button></div><div class="meta">Last run: <span id="last">Not run yet</span> · Total: <span id="elapsed">—</span></div></section>
+<section class="card"><h2>Guardrails + control logic</h2><div id="checks" class="checks"></div></section>
+<section class="card"><div class="summary" id="summary">Waiting for a run.</div><div class="muted" id="note"></div></section>
+<section class="card"><h2>Individual labs</h2><div class="links"><a href="/daily-discover-test.html">Source Engine Lab</a><a href="/daily-discover-production-test.html">Production Gate Lab</a><a href="/homepage-priority-test.html">Homepage Priority Lab</a><a href="/ticker-bones-test.html">Ticker Bones Lab</a><a href="/alive-fab-test.html">Alive FAB Lab</a></div></section>
+<section class="card"><h2>Raw diagnostic snapshot</h2><pre id="raw" class="json">No run yet.</pre><div class="tiny">Synthetic priority tests use the controller's lab mode. The Daily Discover production endpoint is intentionally not called by this page.</div></section>
+</main>
+<script>
+(()=>{"use strict";
+const $=id=>document.getElementById(id),E={run:$("run"),last:$("last"),elapsed:$("elapsed"),checks:$("checks"),summary:$("summary"),note:$("note"),raw:$("raw")};
+const specs=[
+  ["dd-off","Daily Discover stays intentionally OFF"],
+  ["worlds","15/15 source worlds accounted for"],
+  ["passed","9 confirmed lab-success worlds"],
+  ["unsafe","No unverified source is enabled"],
+  ["reserve","Reserve gate remains visible"],
+  ["sponsor","Priority mock: Sponsor wins"],
+  ["theme","Priority mock: Theme wins"],
+  ["daily","Priority mock: Daily Discover wins"],
+  ["real","Real priority controller responds safely"],
+  ["robots","Diagnostic labs blocked from crawling"],
+];
+const nodes=new Map();
+for(const [id,label] of specs){const d=document.createElement("div");d.className="check";d.innerHTML=`<b>${label}</b><span class="state wait">WAITING</span><div class="meta">—</div>`;E.checks.append(d);nodes.set(id,{state:d.querySelector(".state"),meta:d.querySelector(".meta")})}
+function set(id,kind,text,meta=""){const n=nodes.get(id);n.state.className=`state ${kind}`;n.state.textContent=text;n.meta.textContent=meta||"—"}
+async function fetchJSON(url,ms=12000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms),started=performance.now();try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});const text=await r.text();let data={};try{data=JSON.parse(text)}catch{data={error:`Non-JSON response · HTTP ${r.status}`}}return{ok:r.ok,status:r.status,data,ms:Math.round(performance.now()-started)}}finally{clearTimeout(t)}}
+async function fetchText(url,ms=10000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms),started=performance.now();try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});return{ok:r.ok,status:r.status,text:await r.text(),ms:Math.round(performance.now()-started)}}finally{clearTimeout(t)}}
+async function run(){
+  E.run.disabled=true;E.summary.textContent="Running safe diagnostics…";E.note.textContent="";E.raw.textContent="Collecting…";for(const [id] of specs)set(id,"wait","RUNNING");
+  const started=performance.now(),snapshot={};
+  try{
+    const readiness=await fetchJSON("/.netlify/functions/daily-discover-readiness");snapshot.readiness=readiness;
+    const r=readiness.data||{},inventory=r.source_inventory||{},guards=r.safety_guards||{};
+    set("dd-off",guards.daily_discover_intentionally_off===true?"pass":"fail",guards.daily_discover_intentionally_off===true?"PASS":"FAIL",`production_armed=${String(r.production_armed)} · ${readiness.ms}ms`);
+    set("worlds",inventory.complete===true&&inventory.accounted===15?"pass":"fail",inventory.complete===true&&inventory.accounted===15?"PASS":"FAIL",`${inventory.accounted??"?"}/${inventory.expected_total??15} accounted · ${inventory.sheet_configured_rows??"?"} sheet rows`);
+    set("passed",Array.isArray(r.confirmed_passed_sources)&&r.confirmed_passed_sources.length===9?"pass":"fail",Array.isArray(r.confirmed_passed_sources)&&r.confirmed_passed_sources.length===9?"PASS":"FAIL",`${r.confirmed_passed_sources?.length??0}/9 confirmed`);
+    set("unsafe",Array.isArray(r.unverified_enabled_sources)&&r.unverified_enabled_sources.length===0?"pass":"fail",Array.isArray(r.unverified_enabled_sources)&&r.unverified_enabled_sources.length===0?"PASS":"FAIL",r.unverified_enabled_sources?.length?`${r.unverified_enabled_sources.join(", ")}`:"0 unsafe enabled");
+    const reserveReady=r.reserve?.ready===true;set("reserve",reserveReady?"pass":"warn",reserveReady?"READY":"EXPECTED WAIT",`${r.reserve?.enabled_unique_images??0}/${r.reserve?.minimum_required??3} enabled unique reserve images`);
+    const modes=[["sponsor","sponsor_takeover"],["theme","theme_override"],["daily","daily_discover"]];
+    for(const [key,expected] of modes){const x=await fetchJSON(`/.netlify/functions/homepage-priority?lab=1&mock=${key}`);snapshot[`priority_${key}`]=x;const ok=x.ok&&x.data?.selected_mode===expected;set(key,ok?"pass":"fail",ok?"PASS":"FAIL",`${x.data?.selected_mode||x.data?.status||`HTTP ${x.status}`} · ${x.ms}ms`)}
+    const real=await fetchJSON("/.netlify/functions/homepage-priority?lab=1");snapshot.priority_real=real;const valid=["sponsor_takeover","theme_override","daily_discover"].includes(real.data?.selected_mode);set("real",real.ok&&valid?"pass":"fail",real.ok&&valid?"PASS":"FAIL",`${real.data?.selected_mode||real.data?.status||`HTTP ${real.status}`} · ${real.ms}ms`);
+    const robots=await fetchText("/robots.txt");snapshot.robots={ok:robots.ok,status:robots.status,ms:robots.ms};const expected=["/daily-discover-test.html","/daily-discover-production-test.html","/homepage-priority-test.html","/diagnostic-hardening-test.html","/ticker-bones-test.html","/alive-fab-test.html"];const missing=expected.filter(x=>!robots.text.includes(`Disallow: ${x}`));set("robots",robots.ok&&!missing.length?"pass":"fail",robots.ok&&!missing.length?"PASS":"FAIL",missing.length?`Missing: ${missing.join(", ")}`:`All ${expected.length} labs disallowed · ${robots.ms}ms`);
+    const states=[...nodes.values()].map(n=>n.state.className);const fails=states.filter(x=>x.includes("fail")).length,warns=states.filter(x=>x.includes("warn")).length;
+    E.summary.className=`summary ${fails?"fail":warns?"warn":"pass"}`;E.summary.textContent=fails?`${fails} diagnostic check(s) need attention.`:warns?`Safe diagnostics passed with ${warns} expected waiting state.`:"All safe diagnostics passed.";
+    E.note.textContent=!r.production_armed?"Daily Discover is still OFF. No production source was armed by this test.":"WARNING: readiness reports Daily Discover as armed.";
+    E.raw.textContent=JSON.stringify(snapshot,null,2);
+  }catch(e){
+    E.summary.className="summary fail";E.summary.textContent="Diagnostics stopped on an unexpected error.";E.note.textContent=e?.name==="AbortError"?"A request timed out. Re-run once before treating it as a system failure.":String(e?.message||e);E.raw.textContent=String(e?.stack||e);
+  }finally{
+    E.last.textContent=new Intl.DateTimeFormat("en-PH",{timeZone:"Asia/Manila",dateStyle:"medium",timeStyle:"medium"}).format(new Date());
+    E.elapsed.textContent=`${Math.round(performance.now()-started)}ms`;E.run.disabled=false;
+  }
+}
+E.run.addEventListener("click",run);run();
+})();
+</script>
+</body></html>

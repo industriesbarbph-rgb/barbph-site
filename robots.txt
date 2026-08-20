@@ -5,6 +5,7 @@ Allow: /
 Disallow: /daily-discover-test.html
 Disallow: /daily-discover-production-test.html
 Disallow: /homepage-priority-test.html
+Disallow: /diagnostic-hardening-test.html
 Disallow: /alive-fab-test.html
 Disallow: /ticker-bones-test.html
 
