@@ -331,3 +331,24 @@ body.barb-ticker-lock { overflow: hidden; overscroll-behavior: none; }
   .barb-ticker__marquee { animation:none !important; }
   .barb-ticker__triangle path { stroke-dashoffset:0; }
 }
+
+/* NOEN HQ: visual-only and hard-anchored to the lower-left corner. */
+.noen-hq {
+  left: 0 !important;
+  bottom: 0 !important;
+}
+.noen-hq__label {
+  display: none !important;
+}
+.noen-hq__scene {
+  bottom: -12px !important;
+}
+@media (max-width:720px) {
+  .noen-hq {
+    left: 0 !important;
+    bottom: 0 !important;
+  }
+  .noen-hq__scene {
+    bottom: -10px !important;
+  }
+}
