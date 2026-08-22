@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Heart — Chaotic Shoreline Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&family=Syncopate:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --orb-size: 380px;
+            --text-color: #111110;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Removes iOS gray tap flash globally */
+        }
+
+        .portal-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* 1. THE SIGNATURE */
+        .powered-by-signature {
+            position: absolute;
+            bottom: calc(50% - 212px); 
+            font-family: 'Syncopate', sans-serif;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.45em;
+            text-transform: uppercase;
+            z-index: 1;
+            color: rgba(0, 0, 0, 0.15);
+            text-shadow: -1px -1px 1px rgba(255,255,255,1), 1px 1px 1px rgba(0,0,0,0.05);
+            transition: opacity 0.5s ease; /* Smooth fade out during mitosis */
+        }
+
+        /* 2. THE HEART CONTAINER */
+        .orb-container {
+            position: relative;
+            width: var(--orb-size);
+            height: var(--orb-size);
+            background: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 40px 40px 80px #d8d8d8, -30px -30px 70px #ffffff;
+            z-index: 10;
+            transition: all 0.9s cubic-bezier(0.19, 1, 0.22, 1); /* Flawless shrink animation */
+        }
+
+        /* 3. THE GLASS LENS */
+        .glass-lens {
+            position: absolute;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.2) 50%, rgba(180,180,180,0.1) 100%);
+            border: 1.5px solid rgba(255,255,255,0.7);
+            z-index: 5;
+        }
+
+        .glass-lens::before {
+            content: '';
+            position: absolute; top: 8%; left: 15%; width: 45%; height: 20%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.8), transparent);
+            border-radius: 50%; transform: rotate(-25deg);
+        }
+
+        /* 4. CHAOTIC 360 PHYSICS */
+        .oil-container {
+            position: absolute;
+            width: 100%; height: 100%;
+            filter: url(#gooey); 
+            z-index: 2;
+        }
+
+        .blob {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            filter: blur(12px);
+        }
+
+        .blob-top { width: 160px; height: 160px; left: 25%; top: -15%; animation: move-top 7s ease-in-out infinite alternate; }
+        .blob-left { width: 170px; height: 170px; left: -20%; top: 25%; animation: move-left 14s ease-in-out infinite alternate; }
+        .blob-right { width: 180px; height: 180px; right: -20%; top: 30%; animation: move-right 9s ease-in-out infinite alternate; }
+        .blob-bottom { 
+            width: 300px; height: 300px; left: 10%; bottom: -40%;
+            animation: move-tide 12s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate; 
+        }
+
+        @keyframes move-top { 0% { transform: translate(0, 0); } 100% { transform: translate(60px, 30px) scale(1.2); } }
+        @keyframes move-left { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(80px, 10px) scale(1.4, 0.9); } }
+        @keyframes move-right { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-70px, -20px) scale(1.3, 0.85); } }
+        
+        @keyframes move-tide { 
+            0% { transform: translate(0, -185px) scale(1, 0.45); opacity: 0.7; } 
+            35% { transform: translate(0, -185px) scale(1, 0.45); opacity: 0.7; } 
+            100% { transform: translate(0, 80px) scale(1.7, 1.3); opacity: 1; } 
+        }
+
+        /* 5. THE CORE WORD */
+        .word-wrapper {
+            z-index: 10;
+            pointer-events: none;
+            filter: url(#refraction);
+        }
+
+        .impactful-word {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 0.55em;
+            color: var(--text-color);
+            text-transform: uppercase;
+            text-shadow: 0 0 12px rgba(255,255,255,1);
+        }
+
+        /* 6. THE BLOOM (Mitosis) */
+        .portal-wrapper.active .orb-container { scale: 0.15; opacity: 0; pointer-events: none; }
+        .portal-wrapper.active .powered-by-signature { opacity: 0; }
+        .portal-wrapper.active .proposal-panel { opacity: 1; scale: 1; pointer-events: auto; }
+
+        .svg-filters { position: absolute; visibility: hidden; }
+
+        /* ══════════════════════════════
+           7. MOBILE RESPONSIVENESS HOTFIX
+        ══════════════════════════════ */
+        @media (max-width: 768px) {
+            :root {
+                --orb-size: 280px; 
+            }
+            .choice-bubble {
+                width: 120px; 
+                height: 120px;
+            }
+            .choice-text { 
+                font-size: 0.65rem; 
+            }
+            .portal-wrapper.active .donation-path { transform: translate(-115px, 0px); }
+            .portal-wrapper.active .featured-path { transform: translate(115px, 0px); }
+        }
+
+        /* 8. PARTNERSHIP PROPOSAL PANEL — added without changing the original orb */
+        .proposal-panel {
+            position: absolute;
+            width: min(680px, calc(100vw - 40px));
+            max-height: calc(100vh - 60px);
+            overflow: auto;
+            padding: 34px 32px 28px;
+            border-radius: 42px;
+            background: rgba(255,255,255,0.96);
+            box-shadow: 26px 26px 70px #d6d6d6, -22px -22px 58px #ffffff;
+            opacity: 0;
+            scale: 0.82;
+            transition: all 0.9s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 12;
+            pointer-events: none;
+        }
+
+        .proposal-panel h2 {
+            margin: 0 0 8px;
+            font-size: 1.8rem;
+            letter-spacing: -0.03em;
+        }
+
+        .proposal-panel > p {
+            margin: 0 0 22px;
+            color: rgba(17,17,16,0.56);
+            line-height: 1.6;
+            font-size: 0.92rem;
+        }
+
+        .proposal-form { display: grid; gap: 16px; }
+
+        .proposal-form label {
+            display: grid;
+            gap: 7px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(17,17,16,0.48);
+        }
+
+        .proposal-form input[type="email"],
+        .proposal-form textarea {
+            width: 100%;
+            border: 0;
+            outline: 0;
+            border-radius: 22px;
+            background: #ffffff;
+            padding: 15px 17px;
+            font: 600 0.92rem/1.45 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-color);
+            box-shadow: inset 8px 8px 20px rgba(0,0,0,0.05), inset -8px -8px 20px rgba(255,255,255,1);
+        }
+
+        .proposal-form textarea { min-height: 145px; resize: vertical; }
+
+        .proposal-type { display: grid; gap: 10px; border: 0; padding: 0; margin: 0; }
+
+        .proposal-type legend {
+            margin-bottom: 4px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(17,17,16,0.48);
+        }
+
+        .proposal-choice {
+            display: flex !important;
+            grid-template-columns: none;
+            gap: 10px !important;
+            align-items: flex-start;
+            font-size: 0.86rem !important;
+            text-transform: none !important;
+            letter-spacing: 0 !important;
+            color: var(--text-color) !important;
+            cursor: pointer;
+        }
+
+        .proposal-choice input { margin-top: 3px; }
+
+        .other-wrap { display: none !important; }
+        .other-wrap.is-visible { display: grid !important; }
+
+        .proposal-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        .proposal-link {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.78rem;
+            border-bottom: 1px solid rgba(17,17,16,0.18);
+            padding-bottom: 3px;
+        }
+
+        .proposal-send {
+            width: 112px;
+            height: 112px;
+            border: 0;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            font: 800 0.68rem/1 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            box-shadow: 18px 18px 42px #d7d7d7, -14px -14px 36px #ffffff;
+        }
+
+        .proposal-send:disabled { opacity: .5; cursor: wait; }
+
+        .proposal-status {
+            min-height: 20px;
+            font-size: 0.78rem;
+            color: rgba(17,17,16,0.5);
+        }
+
+        .honeypot {
+            position: absolute !important;
+            left: -9999px !important;
+            width: 1px !important;
+            height: 1px !important;
+            opacity: 0 !important;
+        }
+
+        @media (max-width: 768px) {
+            .proposal-panel {
+                width: min(94vw, 680px);
+                padding: 26px 20px 22px;
+                border-radius: 30px;
+            }
+            .proposal-send { width: 96px; height: 96px; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="portal-wrapper" id="portal">
+        <div class="powered-by-signature">Powered by Barb The Builder</div>
+
+        <div class="orb-container" id="mainOrb">
+            <div class="oil-container">
+                <div class="blob blob-top"></div>
+                <div class="blob blob-left"></div>
+                <div class="blob blob-right"></div>
+                <div class="blob blob-bottom"></div> 
+            </div>
+            <div class="glass-lens"></div>
+            <div class="word-wrapper">
+                <h1 class="impactful-word">Partnerships</h1>
+            </div>
+        </div>
+
+        <section class="proposal-panel" aria-label="Partnership proposal form">
+            <h2>Tell us what you have in mind.</h2>
+            <p>If it fits one of our partnership paths, great. If it doesn’t, send it anyway.</p>
+
+            <form class="proposal-form" id="proposalForm" action="https://script.google.com/macros/s/AKfycbwJYsFiAIdFjeraVIrIirCt5MBZXrvVoTqNJNMoLx1EDxWD2c1BeQ1mXTTcGAwHOg75XQ/exec" method="post" target="submissionFrame" novalidate>
+                <input class="honeypot" type="text" name="website" tabindex="-1" autocomplete="off">
+                <input type="hidden" name="source_page" value="barbph-partnership-world">
+
+                <label>
+                    Email
+                    <input id="proposalEmail" name="email" type="email" autocomplete="email" required>
+                </label>
+
+                <label>
+                    Proposal letter
+                    <textarea id="proposalLetter" name="proposal_letter" maxlength="10000" required></textarea>
+                </label>
+
+                <fieldset class="proposal-type">
+                    <legend>Which best describes your proposal?</legend>
+
+                    <label class="proposal-choice">
+                        <input type="radio" name="proposal_type" value="standard" checked>
+                        <span>It fits one of BarbPH’s partnership paths.</span>
+                    </label>
+
+                    <label class="proposal-choice">
+                        <input type="radio" name="proposal_type" value="other">
+                        <span>I have something different in mind.</span>
+                    </label>
+                </fieldset>
+
+                <label class="other-wrap" id="otherWrap">
+                    Tell us what makes it different
+                    <textarea id="otherIdea" name="other_idea" maxlength="3000"></textarea>
+                </label>
+
+                <div class="proposal-actions">
+                    <a class="proposal-link" href="https://script.google.com/macros/s/AKfycbwJYsFiAIdFjeraVIrIirCt5MBZXrvVoTqNJNMoLx1EDxWD2c1BeQ1mXTTcGAwHOg75XQ/exec?go=partnership-info" target="_blank" rel="noopener">
+                        How BarbPH Partnerships Work →
+                    </a>
+                    <button class="proposal-send" id="proposalSend" type="submit">Send</button>
+                </div>
+
+                <div class="proposal-status" id="proposalStatus" role="status" aria-live="polite"></div>
+            </form>
+        </section>
+
+        <iframe name="submissionFrame" id="submissionFrame" hidden title="Partnership proposal submission"></iframe>
+    </div>
+
+    <svg class="svg-filters">
+        <defs>
+            <filter id="gooey">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="22" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 32 -16" />
+            </filter>
+            <filter id="refraction">
+                <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="1" result="noise">
+                    <animate attributeName="baseFrequency" values="0.012; 0.008; 0.012" dur="12s" repeatCount="indefinite" />
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="48" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
+
+    <script>
+        const mainOrb = document.getElementById('mainOrb');
+        const portal = document.getElementById('portal');
+        
+        mainOrb.addEventListener('click', () => {
+            portal.classList.add('active');
+        });
+        
+        // Tap anywhere on the background to reset the animation
+        portal.addEventListener('click', (e) => { 
+            if(e.target === portal) {
+                portal.classList.remove('active'); 
+            }
+        });
+    </script>
+</body>
+</html>
