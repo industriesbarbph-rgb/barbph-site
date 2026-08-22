@@ -1,0 +1,154 @@
+/* NOEN HQ v5 — Luna Rosa depth + restrained multi-color LED traffic */
+.noen-hq .hq-back{
+  fill:#34414a!important;
+  opacity:.34!important;
+}
+.noen-hq .hq-mid{
+  fill:#1c252d!important;
+  opacity:.64!important;
+}
+.noen-hq .hq-front{
+  fill:#090d11!important;
+  opacity:.98!important;
+}
+.noen-hq .hq-antenna{
+  stroke:#080c10!important;
+}
+.noen-hq .hq-antenna-fine{
+  stroke:#0e1419!important;
+}
+.noen-hq .hq-wire{
+  stroke:#141b21!important;
+  opacity:.66!important;
+}
+.noen-hq .hq-dish,
+.noen-hq .hq-panel{
+  fill:#080d11!important;
+}
+.noen-hq .hq-slit{
+  fill:#25313a!important;
+  opacity:.68!important;
+}
+
+/* LEDs stay tiny and technical. No glitter bloom. */
+.noen-hq .hq-led{
+  opacity:.12!important;
+  transform-box:fill-box!important;
+  transform-origin:center!important;
+  filter:none!important;
+}
+
+/* 1 — central top red double aviation beacon */
+.noen-hq .hq-led:nth-of-type(1){
+  fill:#a85c62!important;
+  opacity:.13!important;
+  animation:hqV5RedDouble 4.8s linear infinite!important;
+}
+/* 2 — left tower red single beacon */
+.noen-hq .hq-led:nth-of-type(2){
+  fill:#a85c62!important;
+  opacity:.11!important;
+  animation:hqV5RedSingle 3.55s linear .55s infinite!important;
+}
+/* 3 — right mast cool-blue transmission */
+.noen-hq .hq-led:nth-of-type(3){
+  fill:#7192b7!important;
+  opacity:.10!important;
+  animation:hqV5BlueTxA 2.9s steps(2,end) .25s infinite!important;
+}
+/* 4 — tiny red support light, slower */
+.noen-hq .hq-led:nth-of-type(4){
+  fill:#9b5960!important;
+  opacity:.14!important;
+  animation:hqV5RedSlow 6.2s ease-in-out 1.2s infinite!important;
+}
+/* 5 — blue monitoring pulse */
+.noen-hq .hq-led:nth-of-type(5){
+  fill:#6d8faf!important;
+  opacity:.10!important;
+  animation:hqV5BlueBreath 5.5s ease-in-out .9s infinite!important;
+}
+/* 6 — gray-white steady heartbeat */
+.noen-hq .hq-led:nth-of-type(6){
+  fill:#b8bec2!important;
+  opacity:.22!important;
+  animation:hqV5Neutral 7.1s ease-in-out 1.8s infinite!important;
+}
+/* 7 — blue irregular data traffic */
+.noen-hq .hq-led:nth-of-type(7){
+  fill:#7597bd!important;
+  opacity:.09!important;
+  animation:hqV5BlueTxB 4.35s steps(3,end) .7s infinite!important;
+}
+/* 8 — blue quick acknowledgement pulse */
+.noen-hq .hq-led:nth-of-type(8){
+  fill:#678caf!important;
+  opacity:.09!important;
+  animation:hqV5BlueAck 3.25s steps(2,end) 1.55s infinite!important;
+}
+
+@keyframes hqV5RedDouble{
+  0%,66%,100%{opacity:.08;transform:scale(.96)}
+  69%,73%{opacity:.44;transform:scale(1.03)}
+  76%,80%{opacity:.09;transform:scale(.97)}
+  83%,87%{opacity:.38;transform:scale(1.02)}
+  90%{opacity:.08;transform:scale(.96)}
+}
+@keyframes hqV5RedSingle{
+  0%,75%,100%{opacity:.07}
+  79%,88%{opacity:.38}
+  91%{opacity:.09}
+}
+@keyframes hqV5RedSlow{
+  0%,100%{opacity:.08}
+  48%{opacity:.22}
+  58%{opacity:.11}
+}
+@keyframes hqV5BlueBreath{
+  0%,100%{opacity:.07;transform:scale(.96)}
+  42%{opacity:.31;transform:scale(1.03)}
+  65%{opacity:.13;transform:scale(.99)}
+}
+@keyframes hqV5Neutral{
+  0%,100%{opacity:.16}
+  52%{opacity:.29}
+}
+@keyframes hqV5BlueTxA{
+  0%,53%,100%{opacity:.06}
+  58%,65%{opacity:.32}
+  69%{opacity:.09}
+  75%,80%{opacity:.23}
+  84%{opacity:.07}
+}
+@keyframes hqV5BlueTxB{
+  0%,58%,100%{opacity:.05}
+  62%{opacity:.23}
+  67%{opacity:.08}
+  72%{opacity:.30}
+  77%{opacity:.10}
+  82%{opacity:.20}
+  87%{opacity:.06}
+}
+@keyframes hqV5BlueAck{
+  0%,68%,100%{opacity:.05}
+  72%,76%{opacity:.26}
+  80%{opacity:.07}
+  85%,88%{opacity:.18}
+  92%{opacity:.05}
+}
+
+.noen-hq[data-state="offline"] .hq-led{
+  animation:none!important;
+  opacity:.035!important;
+}
+.noen-hq[data-state="offline"] .hq-led:nth-of-type(1){
+  opacity:.12!important;
+  animation:hqV5RedSlow 7.4s ease-in-out infinite!important;
+}
+
+@media(prefers-reduced-motion:reduce){
+  .noen-hq .hq-led{animation:none!important}
+  .noen-hq .hq-led:nth-of-type(1),
+  .noen-hq .hq-led:nth-of-type(3),
+  .noen-hq .hq-led:nth-of-type(6){opacity:.20!important}
+}
