@@ -5,6 +5,14 @@
   const drawer = document.getElementById('barb-satellite-drawer');
   if (!topbar || !handle || !drawer) return;
 
+  const ee = document.querySelector('.folder-tab--mystery');
+  if (ee && ee.parentElement === handle.parentElement) ee.insertAdjacentElement('afterend', handle);
+
+  const surface = handle.querySelector('.folder-tab__surface');
+  if (surface) {
+    surface.innerHTML = '<img class="satellite-tab-art" src="/satellite-tab.png" alt="" aria-hidden="true" decoding="async">';
+  }
+
   const rows = {
     yesterday: drawer.querySelector('[data-sat-day="yesterday"]'),
     today: drawer.querySelector('[data-sat-day="today"]'),
