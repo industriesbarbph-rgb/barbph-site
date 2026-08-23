@@ -9,6 +9,12 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "*/5 * * * *"
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - main
+    paths:
+      - .github/launch-trigger.txt
 
 permissions:
   contents: write
