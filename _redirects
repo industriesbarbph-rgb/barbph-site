@@ -11,3 +11,5 @@
 /partnership-guide /partnership-guide.html 200
 /ticker.html /ticker 301!
 /ticker /ticker.html 200
+
+/web/:name.webp /:name.png 200
