@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<title>How BarbPH Partnerships Work | BarbPH</title>
+<meta content="noindex,follow" name="robots"/>
+<style>
+:root{--paper:#f7f4ec;--ink:#17191c;--line:rgba(23,25,28,.15);--muted:#73777b}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+body{padding:18px}
+.shell{width:min(1280px,100%);margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:14px}
+.brand{font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.title{font-family:Georgia,"Times New Roman",serif;font-size:clamp(28px,4.5vw,54px);font-weight:400;margin:5px 0 0}
+.back{display:inline-grid;place-items:center;width:42px;height:42px;border:1px solid var(--line);border-radius:999px;color:inherit;text-decoration:none;background:rgba(255,255,255,.5);font-size:22px}
+.viewer{width:100%;min-height:70vh;border:1px solid var(--line);background:#ececec;border-radius:18px;overflow:auto;padding:18px}
+.page{display:block;margin:0 auto 18px;background:white;box-shadow:0 8px 30px rgba(0,0,0,.08);max-width:100%;height:auto}
+.loading{padding:44px 18px;text-align:center;color:var(--muted);font-size:14px}
+.error{display:none;padding:30px;text-align:center;color:var(--ink)}
+.error a{color:inherit;text-underline-offset:4px}
+@media(max-width:700px){body{padding:10px}.viewer{border-radius:12px;padding:8px}}
+</style>
+<meta content="Read the BarbPH Partnerships Guide." name="description"/></head>
+<body>
+<div class="shell">
+<div class="top">
+<div>
+<div class="brand">BarbPH</div>
+<h1 class="title">How BarbPH Partnerships Work</h1>
+</div>
+<a aria-label="Back to Partnerships" class="back" href="partnership.html">←</a>
+</div>
+<div class="viewer" id="pdfViewer">
+<div class="loading" id="loading">Opening Partnership Guide…</div>
+<div class="error" id="errorBox">
+<p>The guide could not be displayed here.</p>
+<a href="https://raw.githubusercontent.com/industriesbarbph-rgb/barbph-media/main/BarbPH_Partnerships.pdf" rel="noopener" target="_blank">Open the Partnership Guide →</a>
+</div>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
+<script type="module">
+import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs';
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
+
+const PDF_URL = 'https://raw.githubusercontent.com/industriesbarbph-rgb/barbph-media/main/BarbPH_Partnerships.pdf';
+const viewer = document.getElementById('pdfViewer');
+const loading = document.getElementById('loading');
+const errorBox = document.getElementById('errorBox');
+
+async function renderPdf() {
+  try {
+    const pdf = await pdfjsLib.getDocument({
+      url: PDF_URL,
+      withCredentials: false
+    }).promise;
+
+    loading.remove();
+
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const base = page.getViewport({ scale: 1 });
+      const maxWidth = Math.min(viewer.clientWidth - 36, 980);
+      const scale = Math.max(0.6, maxWidth / base.width);
+      const viewport = page.getViewport({ scale });
+
+      const canvas = document.createElement('canvas');
+      canvas.className = 'page';
+      const ctx = canvas.getContext('2d', { alpha: false });
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+
+      canvas.width = Math.floor(viewport.width * ratio);
+      canvas.height = Math.floor(viewport.height * ratio);
+      canvas.style.width = viewport.width + 'px';
+      canvas.style.height = viewport.height + 'px';
+
+      await page.render({
+        canvasContext: ctx,
+        viewport,
+        transform: ratio !== 1 ? [ratio,0,0,ratio,0,0] : null
+      }).promise;
+
+      viewer.appendChild(canvas);
+    }
+  } catch (err) {
+    console.error('Partnership PDF render error:', err);
+    loading.style.display = 'none';
+    errorBox.style.display = 'block';
+  }
+}
+
+renderPdf();
+</script>
+</body>
+</html>

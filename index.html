@@ -3,19 +3,44 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>BarbPH — Products, Programs & Interactive Builds</title>
-  <meta name="description" content="BarbPH is a living stage for original digital products, programs, interactive builds, Daily Discover, and what is being built next.">
+  <title>BarbPH — Digital Products, Programs & Interactive Builds</title>
+  <meta name="description" content="Explore BarbPH digital products, practical programs, interactive builds, publications, partnerships, and the evolving Daily Discover experience.">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="theme-color" content="#F7F3E8">
   <link rel="canonical" href="https://barbph.com/">
+
   <meta property="og:type" content="website">
-  <meta property="og:title" content="BarbPH">
-  <meta property="og:description" content="Original digital products, programs, interactive builds, Daily Discover, and what is being built next.">
+  <meta property="og:site_name" content="BarbPH">
+  <meta property="og:title" content="BarbPH — Digital Products, Programs & Interactive Builds">
+  <meta property="og:description" content="Digital products, practical programs, interactive builds, publications, partnerships, and Daily Discover from BarbPH.">
   <meta property="og:url" content="https://barbph.com/">
+  <meta property="og:image" content="https://barbph.com/3stars1sun%20%283%29.png">
+  <meta property="og:image:alt" content="Charcoal sun artwork from BarbPH">
+  <meta property="og:locale" content="en_PH">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="BarbPH — Digital Products, Programs & Interactive Builds">
+  <meta name="twitter:description" content="Digital products, programs, interactive builds, publications and partnerships from BarbPH.">
+  <meta name="twitter:image" content="https://barbph.com/3stars1sun%20%283%29.png">
+  <meta name="twitter:image:alt" content="Charcoal sun artwork from BarbPH">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Space+Grotesk:wght@400;500;600&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/ticker-bones.css">
 
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "@id":"https://barbph.com/#website",
+    "name":"BarbPH",
+    "url":"https://barbph.com/",
+    "description":"Digital products, practical programs, interactive builds, publications, partnerships, and Daily Discover from BarbPH."
+  }
+  </script>
   <style>
     :root{
       --ivory:#F7F3E8;
@@ -89,155 +114,8 @@
     .prebirth__status.is-error{color:#ffb2b2}
     .prebirth__fine{margin:-8px 0 0;font-size:10px;line-height:1.45;color:rgba(255,255,255,.38)}
 
-    /* ===== LIVING FAB — ORGANIC GLASS PEARL, NOT A BUTTON ===== */
-    .fab{
-      --fab-size:86px;
-      position:fixed;
-      right:max(26px,env(safe-area-inset-right));
-      bottom:max(26px,env(safe-area-inset-bottom));
-      width:var(--fab-size);height:var(--fab-size);
-      z-index:9100;
-      font-family:'Work Sans',system-ui,sans-serif;
-      isolation:isolate;
-    }
-    .fab__orb{
-      position:absolute;inset:0;
-      width:var(--fab-size);height:var(--fab-size);
-      appearance:none;border:0;padding:0;cursor:pointer;
-      border-radius:49% 51% 47% 53% / 53% 47% 52% 48%;
-      background:
-        radial-gradient(ellipse at 29% 23%,rgba(255,255,255,.98) 0 7%,rgba(255,255,255,.58) 13%,transparent 28%),
-        radial-gradient(ellipse at 70% 76%,rgba(206,215,219,.44) 0 16%,transparent 47%),
-        radial-gradient(ellipse at 36% 68%,rgba(235,218,223,.34) 0 15%,transparent 43%),
-        radial-gradient(circle at 52% 48%,rgba(255,255,255,.43),rgba(246,244,238,.18) 55%,rgba(220,220,216,.20) 76%,rgba(255,255,255,.33) 100%);
-      box-shadow:
-        inset 9px 12px 25px rgba(255,255,255,.72),
-        inset -14px -16px 28px rgba(117,128,134,.10),
-        0 15px 34px rgba(45,39,31,.13),
-        0 2px 8px rgba(255,255,255,.72);
-      backdrop-filter:blur(22px) saturate(118%);
-      -webkit-backdrop-filter:blur(22px) saturate(118%);
-      filter:saturate(.96);
-      overflow:hidden;
-      transform-origin:52% 55%;
-      animation:fabLife 6.4s ease-in-out infinite;
-      transition:transform .32s cubic-bezier(.2,.8,.2,1),box-shadow .32s ease,filter .32s ease;
-    }
-    .fab__orb::before{
-      content:"";position:absolute;
-      width:72%;height:30%;left:-7%;top:11%;
-      border-radius:50%;
-      background:linear-gradient(100deg,transparent 3%,rgba(255,255,255,.15) 22%,rgba(255,255,255,.92) 48%,rgba(255,255,255,.12) 72%,transparent 96%);
-      filter:blur(6px);
-      opacity:.58;
-      transform:rotate(-24deg) translateX(-18%);
-      animation:fabCaustic 8.5s ease-in-out infinite alternate;
-      pointer-events:none;
-    }
-    .fab__orb::after{
-      content:"";position:absolute;
-      width:62%;height:58%;right:-14%;bottom:-10%;
-      border-radius:50%;
-      background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.08),rgba(186,205,210,.28) 42%,rgba(255,255,255,0) 72%);
-      filter:blur(7px);
-      opacity:.72;
-      animation:fabInnerDrift 7.4s ease-in-out infinite alternate;
-      pointer-events:none;
-    }
-    .fab__orb:hover,.fab__orb:focus-visible{
-      outline:none;
-      transform:translateY(-3px) scale(1.045) rotate(-1deg);
-      filter:saturate(1.02);
-      box-shadow:
-        inset 10px 13px 27px rgba(255,255,255,.78),
-        inset -14px -16px 28px rgba(117,128,134,.09),
-        0 19px 42px rgba(45,39,31,.16),
-        0 0 20px rgba(255,255,255,.34);
-    }
-    .fab.is-open .fab__orb{transform:scale(.93) rotate(1deg)}
-    .fab__fan{position:absolute;inset:0;pointer-events:none}
-    .fab__word{
-      position:absolute;right:3px;bottom:13px;
-      min-height:50px;padding:9px 8px;
-      display:flex;align-items:center;justify-content:flex-end;
-      border:0;background:transparent;text-decoration:none;
-      font:500 clamp(21px,1.72vw,25px)/1 'Work Sans',sans-serif;
-      letter-spacing:-.028em;color:#1d2023;
-      text-shadow:0 1px 10px rgba(255,255,255,.98),0 0 2px rgba(255,255,255,.9);
-      white-space:nowrap;opacity:0;
-      transform:translate(20px,10px) scale(.9);transform-origin:right center;
-      transition:opacity .24s ease,transform .48s cubic-bezier(.16,1,.3,1),color .25s ease;
-      pointer-events:none;
-    }
-    .fab__word:nth-child(1){--tx:-117px;--ty:-132px;transition-delay:.03s}
-    .fab__word:nth-child(2){--tx:-169px;--ty:-74px;transition-delay:.08s}
-    .fab__word:nth-child(3){--tx:-150px;--ty:-16px;transition-delay:.13s}
-    .fab.is-open .fab__word{opacity:1;transform:translate(var(--tx),var(--ty)) scale(1);pointer-events:auto}
-    .fab__word:hover,.fab__word:focus-visible{outline:none;transform:translate(var(--tx),calc(var(--ty) - 2px)) scale(1.035);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:6px}
-    .fab.over-dark .fab__word{color:#F3F1ED;text-shadow:0 2px 13px rgba(0,0,0,.72),0 0 2px rgba(0,0,0,.8)}
-    @keyframes fabLife{
-      0%,100%{border-radius:49% 51% 47% 53% / 53% 47% 52% 48%;transform:scale(.992) rotate(0deg)}
-      36%{border-radius:52% 48% 51% 49% / 48% 53% 47% 52%;transform:scale(1.016) rotate(.55deg)}
-      68%{border-radius:47% 53% 49% 51% / 52% 48% 54% 46%;transform:scale(1.006) rotate(-.45deg)}
-    }
-    @keyframes fabCaustic{0%{transform:rotate(-25deg) translateX(-22%);opacity:.42}100%{transform:rotate(-18deg) translateX(27%);opacity:.72}}
-    @keyframes fabInnerDrift{0%{transform:translate(-2%,2%) scale(.92)}100%{transform:translate(7%,-5%) scale(1.09)}}
-
-    /* ===== NOEN HQ — SILENT CORNER COMMAND COMPLEX ===== */
-    .noen-hq{
-      --hq-w:390px;
-      position:fixed;left:0;bottom:0;
-      width:var(--hq-w);height:196px;
-      z-index:9050;
-      border:0;background:transparent;padding:0;margin:0;
-      color:var(--graphite);cursor:default;
-      filter:drop-shadow(0 10px 16px rgba(17,21,26,.12));
-      transition:filter .35s ease;
-      overflow:visible;
-    }
-    .noen-hq::before{
-      content:"";position:absolute;left:0;right:-12px;bottom:0;height:88px;z-index:-1;
-      background:radial-gradient(ellipse at 34% 100%,rgba(255,255,255,.42),rgba(247,243,232,.09) 52%,transparent 76%);
-      opacity:.38;pointer-events:none;
-    }
-    .noen-hq.is-over-dark{filter:drop-shadow(0 0 1px rgba(205,210,213,.28)) drop-shadow(0 10px 22px rgba(255,255,255,.035))}
-    .noen-hq.is-over-dark::before{background:radial-gradient(ellipse at 34% 100%,rgba(198,204,208,.10),rgba(120,127,132,.025) 52%,transparent 76%);opacity:1}
-    .noen-hq__scene{position:absolute;left:0;bottom:0;width:100%;height:196px;overflow:visible}
-    .noen-hq svg{display:block;width:100%;height:100%;overflow:visible}
-    .hq-layer{transform-origin:center bottom;transition:transform .25s ease-out}
-    .hq-back{fill:#2a3034;opacity:.25;transform:translateX(var(--hq-back-shift,0px))}
-    .hq-mid{fill:#171d21;opacity:.58;transform:translateX(var(--hq-mid-shift,0px))}
-    .hq-front{fill:#080c0f;opacity:.96;transform:translateX(var(--hq-front-shift,0px))}
-    .hq-antenna{stroke:#090d10;stroke-width:2.1;fill:none;stroke-linecap:square;stroke-linejoin:miter}
-    .hq-antenna-fine{stroke:#0b1014;stroke-width:1.1;fill:none;opacity:.96}
-    .hq-wire{stroke:#0c1115;stroke-width:.65;fill:none;opacity:.56}
-    .hq-dish{fill:#090d10}
-    .hq-panel{fill:#0b1014}
-    .hq-slit{fill:#151c21;opacity:.78}
-    .hq-led{
-      fill:#c9ced1;
-      opacity:.42;
-      filter:drop-shadow(0 0 .7px rgba(214,219,222,.28));
-      transform-box:fill-box;transform-origin:center;
-    }
-    .hq-led.steady{opacity:.58}
-    .hq-led.pulse{animation:hqLedPulse 4.2s ease-in-out infinite}
-    .hq-led.tx{animation:hqLedTx 3.1s steps(2,end) infinite}
-    .hq-led.tx2{animation:hqLedTx 4.6s steps(2,end) infinite .9s}
-    .noen-hq[data-state="building"] .hq-led.tx{animation-duration:4.7s}
-    .noen-hq[data-state="building"] .hq-led.tx2{animation-duration:6.2s}
-    .noen-hq[data-state="standby"] .hq-led.tx,.noen-hq[data-state="standby"] .hq-led.tx2{animation-play-state:paused;opacity:.25}
-    .noen-hq[data-state="waking"] .hq-led{animation-duration:1.8s}
-    .noen-hq[data-state="patrolling"] .hq-led.tx{animation-duration:1.55s}
-    .noen-hq[data-state="patrolling"] .hq-led.tx2{animation-duration:2.05s}
-    .noen-hq[data-state="verifying"] .hq-led.pulse{animation-duration:1.1s}
-    .noen-hq[data-state="offline"] .hq-led{animation:none;opacity:.08}
-    .noen-hq[data-state="offline"] .hq-led.safety{opacity:.34;animation:hqLedPulse 5.6s ease-in-out infinite}
-    @keyframes hqLedPulse{0%,100%{opacity:.25;transform:scale(.88)}50%{opacity:.66;transform:scale(1.06)}}
-    @keyframes hqLedTx{0%,62%,100%{opacity:.18}64%,75%{opacity:.62}77%{opacity:.24}}
-    #noen-hq-root{position:absolute;left:116px;right:102px;bottom:0;height:72px;pointer-events:none}
-
     /* ===== BEHIND THE BUILDS ===== */
+
     .behind-world{
       position:relative;min-height:72dvh;
       display:grid;place-items:center;
@@ -276,34 +154,1493 @@
     .celestial__s3{width:clamp(16px,1.75vw,26px);left:clamp(38px,3.6vw,50px);top:clamp(-40px,-3.35vw,-27px);transform:rotate(18deg)}
 
     /* ===== RESPONSIVE ===== */
-    @media(max-width:720px){
+    
+  .folder-tab--ticker .folder-tab__surface{
+    padding-top:3px;
+  }
+  .folder-tab--products .folder-tab__surface,
+  .folder-tab--programs .folder-tab__surface,
+  .folder-tab--partnership .folder-tab__surface,
+  .folder-tab--connect .folder-tab__surface{
+    padding-top:1px;
+  }
+
+  @media(max-width:720px){
       .prebirth{padding:44px 18px 26px}
       .prebirth__rotator{min-height:116px}
       .prebirth__form{flex-direction:column}
       .prebirth__input,.prebirth__button{width:100%}
-      .fab{--fab-size:72px;right:max(17px,env(safe-area-inset-right));bottom:max(17px,env(safe-area-inset-bottom))}
-      .fab__word{font-size:19px;min-height:44px}
-      .fab__word:nth-child(1){--tx:-80px;--ty:-112px}
-      .fab__word:nth-child(2){--tx:-119px;--ty:-62px}
-      .fab__word:nth-child(3){--tx:-102px;--ty:-14px}
-      .noen-hq{--hq-w:252px;left:0;bottom:0;height:136px}
-      .noen-hq__scene{height:136px;bottom:0}
-      .behind-world{min-height:62dvh;padding-left:18px;padding-right:18px}
+            .behind-world{min-height:62dvh;padding-left:18px;padding-right:18px}
       .behind-link{font-size:clamp(40px,12vw,64px)}
     }
-    @media(max-width:420px){
-      .fab__word:nth-child(1){--tx:-58px;--ty:-109px}
-      .fab__word:nth-child(2){--tx:-93px;--ty:-61px}
-      .fab__word:nth-child(3){--tx:-82px;--ty:-15px}
-      .noen-hq{--hq-w:224px;height:124px}.noen-hq__scene{height:124px}
+    @media(max-width:420px){.noen-hq__scene{height:124px}
     }
     @media(prefers-reduced-motion:reduce){
       html{scroll-behavior:auto}
       .world__asset,.prebirth__line{transition:none}
-      .fab__orb,.fab__orb::before,.fab__orb::after,.hq-led,.behind-peek{animation:none!important}
-      .hq-layer{transform:none!important}
     }
   </style>
+
+<style id="local-ticker-positioning-fix">
+:root{
+  --ticker-panel-height:48dvh;
+  --ticker-safe-top:max(16px,env(safe-area-inset-top));
+}
+.barb-ticker{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:9000 !important;
+  pointer-events:none !important;
+}
+.barb-ticker__panel{
+  position:fixed !important;
+  inset:0 0 auto 0 !important;
+  width:100% !important;
+  height:var(--ticker-panel-height) !important;
+  min-height:320px !important;
+  max-height:560px !important;
+  overflow:hidden !important;
+  transform:translate3d(0,-100%,0) !important;
+  transition:transform 720ms cubic-bezier(.18,.88,.24,1) !important;
+  pointer-events:auto !important;
+  box-shadow:0 22px 65px rgba(0,0,0,.55) !important;
+  margin:0 !important;
+}
+.barb-ticker.is-open .barb-ticker__panel{
+  transform:translate3d(0,0,0) !important;
+}
+.barb-ticker.is-dragging .barb-ticker__panel{
+  transition:none !important;
+}
+
+.barb-ticker__handle{
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  width:100vw !important;
+  height:74px !important;
+  transform:none !important;
+  display:block !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  background:transparent !important;
+  color:rgba(255,255,255,.96) !important;
+  cursor:grab !important;
+  pointer-events:auto !important;
+  touch-action:none !important;
+  z-index:9010 !important;
+  transition:top 720ms cubic-bezier(.18,.88,.24,1) !important;
+}
+.barb-ticker.is-open .barb-ticker__handle{
+  top:calc(min(var(--ticker-panel-height),560px) - 36px) !important;
+}
+.barb-ticker.is-dragging .barb-ticker__handle{
+  transition:none !important;
+}
+.barb-ticker__folder{
+  position:relative;
+  width:100vw;
+  height:64px;
+  display:block;
+  animation:folderTabDrop 3.8s ease-in-out infinite;
+  transition:transform 300ms ease,filter 300ms ease;
+  filter:drop-shadow(0 8px 18px rgba(0,0,0,.16));
+}
+.barb-ticker__folder-rail,
+.barb-ticker__folder-tab,
+.barb-ticker__folder-rail-inner,
+.barb-ticker__folder-tab-inner{
+  position:absolute;
+  box-sizing:border-box;
+  display:block;
+}
+.barb-ticker__folder-rail{
+  left:0;
+  top:0;
+  width:100vw;
+  height:24px;
+  border:5px solid rgba(199,204,210,.96);
+  border-left:0;
+  border-right:0;
+  border-bottom-width:4px;
+  border-radius:0;
+  background:linear-gradient(180deg,rgba(252,253,254,.92),rgba(228,232,236,.84) 56%,rgba(210,215,220,.90));
+  box-shadow:
+    inset 0 -1px 0 rgba(255,255,255,.86),
+    inset 0 -8px 12px rgba(120,128,138,.10),
+    0 1px 0 rgba(255,255,255,.70);
+}
+.barb-ticker__folder-rail-inner{
+  left:0;
+  right:0;
+  top:5px;
+  height:8px;
+  border-radius:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,.10));
+}
+.barb-ticker__folder-tab{
+  left:28px;
+  top:19px;
+  width:92px;
+  height:43px;
+  transform:none;
+  border:5px solid rgba(199,204,210,.98);
+  border-top:0;
+  border-radius:0 0 14px 14px;
+  background:linear-gradient(180deg,rgba(250,251,252,.96),rgba(223,228,233,.90) 60%,rgba(206,211,217,.94));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.78),
+    inset 0 -10px 14px rgba(124,132,141,.12),
+    0 1px 0 rgba(255,255,255,.62);
+}
+.barb-ticker__folder-tab-inner{
+  left:8px;
+  right:8px;
+  top:7px;
+  height:14px;
+  border-radius:0 0 8px 8px;
+  background:linear-gradient(180deg,rgba(255,255,255,.58),rgba(255,255,255,.10));
+}
+.barb-ticker__folder::before{
+  content:"";
+  position:absolute;
+  top:4px;
+  left:8%;
+  width:84%;
+  height:8px;
+  border-radius:0;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.82),rgba(255,255,255,0));
+  opacity:.52;
+  filter:blur(1px);
+}
+.barb-ticker__folder::after{
+  content:"";
+  position:absolute;
+  top:24px;
+  left:50px;
+  width:48px;
+  height:6px;
+  border-radius:0 0 999px 999px;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.72),rgba(255,255,255,0));
+  opacity:.45;
+  filter:blur(.8px);
+}
+.barb-ticker__handle:hover .barb-ticker__folder,
+.barb-ticker__handle:focus-visible .barb-ticker__folder{
+  transform:translateY(2px);
+  filter:drop-shadow(0 10px 20px rgba(0,0,0,.20));
+}
+.barb-ticker.is-open .barb-ticker__folder{
+  transform:translateY(6px);
+}
+@keyframes folderTabDrop{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(5px)}
+}
+body.barb-ticker-lock{
+  overflow:hidden !important;
+  overscroll-behavior:none;
+}
+@media(max-width:700px){
+  :root{--ticker-panel-height:48dvh}
+  .barb-ticker__panel{min-height:300px !important;max-height:500px !important}
+  .barb-ticker__folder-tab{left:18px;width:82px}
+}
+@media(prefers-reduced-motion:reduce){
+  .barb-ticker__panel,.barb-ticker__handle,.barb-ticker__folder{
+    transition-duration:1ms !important;
+  }
+  .barb-ticker__folder{animation:none !important}
+}
+
+</style>
+
+
+<style id="preview-safe-fix">
+  html,body{min-height:100%;background:#F7F3E8}
+  body{font-family:Georgia,'Times New Roman',serif}
+  .hero{min-height:100vh}
+  .world{background:
+    radial-gradient(circle at 20% 14%,rgba(255,255,255,.98),transparent 28%),
+    radial-gradient(circle at 80% 22%,rgba(233,226,210,.78),transparent 34%),
+    linear-gradient(145deg,#F7F3E8,#F1EEE7 56%,#E9E2D2)}
+  .barb-ticker{position:fixed!important;inset:0!important;pointer-events:none!important;z-index:9000!important}
+  .barb-ticker__panel{position:fixed!important;top:0!important;left:0!important;right:0!important;height:48vh!important;transform:translateY(-100%)!important}
+  .barb-ticker__handle{position:fixed!important;top:0!important;left:0!important;width:100vw!important;transform:none!important;pointer-events:auto!important}
+  .behind-world{min-height:100vh}
+</style>
+
+
+<style id="celestial-local-file-placeholders">
+  .celestial img{
+    display:block !important;
+    position:absolute !important;
+    object-fit:contain !important;
+  }
+  /* These are real file placeholders. Put these exact files beside index.html:
+     sun.png, star1.png, star2.png */
+</style>
+
+
+<style id="barbph-complete-folder-tab-system">
+  :root{
+    --ticker-open-height:clamp(420px,60dvh,620px);
+    --folder-rail-h:24px;
+    --folder-silver-1:#fafbfc;
+    --folder-silver-2:#e3e7ea;
+    --folder-silver-3:#cbd1d6;
+    --folder-edge:#c1c7cd;
+    --folder-ink:#30363b;
+  }
+
+  .barb-ticker__topbar{
+    position:fixed !important;
+    top:0 !important;
+    left:-3px !important;
+    right:-3px !important;
+    height:126px !important;
+    z-index:9050 !important;
+    overflow:visible !important;
+    pointer-events:none !important;
+    transition:top 720ms cubic-bezier(.18,.88,.24,1) !important;
+  }
+
+  .barb-ticker__top-rail{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:var(--folder-rail-h);
+    display:block;
+    box-sizing:border-box;
+    border-top:5px solid rgba(197,203,209,.98);
+    border-bottom:4px solid rgba(197,203,209,.98);
+    background:linear-gradient(180deg,var(--folder-silver-1),var(--folder-silver-2) 56%,var(--folder-silver-3));
+    box-shadow:
+      inset 0 -1px 0 rgba(255,255,255,.92),
+      inset 0 -8px 12px rgba(110,119,128,.10),
+      0 1px 0 rgba(255,255,255,.75),
+      0 7px 18px rgba(0,0,0,.08);
+  }
+
+  .barb-ticker__top-rail-inner{
+    position:absolute;
+    left:0;
+    right:0;
+    top:5px;
+    height:8px;
+    background:linear-gradient(180deg,rgba(255,255,255,.76),rgba(255,255,255,.12));
+  }
+
+  .folder-tabs{
+    position:absolute;
+    top:19px;
+    left:14px;
+    display:flex;
+    align-items:flex-start;
+    gap:0;
+    pointer-events:auto;
+  }
+
+  .folder-tab{
+    --tab-w:84px;
+    --tab-h:44px;
+    position:relative;
+    width:var(--tab-w);
+    height:var(--tab-h);
+    flex:0 0 auto;
+    margin:0 0 0 -4px;
+    padding:0;
+    border:0;
+    background:transparent;
+    color:var(--folder-ink);
+    text-decoration:none;
+    cursor:pointer;
+    outline:none;
+    z-index:1;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  .folder-tab:first-child{margin-left:0}
+  .folder-tab--builds{--tab-w:118px;--tab-h:64px;z-index:7}
+  .folder-tab--ticker{--tab-w:102px;--tab-h:60px;z-index:6}
+  .folder-tab--products{z-index:5}
+  .folder-tab--programs{z-index:4}
+  .folder-tab--partnership{z-index:3}
+  .folder-tab--publications{z-index:2}
+  .folder-tab--connect{z-index:1}
+
+  .folder-tab__surface{
+    position:absolute;
+    inset:0;
+    display:grid;
+    place-items:center;
+    box-sizing:border-box;
+    overflow:hidden;
+    border:5px solid rgba(197,203,209,.98);
+    border-top:0;
+    border-radius:0 0 14px 14px;
+    background:linear-gradient(180deg,var(--folder-silver-1),var(--folder-silver-2) 58%,var(--folder-silver-3));
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.88),
+      inset 0 -10px 15px rgba(111,121,130,.10),
+      0 1px 0 rgba(255,255,255,.70),
+      0 7px 15px rgba(0,0,0,.09);
+    transition:
+      height .20s ease,
+      transform .20s ease,
+      background .20s ease,
+      border-color .20s ease,
+      box-shadow .20s ease;
+  }
+
+  .folder-tab__surface::before{
+    content:"";
+    position:absolute;
+    top:7px;
+    left:12%;
+    width:76%;
+    height:7px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.80),transparent);
+    filter:blur(.9px);
+    opacity:.43;
+    pointer-events:none;
+  }
+
+  .folder-tab__icon svg{
+    width:31px;
+    height:31px;
+    overflow:visible;
+    fill:none;
+    stroke:#3c4349;
+    stroke-width:2.4;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    position:relative;
+    z-index:2;
+  }
+
+  .folder-tab--ticker .folder-tab__icon svg{width:42px;height:36px}
+  .folder-tab--programs .folder-tab__icon svg{width:35px;height:35px}
+  .folder-tab--partnership .folder-tab__icon svg{width:36px;height:36px}
+  .folder-tab--publications .folder-tab__icon svg{width:32px;height:32px}
+  .folder-tab--connect .folder-tab__icon svg{width:39px;height:34px}
+
+  .folder-tab__embroidery{
+    position:absolute;
+    inset:0;
+  }
+
+  .folder-tab__embroidery img{
+    position:absolute;
+    display:block;
+    object-fit:contain;
+    filter:drop-shadow(0 2px 2px rgba(74,55,13,.14));
+  }
+
+  .embroidery-sun{
+    left:6px;
+    top:6px;
+    width:54px;
+    height:54px;
+  }
+
+  .embroidery-star--1{
+    left:59px;
+    top:4px;
+    width:38px;
+    height:27px;
+    transform:rotate(7deg);
+  }
+
+  .embroidery-star--2{
+    left:72px;
+    top:27px;
+    width:34px;
+    height:24px;
+    transform:rotate(-6deg);
+  }
+
+  .embroidery-star--3{
+    left:52px;
+    top:41px;
+    width:28px;
+    height:20px;
+    transform:rotate(13deg);
+  }
+
+  /* Quiet text appears only when the pointer/focus reaches a tab. */
+  .folder-tab__hint{
+    position:absolute;
+    left:50%;
+    top:calc(100% + 8px);
+    transform:translate(-50%,-3px);
+    width:max-content;
+    max-width:210px;
+    padding:6px 9px 5px;
+    border:1px solid rgba(55,61,67,.12);
+    border-radius:7px;
+    background:rgba(248,248,246,.96);
+    box-shadow:0 8px 18px rgba(0,0,0,.08);
+    color:#343a3f;
+    font:600 10px/1 system-ui,-apple-system,"Segoe UI",sans-serif;
+    letter-spacing:.10em;
+    text-transform:uppercase;
+    white-space:nowrap;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .14s ease,transform .14s ease,visibility .14s ease;
+    z-index:30;
+  }
+
+  @media (hover:hover) and (pointer:fine){
+    .folder-tab:hover .folder-tab__hint{
+      opacity:1;
+      visibility:visible;
+      transform:translate(-50%,0);
+    }
+    .folder-tab:hover .folder-tab__surface{
+      background:linear-gradient(180deg,#ffffff,#e8ebee 56%,#cfd5da);
+      border-color:#b9c0c6;
+    }
+  }
+
+  .folder-tab:focus-visible .folder-tab__hint{
+    opacity:1;
+    visibility:visible;
+    transform:translate(-50%,0);
+  }
+
+  .folder-tab:focus-visible .folder-tab__surface{
+    outline:2px solid rgba(47,54,60,.82);
+    outline-offset:3px;
+  }
+
+  /* ACTIVE = a folder physically pulled forward. */
+  .folder-tab.is-active{
+    z-index:20 !important;
+  }
+
+  .folder-tab.is-active .folder-tab__surface{
+    height:calc(100% + 5px);
+    transform:translateY(4px);
+    border-color:#aeb6bd;
+    background:linear-gradient(180deg,#f6f7f8,#dce1e5 56%,#bcc5cc);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      inset 0 -12px 18px rgba(91,101,111,.14),
+      0 2px 0 rgba(255,255,255,.66),
+      0 10px 18px rgba(0,0,0,.14);
+  }
+
+  /* Ticker panel */
+  .barb-ticker__panel{
+    height:var(--ticker-open-height) !important;
+    min-height:0 !important;
+    max-height:none !important;
+    transform:translate3d(0,-100%,0) !important;
+    transition:transform 720ms cubic-bezier(.18,.88,.24,1) !important;
+  }
+
+  .barb-ticker.is-open .barb-ticker__panel{
+    transform:translate3d(0,0,0) !important;
+  }
+
+  .barb-ticker.is-open .barb-ticker__topbar{
+    top:calc(var(--ticker-open-height) - var(--folder-rail-h)) !important;
+  }
+
+  /* Connect drawer */
+  .connect-drawer{
+    position:absolute;
+    top:24px;
+    left:0;
+    right:0;
+    min-height:0;
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+    pointer-events:none;
+    background:rgba(246,247,247,.975);
+    border-bottom:1px solid rgba(58,64,69,.14);
+    box-shadow:0 20px 42px rgba(0,0,0,.12);
+    transition:max-height .38s cubic-bezier(.2,.8,.2,1),opacity .18s ease;
+  }
+
+  .barb-ticker__topbar.is-connect-open .connect-drawer{
+    max-height:min(560px,calc(100vh - 24px));
+    opacity:1;
+    pointer-events:auto;
+    overflow:auto;
+  }
+
+  .connect-drawer__inner{
+    min-height:112px;
+    padding:70px 20px 20px;
+  }
+
+  .connect-drawer__inner--form{
+    display:block;
+  }
+
+  .testimonial-connect{
+    width:min(980px,100%);
+    margin:0 auto;
+    padding:18px;
+    border:1px solid rgba(71,78,84,.14);
+    background:rgba(255,255,255,.68);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+  }
+
+  .testimonial-connect__intro{
+    display:grid;
+    gap:5px;
+    margin-bottom:16px;
+  }
+
+  .testimonial-connect__eyebrow{
+    font:650 9px/1 system-ui,sans-serif;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:rgba(41,47,52,.48);
+  }
+
+  .testimonial-connect h2{
+    margin:0;
+    color:#292f34;
+    font:520 22px/1.15 system-ui,sans-serif;
+  }
+
+  .testimonial-connect p{
+    margin:2px 0 0;
+    max-width:720px;
+    color:rgba(41,47,52,.66);
+    font:400 13px/1.5 system-ui,sans-serif;
+  }
+
+  .testimonial-form{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:11px;
+  }
+
+  .testimonial-field{
+    display:grid;
+    gap:6px;
+    min-width:0;
+  }
+
+  .testimonial-field--wide{
+    grid-column:1 / -1;
+  }
+
+  .testimonial-field > span{
+    font:650 9px/1 system-ui,sans-serif;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:rgba(41,47,52,.56);
+  }
+
+  .testimonial-field input,
+  .testimonial-field textarea,
+  .testimonial-field select{
+    width:100%;
+    min-height:42px;
+    border:1px solid rgba(71,78,84,.18);
+    border-radius:0;
+    background:rgba(255,255,255,.9);
+    color:#292f34;
+    padding:10px 11px;
+    font:400 14px/1.35 system-ui,sans-serif;
+    outline:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.95);
+  }
+
+  .testimonial-field textarea{
+    min-height:86px;
+    resize:vertical;
+  }
+
+  .testimonial-field input:focus,
+  .testimonial-field textarea:focus,
+  .testimonial-field select:focus{
+    border-color:rgba(55,62,67,.52);
+    box-shadow:0 0 0 2px rgba(55,62,67,.08);
+  }
+
+  .testimonial-honeypot{
+    position:absolute !important;
+    width:1px !important;
+    height:1px !important;
+    overflow:hidden !important;
+    clip:rect(0 0 0 0) !important;
+    white-space:nowrap !important;
+  }
+
+  .testimonial-form__footer{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    flex-wrap:wrap;
+    padding-top:2px;
+  }
+
+  .testimonial-submit{
+    appearance:none;
+    border:1px solid rgba(41,47,52,.24);
+    background:#2d3439;
+    color:#fff;
+    padding:11px 15px;
+    min-height:42px;
+    font:620 12px/1 system-ui,sans-serif;
+    letter-spacing:.04em;
+    cursor:pointer;
+    box-shadow:0 5px 14px rgba(0,0,0,.10);
+  }
+
+  .testimonial-submit:hover,
+  .testimonial-submit:focus-visible{
+    background:#171c20;
+    outline:none;
+  }
+
+  .testimonial-submit:disabled{
+    opacity:.55;
+    cursor:wait;
+  }
+
+  .testimonial-status{
+    color:rgba(41,47,52,.68);
+    font:500 12px/1.35 system-ui,sans-serif;
+  }
+
+  @media(max-width:720px){
+    .folder-tabs{
+      left:9px;
+      max-width:calc(100vw - 18px);
+      overflow-x:auto;
+      overflow-y:visible;
+      scrollbar-width:none;
+      padding-bottom:42px;
+    }
+    .folder-tabs::-webkit-scrollbar{display:none}
+    .folder-tab{--tab-w:72px}
+    .folder-tab--builds{--tab-w:108px}
+    .folder-tab__icon svg{width:28px;height:28px}
+    .connect-drawer__inner{
+      padding:70px 10px 14px;
+    }
+    .testimonial-connect{
+      padding:14px;
+    }
+    .testimonial-form{
+      grid-template-columns:1fr;
+    }
+    .testimonial-field--wide{
+      grid-column:auto;
+    }
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    .barb-ticker__panel,
+    .barb-ticker__topbar,
+    .folder-tab__surface,
+    .folder-tab__hint,
+    .connect-drawer{
+      transition-duration:1ms !important;
+    }
+  }
+</style>
+
+
+<style id="barbph-icon-refinement-chart-plus">
+  .folder-tab--ticker .folder-tab__icon svg{
+    width:42px !important;
+    height:36px !important;
+    stroke-width:2.15 !important;
+  }
+
+  .folder-tab--ticker .folder-tab__icon rect{
+    fill:rgba(60,67,73,.16);
+    stroke:#3c4349;
+    stroke-width:1.6;
+  }
+
+  .folder-tab--products .folder-tab__icon svg,
+  .folder-tab--partnership .folder-tab__icon svg,
+  .folder-tab--programs .folder-tab__icon svg{
+    stroke-width:2.25 !important;
+  }
+
+  .folder-tab--connect .folder-tab__icon svg{
+    width:39px !important;
+    height:34px !important;
+  }
+
+  .folder-tab--connect .folder-tab__icon .connect-plus{
+    stroke-width:4.8 !important;
+    stroke-linecap:round;
+  }
+</style>
+
+
+
+<style id="barbph-final-tab-art">
+  .folder-tab--ticker{
+    --tab-w:102px !important;
+    --tab-h:60px !important;
+  }
+  .folder-tab--partnership{
+    --tab-w:104px !important;
+  }
+  .folder-tab--connect{
+    --tab-w:92px !important;
+  }
+
+  .final-tab-art{
+    position:absolute;
+    left:5px;
+    right:5px;
+    top:4px;
+    bottom:5px;
+    width:calc(100% - 10px);
+    height:calc(100% - 9px);
+    display:block;
+    object-fit:contain;
+    object-position:center;
+    pointer-events:none;
+    user-select:none;
+    z-index:2;
+  }
+
+  .folder-tab--ticker .final-tab-art{
+    left:8px;
+    right:8px;
+    top:5px;
+    bottom:6px;
+    width:calc(100% - 16px);
+    height:calc(100% - 11px);
+  }
+
+  .folder-tab--partnership .final-tab-art{
+    left:4px;
+    right:4px;
+    width:calc(100% - 8px);
+  }
+
+  .folder-tab--programs .final-tab-art{
+    left:7px;
+    right:7px;
+    width:calc(100% - 14px);
+  }
+
+  .folder-tab--products .final-tab-art,
+  .folder-tab--publications .final-tab-art{
+    left:8px;
+    right:8px;
+    width:calc(100% - 16px);
+  }
+
+  @media(max-width:720px){
+    .folder-tab--ticker{--tab-w:92px !important;--tab-h:58px !important}
+    .folder-tab--partnership{--tab-w:94px !important}
+    .folder-tab--connect{--tab-w:84px !important}
+  }
+</style>
+
+
+<style id="barbph-mystery-tab">
+  .folder-tab--mystery{
+    --tab-w:54px !important;
+    --tab-h:38px !important;
+    z-index:0;
+  }
+  .folder-tab--mystery .folder-tab__surface{
+    border-radius:0 0 11px 11px;
+  }
+  .folder-tab__mystery-mark{
+    font:700 24px/1 Georgia,serif;
+    color:#3c4349;
+    padding-top:1px;
+  }
+  @media(max-width:720px){
+    .folder-tab--mystery{
+      --tab-w:48px !important;
+      --tab-h:36px !important;
+    }
+    .folder-tab__mystery-mark{
+      font-size:21px;
+    }
+  }
+</style>
+
+
+<style id="barbph-rightmost-question-fix">
+  @media (min-width:721px){
+    .folder-tabs{
+      right:14px !important;
+      width:auto !important;
+    }
+
+    .folder-tab--mystery{
+      margin-left:auto !important;
+      flex:0 0 54px !important;
+    }
+  }
+</style>
+
+
+<style id="barbph-original-tab-design-lock">
+  /* VISUAL MASTER: exact silver/acrylic treatment from the first two-tab build.
+     The newer routing, drawers and tab functions remain untouched. */
+  .folder-tab{
+    --tab-w:92px !important;
+    --tab-h:43px !important;
+    width:var(--tab-w) !important;
+    height:var(--tab-h) !important;
+    flex:0 0 var(--tab-w) !important;
+    margin-left:-4px !important;
+    transform:none !important;
+  }
+  .folder-tab:first-child{margin-left:0 !important}
+
+  .folder-tab--builds{
+    --tab-w:196px !important;
+    --tab-h:78px !important;
+    z-index:8 !important;
+  }
+  .folder-tab--ticker{z-index:7 !important}
+  .folder-tab--products{z-index:6 !important}
+  .folder-tab--programs{z-index:5 !important}
+  .folder-tab--partnership{z-index:4 !important}
+  .folder-tab--publications{z-index:3 !important}
+  .folder-tab--connect{z-index:2 !important}
+  .folder-tab--mystery{
+    --tab-w:54px !important;
+    --tab-h:38px !important;
+    flex:0 0 54px !important;
+    margin-left:auto !important;
+    z-index:1 !important;
+  }
+
+  /* Exact original small-tab shell. */
+  .folder-tab:not(.folder-tab--builds) .folder-tab__surface{
+    inset:0 !important;
+    height:100% !important;
+    border:5px solid rgba(199,204,210,.98) !important;
+    border-top:0 !important;
+    border-radius:0 0 14px 14px !important;
+    background:
+      linear-gradient(180deg,
+        rgba(250,251,252,.96),
+        rgba(223,228,233,.90) 60%,
+        rgba(206,211,217,.94)) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.78),
+      inset 0 -10px 14px rgba(124,132,141,.12),
+      0 1px 0 rgba(255,255,255,.62),
+      0 7px 14px rgba(0,0,0,.10) !important;
+    transition:filter .18s ease,transform .18s ease !important;
+  }
+  .folder-tab:not(.folder-tab--builds) .folder-tab__surface::before{
+    content:"" !important;
+    position:absolute !important;
+    left:8px !important;
+    right:8px !important;
+    top:7px !important;
+    width:auto !important;
+    height:14px !important;
+    border-radius:0 0 8px 8px !important;
+    background:linear-gradient(180deg,rgba(255,255,255,.60),rgba(255,255,255,.10)) !important;
+    filter:none !important;
+    opacity:1 !important;
+    pointer-events:none !important;
+  }
+
+  /* Exact original Behind-the-Builds shell. */
+  .folder-tab--builds .folder-tab__surface{
+    inset:0 !important;
+    height:100% !important;
+    overflow:hidden !important;
+    border:6px solid rgba(195,201,207,.98) !important;
+    border-top:0 !important;
+    border-radius:0 0 18px 18px !important;
+    background:
+      linear-gradient(180deg,
+        rgba(252,253,254,.97),
+        rgba(229,233,237,.94) 50%,
+        rgba(208,214,220,.96)) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.90),
+      inset 0 -14px 18px rgba(112,122,132,.12),
+      0 1px 0 rgba(255,255,255,.72),
+      0 10px 22px rgba(0,0,0,.13) !important;
+    transition:filter .18s ease,transform .18s ease !important;
+  }
+  .folder-tab--builds .folder-tab__surface::before{
+    content:"" !important;
+    position:absolute !important;
+    left:10px !important;
+    right:10px !important;
+    top:7px !important;
+    width:auto !important;
+    height:10px !important;
+    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.84),rgba(255,255,255,0)) !important;
+    opacity:.48 !important;
+    filter:blur(1px) !important;
+    pointer-events:none !important;
+  }
+
+  /* Exact original celestial composition box/coordinates. */
+  .folder-tab--builds .folder-tab__embroidery{
+    position:absolute !important;
+    left:8px !important;
+    top:2px !important;
+    width:104px !important;
+    height:67px !important;
+    transform:none !important;
+  }
+  .folder-tab--builds .folder-tab__embroidery img{
+    position:absolute !important;
+    display:block !important;
+    object-fit:contain !important;
+    filter:drop-shadow(0 2px 2px rgba(30,30,30,.16)) !important;
+  }
+  .folder-tab--builds .embroidery-sun{
+    left:0 !important; top:4px !important; width:58px !important; height:58px !important;
+  }
+  .folder-tab--builds .embroidery-star--1{
+    left:54px !important; top:2px !important; width:42px !important; height:30px !important; transform:rotate(7deg) !important;
+  }
+  .folder-tab--builds .embroidery-star--2{
+    left:64px !important; top:29px !important; width:38px !important; height:25px !important; transform:rotate(-6deg) !important;
+  }
+  .folder-tab--builds .embroidery-star--3{
+    left:47px !important; top:42px !important; width:30px !important; height:22px !important; transform:rotate(14deg) !important;
+  }
+
+  /* Current charcoal drawings fitted inside the original shell, not a redesigned shell. */
+  .folder-tab:not(.folder-tab--builds) .final-tab-art{
+    position:absolute !important;
+    left:8px !important;
+    right:8px !important;
+    top:4px !important;
+    bottom:4px !important;
+    width:calc(100% - 16px) !important;
+    height:calc(100% - 8px) !important;
+    object-fit:contain !important;
+    object-position:center !important;
+    z-index:2 !important;
+  }
+  .folder-tab--ticker .final-tab-art{left:6px !important;right:6px !important;width:calc(100% - 12px) !important}
+  .folder-tab--partnership .final-tab-art,
+  .folder-tab--connect .final-tab-art{left:5px !important;right:5px !important;width:calc(100% - 10px) !important}
+
+  @media (hover:hover) and (pointer:fine){
+    .folder-tab:hover .folder-tab__surface{
+      filter:brightness(1.025) !important;
+      transform:none !important;
+    }
+  }
+
+  /* Active tabs keep the later locked physical cue, but use the original finish. */
+  .folder-tab.is-active{z-index:20 !important}
+  .folder-tab.is-active .folder-tab__surface{
+    height:100% !important;
+    transform:translateY(4px) !important;
+    filter:brightness(.985) !important;
+  }
+
+  @media (min-width:901px){
+    .folder-tabs{
+      left:28px !important;
+      right:14px !important;
+      top:19px !important;
+      width:auto !important;
+      height:78px !important;
+      align-items:flex-start !important;
+      overflow:visible !important;
+    }
+  }
+
+  @media (max-width:900px){
+    .folder-tabs{
+      left:10px !important;
+      right:10px !important;
+      top:19px !important;
+      width:auto !important;
+      max-width:calc(100vw - 20px) !important;
+      overflow-x:auto !important;
+      overflow-y:visible !important;
+      scrollbar-width:none !important;
+      -webkit-overflow-scrolling:touch;
+      padding-right:8px !important;
+    }
+    .folder-tabs::-webkit-scrollbar{display:none}
+    .folder-tab{--tab-w:82px !important}
+    .folder-tab--builds{--tab-w:184px !important;--tab-h:76px !important}
+    .folder-tab--mystery{--tab-w:48px !important;--tab-h:36px !important;flex:0 0 48px !important;margin-left:-4px !important}
+  }
+</style>
+
+
+<style id="barbph-tab-spacing-launch-fix">
+  /* Keep the original approved tab shells. Only the rail spacing changes. */
+  .folder-tabs{
+    justify-content:flex-start !important;
+    gap:12px !important;
+  }
+  .folder-tab,
+  .folder-tab:first-child,
+  .folder-tab--mystery{
+    margin-left:0 !important;
+  }
+  .folder-tab--mystery{
+    flex:0 0 54px !important;
+  }
+  @media (max-width:900px){
+    .folder-tabs{gap:8px !important;}
+    .folder-tab--mystery{
+      flex:0 0 48px !important;
+      margin-left:0 !important;
+    }
+  }
+</style>
+
+
+<style id="barbph-connect-plus-modes">
+  .connect-plus-shell{display:block}
+  .connect-mode-switch{
+    display:flex;
+    gap:8px;
+    margin:0 0 16px;
+    padding:0 0 12px;
+    border-bottom:1px solid rgba(71,78,84,.12);
+  }
+  .connect-mode-button{
+    appearance:none;
+    border:1px solid rgba(41,47,52,.18);
+    background:rgba(255,255,255,.58);
+    color:#3a4045;
+    min-height:36px;
+    padding:8px 13px;
+    font:620 11px/1 system-ui,sans-serif;
+    letter-spacing:.05em;
+    cursor:pointer;
+  }
+  .connect-mode-button:hover,
+  .connect-mode-button:focus-visible{
+    border-color:rgba(41,47,52,.42);
+    outline:none;
+  }
+  .connect-mode-button.is-active{
+    background:#2d3439;
+    color:#fff;
+    border-color:#2d3439;
+  }
+  .connect-mode-panel[hidden]{display:none !important}
+  .connect-contact-note{
+    align-self:end;
+    color:rgba(41,47,52,.58);
+    font:400 11px/1.45 system-ui,sans-serif;
+    padding:4px 2px 8px;
+  }
+  @media(max-width:720px){
+    .connect-mode-switch{flex-wrap:wrap}
+    .connect-contact-note{padding-bottom:2px}
+  }
+</style>
+
+
+<style id="barbph-restore-first-tab-look-final">
+/*
+  RESTORED FIRST-LOOK FOLDER TABS
+  Compact, overlapping silver folder tabs from the earlier approved direction.
+  Keeps the final charcoal artwork files, but removes the later oversized geometry.
+*/
+.folder-tabs{
+  position:absolute !important;
+  top:19px !important;
+  left:14px !important;
+  right:auto !important;
+  width:auto !important;
+  height:auto !important;
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:flex-start !important;
+  gap:0 !important;
+  overflow:visible !important;
+  pointer-events:auto !important;
+}
+
+.folder-tab{
+  --tab-w:84px !important;
+  --tab-h:44px !important;
+  position:relative !important;
+  width:var(--tab-w) !important;
+  height:var(--tab-h) !important;
+  flex:0 0 var(--tab-w) !important;
+  margin:0 0 0 -4px !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+  color:#3c4349 !important;
+  text-decoration:none !important;
+  cursor:pointer !important;
+  outline:none !important;
+}
+.folder-tab:first-child{margin-left:0 !important}
+
+/* Original compact hierarchy */
+.folder-tab--builds{
+  --tab-w:118px !important;
+  --tab-h:64px !important;
+  flex-basis:118px !important;
+  z-index:8 !important;
+}
+.folder-tab--ticker{
+  --tab-w:102px !important;
+  --tab-h:60px !important;
+  flex-basis:102px !important;
+  z-index:7 !important;
+}
+.folder-tab--products{z-index:6 !important}
+.folder-tab--programs{z-index:5 !important}
+.folder-tab--partnership{z-index:4 !important}
+.folder-tab--publications{z-index:3 !important}
+.folder-tab--connect{z-index:2 !important}
+.folder-tab--mystery{
+  --tab-w:48px !important;
+  --tab-h:36px !important;
+  flex:0 0 48px !important;
+  margin-left:-4px !important;
+  z-index:1 !important;
+}
+
+/* Restore the earlier silver folder material and proportions */
+.folder-tab__surface{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  display:grid !important;
+  place-items:center !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+  padding:0 !important;
+  border:5px solid rgba(197,203,209,.98) !important;
+  border-top:0 !important;
+  border-radius:0 0 14px 14px !important;
+  background:
+    linear-gradient(180deg,#f8f9fa 0%,#e7eaed 55%,#cbd1d6 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.88),
+    inset 0 -10px 15px rgba(111,121,130,.10),
+    0 1px 0 rgba(255,255,255,.70),
+    0 7px 15px rgba(0,0,0,.09) !important;
+  filter:none !important;
+  transform:none !important;
+}
+
+.folder-tab__surface::before{
+  content:"" !important;
+  position:absolute !important;
+  top:7px !important;
+  left:12% !important;
+  width:76% !important;
+  right:auto !important;
+  height:7px !important;
+  border-radius:0 !important;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.80),transparent) !important;
+  filter:blur(.9px) !important;
+  opacity:.43 !important;
+  pointer-events:none !important;
+}
+
+/* Behind the Builds: exact earlier compact artwork placement; no dead right-side space */
+.folder-tab--builds .folder-tab__embroidery{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  transform:none !important;
+}
+.folder-tab--builds .folder-tab__embroidery img{
+  position:absolute !important;
+  display:block !important;
+  object-fit:contain !important;
+  filter:drop-shadow(0 2px 2px rgba(74,55,13,.14)) !important;
+}
+.folder-tab--builds .embroidery-sun{
+  left:6px !important;
+  top:6px !important;
+  width:54px !important;
+  height:54px !important;
+}
+.folder-tab--builds .embroidery-star--1{
+  left:59px !important;
+  top:4px !important;
+  width:38px !important;
+  height:27px !important;
+  transform:rotate(7deg) !important;
+}
+.folder-tab--builds .embroidery-star--2{
+  left:72px !important;
+  top:27px !important;
+  width:34px !important;
+  height:24px !important;
+  transform:rotate(-6deg) !important;
+}
+.folder-tab--builds .embroidery-star--3{
+  left:52px !important;
+  top:35px !important;
+  width:28px !important;
+  height:20px !important;
+  transform:rotate(13deg) !important;
+}
+
+/* Fit final charcoal drawings inside the original compact tab faces */
+.folder-tab:not(.folder-tab--builds) .final-tab-art{
+  position:absolute !important;
+  left:8px !important;
+  right:8px !important;
+  top:5px !important;
+  bottom:5px !important;
+  width:calc(100% - 16px) !important;
+  height:calc(100% - 10px) !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:contain !important;
+  object-position:center !important;
+  transform:none !important;
+  filter:none !important;
+}
+.folder-tab--ticker .final-tab-art{
+  left:9px !important;
+  right:9px !important;
+  top:5px !important;
+  bottom:5px !important;
+  width:calc(100% - 18px) !important;
+  height:calc(100% - 10px) !important;
+}
+
+/* Keep the original physical pulled-forward cue restrained */
+.folder-tab.is-active{z-index:20 !important}
+.folder-tab.is-active .folder-tab__surface{
+  height:calc(100% + 5px) !important;
+  transform:translateY(4px) !important;
+  border-color:#aeb6bd !important;
+  background:linear-gradient(180deg,#f6f7f8,#dce1e5 56%,#bcc5cc) !important;
+}
+
+@media (hover:hover) and (pointer:fine){
+  .folder-tab:hover .folder-tab__surface{
+    background:linear-gradient(180deg,#ffffff,#e8ebee 56%,#cfd5da) !important;
+    border-color:#b9c0c6 !important;
+    filter:none !important;
+  }
+}
+
+@media(max-width:720px){
+  .folder-tabs{
+    left:9px !important;
+    right:auto !important;
+    max-width:calc(100vw - 18px) !important;
+    overflow-x:auto !important;
+    overflow-y:visible !important;
+    scrollbar-width:none !important;
+    padding-bottom:42px !important;
+  }
+  .folder-tabs::-webkit-scrollbar{display:none}
+  .folder-tab{
+    --tab-w:72px !important;
+    flex-basis:72px !important;
+  }
+  .folder-tab--builds{
+    --tab-w:108px !important;
+    --tab-h:64px !important;
+    flex-basis:108px !important;
+  }
+  .folder-tab--ticker{
+    --tab-w:92px !important;
+    --tab-h:58px !important;
+    flex-basis:92px !important;
+  }
+  .folder-tab--mystery{
+    --tab-w:44px !important;
+    --tab-h:36px !important;
+    flex-basis:44px !important;
+  }
+}
+</style>
+
+
+<style id="barbph-launch-ticker-guard">
+  .barb-ticker:not(.is-open) .barb-ticker__panel{
+    transform:translate3d(0,-100%,0) !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
+  }
+  .barb-ticker.is-open .barb-ticker__panel{
+    transform:translate3d(0,0,0) !important;
+    visibility:visible !important;
+    pointer-events:auto !important;
+  }
+  .barb-ticker:not(.is-open) .barb-ticker__topbar{
+    top:0 !important;
+  }
+  .prebirth{padding-top:34px !important;padding-bottom:26px !important}
+  .prebirth__inner{gap:16px !important}
+  .prebirth__rotator{min-height:74px !important}
+</style>
+
+
+<style id="barbph-ee-hover">
+  [data-ee-tab]{position:relative}
+  [data-ee-tab]::after{
+    content:"Everything Else";
+    position:absolute;
+    left:50%;
+    top:calc(100% + 8px);
+    transform:translateX(-50%) translateY(-4px);
+    opacity:0;
+    pointer-events:none;
+    white-space:nowrap;
+    font:600 11px/1.2 Arial,sans-serif;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#2f3438;
+    background:rgba(255,255,255,.96);
+    border:1px solid rgba(80,90,100,.22);
+    border-radius:999px;
+    padding:6px 10px;
+    box-shadow:0 8px 20px rgba(0,0,0,.12);
+    transition:opacity .16s ease,transform .16s ease;
+    z-index:9999;
+  }
+  [data-ee-tab]:hover::after,
+  [data-ee-tab]:focus-visible::after{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+</style>
+
+
+
+<style id="barbph-final-tab-spacing">
+  /* Final centered rail: tabs stay near each other, evenly spaced, never overlapping. */
+  @media (min-width:901px){
+    .folder-tabs{
+      left:50% !important;
+      right:auto !important;
+      width:auto !important;
+      max-width:calc(100vw - 36px) !important;
+      transform:translateX(-50%) !important;
+      justify-content:center !important;
+      align-items:flex-start !important;
+      gap:clamp(12px,1vw,18px) !important;
+      overflow:visible !important;
+      flex-wrap:nowrap !important;
+    }
+    .folder-tab,
+    .folder-tab:first-child,
+    .folder-tab--mystery{
+      margin-left:0 !important;
+      flex:0 0 auto !important;
+    }
+  }
+
+  @media (min-width:721px) and (max-width:900px){
+    .folder-tabs{
+      left:50% !important;
+      right:auto !important;
+      width:max-content !important;
+      max-width:calc(100vw - 24px) !important;
+      transform:translateX(-50%) !important;
+      justify-content:center !important;
+      gap:10px !important;
+      overflow-x:auto !important;
+      flex-wrap:nowrap !important;
+    }
+    .folder-tab,
+    .folder-tab:first-child,
+    .folder-tab--mystery{
+      margin-left:0 !important;
+      flex:0 0 auto !important;
+    }
+  }
+
+  @media (max-width:720px){
+    .folder-tabs{
+      left:10px !important;
+      right:10px !important;
+      width:auto !important;
+      transform:none !important;
+      justify-content:flex-start !important;
+      gap:8px !important;
+      overflow-x:auto !important;
+      flex-wrap:nowrap !important;
+    }
+  }
+</style>
+
+
+
+
+<style id="barbph-submit-success-actions">
+  .submit-success-actions{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    margin-left:14px;
+    flex-wrap:wrap;
+  }
+  .submit-success-actions a,
+  .submit-success-actions button{
+    appearance:none;
+    border:0;
+    background:transparent;
+    color:#2f3438;
+    font:inherit;
+    font-weight:700;
+    text-decoration:underline;
+    text-underline-offset:4px;
+    cursor:pointer;
+    padding:0;
+  }
+  @media(max-width:640px){
+    .submit-success-actions{
+      display:flex;
+      margin:12px 0 0;
+    }
+  }
+</style>
+
+
+<link rel="preload" as="image" href="web/ChatGPT Image Aug 22, 2026, 06_39_58 PM (2)(1).webp" type="image/webp">
+<link rel="preload" as="image" href="web/3stars1sun (3).webp" type="image/webp">
+<link rel="preload" as="image" href="web/3stars1sun (1).webp" type="image/webp">
+<link rel="preload" as="image" href="web/3stars1sun (2).webp" type="image/webp">
+<link rel="preload" as="image" href="web/3stars1sun.webp" type="image/webp">
+
+
+<style id="barbph-ticker-frozen-frame">
+  /* FROZEN INTERFACE: index.html owns only the pull-down shell.
+     ticker.html owns everything rendered inside this exact area. */
+  .barb-ticker__panel{overflow:hidden !important}
+  .barb-ticker__frame{
+    display:block;
+    width:100%;
+    height:100%;
+    border:0;
+    margin:0;
+    padding:0;
+    background:transparent;
+  }
+</style>
+
 </head>
 <body>
   <main>
@@ -313,164 +1650,817 @@
       <h1 class="visually-hidden">BarbPH — Products, Programs, Interactive Builds and Daily Discover</h1>
       <p class="visually-hidden">BarbPH is a living stage for original digital products, interactive builds, programs, and a changing Daily Discover visual world.</p>
     </section>
+</main>
 
-    <section class="behind-world" id="behind-the-builds" aria-label="Behind the Builds">
-      <div class="behind-peek" aria-hidden="true"></div>
-      <a class="behind-link" href="https://behindthebuilds.barbph.com/" target="_blank" rel="noopener noreferrer" aria-label="Behind the Builds. Opens in a new tab.">
-        <span>Behind the</span>
-        <span class="builds"><span class="b-anchor">B<span class="celestial" aria-hidden="true">
-          <img class="celestial__sun" src="/assets/behind-sun.webp" alt="">
-          <img class="celestial__s1" src="/assets/behind-star1.webp" alt="">
-          <img class="celestial__s2" src="/assets/behind-star2.webp" alt="">
-          <img class="celestial__s3" src="/assets/behind-star1.webp" alt="">
-        </span></span>uilds</span>
-      </a>
-    </section>
-  </main>
-
+  <!-- Ticker: permanent top-center gem. Newsletter remains inside the pre-birthday panel. -->
   <div class="barb-ticker" data-barb-ticker>
-    <section class="barb-ticker__panel" id="barb-ticker-panel" data-ticker-panel aria-hidden="true" aria-label="BarbPH ticker preview panel">
-      <div class="prebirth"><div class="prebirth__inner">
-        <div class="prebirth__rotator" aria-live="polite">
-          <p class="prebirth__line is-active">This layer is still unfolding.</p>
-          <p class="prebirth__line">Something is taking shape here.</p>
-          <p class="prebirth__line">The board is getting ready.</p>
-          <p class="prebirth__line">Not everything wakes at once.</p>
-          <p class="prebirth__line">There’s more to this layer.</p>
-          <p class="prebirth__line">This part of BarbPH is still becoming.</p>
-        </div>
-        <p class="prebirth__invite">You can always return — or join the BarbPH newsletter. There, we’ll announce when this layer wakes up.</p>
-        <form class="prebirth__form" id="newsletter-form" novalidate>
-          <label class="visually-hidden" for="newsletter-email">Email address</label>
-          <input class="prebirth__input" id="newsletter-email" type="email" autocomplete="email" inputmode="email" placeholder="your@email.com" required>
-          <button class="prebirth__button" type="submit">Join</button>
-        </form>
-        <p class="prebirth__status" id="newsletter-status" role="status" aria-live="polite"></p>
-        <p class="prebirth__fine">Email only. We’ll use it for BarbPH newsletter announcements.</p>
-      </div></div>
+    <section class="barb-ticker__panel" id="barb-ticker-panel" data-ticker-panel aria-hidden="true" aria-label="BarbPH ticker panel">
+      <!-- FROZEN INDEX CONTRACT:
+           Future ticker work happens ONLY in ticker.html.
+           Do not redesign or replace this iframe from index.html. -->
+      <iframe
+        class="barb-ticker__frame"
+        src="ticker.html"
+        title="BarbPH Ticker"
+        loading="eager"
+        scrolling="no"
+        frameborder="0"></iframe>
     </section>
-    <button class="barb-ticker__handle" type="button" data-ticker-handle aria-label="Open BarbPH ticker preview" aria-expanded="false" aria-controls="barb-ticker-panel">
-      <span class="barb-ticker__triangle-wrap" aria-hidden="true"><svg class="barb-ticker__triangle" viewBox="0 0 32 24"><path d="M4 5 L28 5 L16 20 Z"></path></svg></span>
+    
+    
+<div class="barb-ticker__topbar" data-ticker-topbar>
+  <span class="barb-ticker__top-rail" aria-hidden="true">
+    <span class="barb-ticker__top-rail-inner"></span>
+  </span>
+
+  <nav class="folder-tabs" aria-label="BarbPH">
+    <a class="folder-tab folder-tab--builds"
+       href="https://behindthebuilds.barbph.com/"
+       data-tab-key="behind"
+       aria-label="Behind the Builds"
+       title="Behind the Builds">
+      <span class="visually-hidden">Behind the Builds</span>
+      <span class="folder-tab__surface">
+        <span class="folder-tab__embroidery" aria-hidden="true">
+          <img class="embroidery-sun" src="web/3stars1sun (3).webp" data-webp="web/3stars1sun (3).webp" alt="" decoding="sync" fetchpriority="high">
+          <img class="embroidery-star embroidery-star--1" src="web/3stars1sun (1).webp" data-webp="web/3stars1sun (1).webp" alt="" decoding="sync" fetchpriority="high">
+          <img class="embroidery-star embroidery-star--2" src="web/3stars1sun (2).webp" data-webp="web/3stars1sun (2).webp" alt="" decoding="sync" fetchpriority="high">
+          <img class="embroidery-star embroidery-star--3" src="web/3stars1sun.webp" data-webp="web/3stars1sun.webp" alt="" decoding="sync" fetchpriority="high">
+        </span>
+      </span>
+      <span class="folder-tab__hint" aria-hidden="true">Behind the Builds</span>
+    </a>
+
+    <button class="folder-tab folder-tab--ticker"
+            type="button"
+            data-ticker-handle
+            data-tab-key="ticker"
+            aria-label="Ticker"
+            aria-expanded="false"
+            aria-controls="barb-ticker-panel"
+            title="Ticker">
+      <span class="visually-hidden">Ticker</span>
+      <span class="folder-tab__surface folder-tab__icon"><img class="final-tab-art" src="web/ChatGPT Image Aug 22, 2026, 06_39_58 PM (2)(1).webp" data-webp="web/ChatGPT Image Aug 22, 2026, 06_39_58 PM (2)(1).webp" alt="" aria-hidden="true" decoding="sync" fetchpriority="high"></span>
+      <span class="folder-tab__hint" aria-hidden="true">Ticker</span>
     </button>
+
+    <a class="folder-tab folder-tab--products"
+       href="/products"
+       data-tab-key="products"
+       data-route="/products"
+       aria-label="Products"
+       title="Products">
+      <span class="visually-hidden">Products</span>
+      <span class="folder-tab__surface folder-tab__icon"><img class="final-tab-art" src="ChatGPT Image Aug 22, 2026, 06_25_20 PM (1)(1).png" data-webp="web/ChatGPT Image Aug 22, 2026, 06_25_20 PM (1)(1).webp" alt="" aria-hidden="true" decoding="async"></span>
+      <span class="folder-tab__hint" aria-hidden="true">Products</span>
+    </a>
+
+    <a class="folder-tab folder-tab--programs"
+       href="/programs"
+       data-tab-key="programs"
+       data-route="/programs"
+       aria-label="Programs"
+       title="Programs">
+      <span class="visually-hidden">Programs</span>
+      <span class="folder-tab__surface folder-tab__icon"><img class="final-tab-art" src="ChatGPT Image Aug 22, 2026, 06_40_38 PM(1).png" data-webp="web/ChatGPT Image Aug 22, 2026, 06_40_38 PM(1).webp" alt="" aria-hidden="true" decoding="async"></span>
+      <span class="folder-tab__hint" aria-hidden="true">Programs</span>
+    </a>
+
+    <a class="folder-tab folder-tab--partnership"
+       href="/partnership"
+       data-tab-key="partnership"
+       data-route="/partnership"
+       aria-label="Partnership"
+       title="Partnership">
+      <span class="visually-hidden">Partnership</span>
+      <span class="folder-tab__surface folder-tab__icon"><img class="final-tab-art" src="ChatGPT Image Aug 22, 2026, 06_40_45 PM(1).png" data-webp="web/ChatGPT Image Aug 22, 2026, 06_40_45 PM(1).webp" alt="" aria-hidden="true" decoding="async"></span>
+      <span class="folder-tab__hint" aria-hidden="true">Partnership</span>
+    </a>
+
+    <a class="folder-tab folder-tab--publications"
+       href="/publications"
+       data-tab-key="publications"
+       data-route="/publications"
+       aria-label="Publication & Bulletin"
+       title="Publication & Bulletin">
+      <span class="visually-hidden">Publication & Bulletin</span>
+      <span class="folder-tab__surface folder-tab__icon"><img class="final-tab-art" src="ChatGPT Image Aug 22, 2026, 06_39_58 PM (1)(1).png" data-webp="web/ChatGPT Image Aug 22, 2026, 06_39_58 PM (1)(1).webp" alt="" aria-hidden="true" decoding="async"></span>
+      <span class="folder-tab__hint" aria-hidden="true">Publication & Bulletin</span>
+    </a>
+
+    <button class="folder-tab folder-tab--connect"
+            type="button"
+            data-connect-handle
+            data-tab-key="connect"
+            aria-label="Connect +"
+            aria-expanded="false"
+            aria-controls="barb-connect-drawer"
+            title="Connect +">
+      <span class="visually-hidden">Connect +</span>
+      <span class="folder-tab__surface folder-tab__icon"><img class="final-tab-art" src="ChatGPT Image Aug 22, 2026, 06_39_59 PM (3)(1).png" data-webp="web/ChatGPT Image Aug 22, 2026, 06_39_59 PM (3)(1).webp" alt="" aria-hidden="true" decoding="async"></span>
+      <span class="folder-tab__hint" aria-hidden="true">Connect +</span>
+    </button>
+
+    <a class="folder-tab folder-tab--mystery"
+       href="https://docs.google.com/presentation/d/e/2PACX-1vR205ky96hoMJqFlqlwqz9D6xOkU-G9mHuh2gTDUwVxiXjkvtY0Uyh-VeGEU7T0tAxfDhCeSbnshHc5/pub?start=false&loop=false&delayms=3000"
+       target="_blank"
+       rel="noopener"
+       data-tab-key="mystery"
+       aria-label="Everything Else"
+       title="Everything Else">
+      <span class="visually-hidden">Everything Else</span>
+      <span class="folder-tab__surface folder-tab__mystery-mark" aria-hidden="true">EE</span>
+      <span class="folder-tab__hint" aria-hidden="true">Everything Else</span>
+    </a>
+
+  </nav>
+
+  <div class="connect-drawer" id="barb-connect-drawer" aria-hidden="true">
+    <div class="connect-drawer__inner connect-drawer__inner--form">
+      <section class="testimonial-connect connect-plus-shell" aria-labelledby="connect-plus-title">
+        <div class="testimonial-connect__intro">
+          <span class="testimonial-connect__eyebrow">Connect +</span>
+          <h2 id="connect-plus-title">Message BarbPH</h2>
+          <p>Send us a message, or use the testimonial option to leave a testimonial.</p>
+        </div>
+
+        <div class="connect-mode-switch" role="tablist" aria-label="Connect options">
+          <button type="button"
+                  class="connect-mode-button is-active"
+                  id="connect-message-tab"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="connect-message-panel"
+                  data-connect-mode="message">Message</button>
+          <button type="button"
+                  class="connect-mode-button"
+                  id="connect-testimonial-tab"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="connect-testimonial-panel"
+                  data-connect-mode="testimonial">Testimonial</button>
+        </div>
+
+        <div class="connect-mode-panel"
+             id="connect-message-panel"
+             role="tabpanel"
+             aria-labelledby="connect-message-tab"
+             data-connect-panel="message">
+          <form class="testimonial-form"
+                id="barbph-message-form"
+                action="https://script.google.com/macros/s/AKfycbwJYsFiAIdFjeraVIrIirCt5MBZXrvVoTqNJNMoLx1EDxWD2c1BeQ1mXTTcGAwHOg75XQ/exec"
+                method="post"
+                target="message-submit-frame"
+                novalidate>
+            <input type="hidden" name="form_type" value="message">
+
+            <label class="testimonial-field testimonial-field--wide">
+              <span>Your message / concern</span>
+              <textarea name="concern"
+                        rows="4"
+                        minlength="3"
+                        maxlength="5000"
+                        placeholder="How can we help?"
+                        required></textarea>
+            </label>
+
+            <label class="testimonial-field">
+              <span>Email</span>
+              <input type="email"
+                     name="email"
+                     maxlength="254"
+                     autocomplete="email"
+                     placeholder="name@example.com">
+            </label>
+
+            <label class="testimonial-field">
+              <span>For your phone number, please ensure it’s reachable via WhatsApp or Viber.</span>
+              <input type="tel"
+                     name="phone"
+                     maxlength="80"
+                     autocomplete="tel"
+                     placeholder="Phone number">
+            </label>
+
+            <div class="connect-contact-note">
+              Please leave at least one way for BarbPH to reply: email or phone.
+            </div>
+
+            <label class="testimonial-honeypot" aria-hidden="true">
+              Website
+              <input type="text"
+                     name="website"
+                     tabindex="-1"
+                     autocomplete="off">
+            </label>
+
+            <div class="testimonial-form__footer testimonial-field--wide">
+              <button type="submit" class="testimonial-submit">Send Message</button>
+              <span class="testimonial-status"
+                    id="message-status"
+                    role="status"
+                    aria-live="polite"></span>
+            </div>
+          </form>
+
+          <iframe name="message-submit-frame"
+                  id="message-submit-frame"
+                  title="Message submission"
+                  hidden></iframe>
+        </div>
+
+        <div class="connect-mode-panel"
+             id="connect-testimonial-panel"
+             role="tabpanel"
+             aria-labelledby="connect-testimonial-tab"
+             data-connect-panel="testimonial"
+             hidden>
+          <form class="testimonial-form"
+                id="barbph-testimonial-form"
+                action="https://script.google.com/macros/s/AKfycbwJYsFiAIdFjeraVIrIirCt5MBZXrvVoTqNJNMoLx1EDxWD2c1BeQ1mXTTcGAwHOg75XQ/exec"
+                method="post"
+                target="testimonial-submit-frame"
+                novalidate>
+            <input type="hidden" name="form_type" value="testimonial">
+
+            <label class="testimonial-field">
+              <span>Your name</span>
+              <input type="text"
+                     name="name"
+                     maxlength="120"
+                     autocomplete="name"
+                     required>
+            </label>
+
+            <label class="testimonial-field testimonial-field--wide">
+              <span>Your testimonial</span>
+              <textarea name="quote"
+                        rows="3"
+                        maxlength="1200"
+                        required></textarea>
+            </label>
+
+            <label class="testimonial-field">
+              <span>Rating</span>
+              <select name="rating" required>
+                <option value="">Choose</option>
+                <option value="5">5 — Excellent</option>
+                <option value="4">4 — Very good</option>
+                <option value="3">3 — Good</option>
+                <option value="2">2 — Fair</option>
+                <option value="1">1 — Poor</option>
+              </select>
+            </label>
+
+            <label class="testimonial-field">
+              <span>Related to</span>
+              <input type="text"
+                     name="related_to"
+                     maxlength="120"
+                     placeholder="Product or program">
+            </label>
+
+            <label class="testimonial-field testimonial-field--wide">
+              <span>Contact details</span>
+              <input type="text"
+                     name="contact_details"
+                     maxlength="254"
+                     autocomplete="email"
+                     placeholder="Email, phone, WhatsApp, Viber, or another way we can reach you">
+            </label>
+
+            <label class="testimonial-honeypot" aria-hidden="true">
+              Website
+              <input type="text"
+                     name="website"
+                     tabindex="-1"
+                     autocomplete="off">
+            </label>
+
+            <div class="testimonial-form__footer testimonial-field--wide">
+              <button type="submit" class="testimonial-submit">Submit Testimonial</button>
+              <span class="testimonial-status"
+                    id="testimonial-status"
+                    role="status"
+                    aria-live="polite"></span>
+            </div>
+          </form>
+
+          <iframe name="testimonial-submit-frame"
+                  id="testimonial-submit-frame"
+                  title="Testimonial submission"
+                  hidden></iframe>
+        </div>
+      </section>
+    </div>
   </div>
 
-  <button class="noen-hq" id="noen-hq" type="button" data-state="building" aria-label="Patroller headquarters" aria-disabled="true">
-    <span class="noen-hq__scene" aria-hidden="true">
-      <svg viewBox="0 0 440 210" role="img" aria-label="">
-        <g class="hq-layer hq-back">
-          <path d="M0 166 H78 L91 153 H151 L163 166 H213 V210 H0 Z"/>
-          <path d="M272 169 H329 L340 158 H407 L420 169 H440 V210 H272 Z"/>
-          <rect x="185" y="177" width="64" height="33"/>
-        </g>
-        <g class="hq-layer hq-mid">
-          <path d="M20 158 H116 L130 145 H169 L181 158 V210 H20 Z"/>
-          <path d="M286 151 H363 L376 139 H420 V210 H286 Z"/>
-          <rect x="77" y="137" width="53" height="73"/>
-          <rect x="319" y="132" width="47" height="78"/>
-        </g>
-        <g class="hq-layer hq-front">
-          <path d="M69 161 L92 143 H151 L166 152 H278 L294 142 H346 L373 161 V210 H69 Z"/>
-          <path d="M145 151 L160 135 H279 L294 151 V210 H145 Z"/>
-          <rect x="185" y="121" width="68" height="89"/>
-          <path d="M193 121 L204 110 H234 L245 121 Z"/>
-          <rect class="hq-slit" x="104" y="171" width="43" height="5" rx="1"/>
-          <rect class="hq-slit" x="299" y="170" width="38" height="5" rx="1"/>
-          <rect class="hq-slit" x="164" y="156" width="30" height="5" rx="1"/>
-          <rect class="hq-slit" x="245" y="156" width="30" height="5" rx="1"/>
-        </g>
-        <g class="hq-layer hq-front hq-antenna-fine">
-          <path d="M78 143 L96 43 L114 143"/>
-          <path d="M83 116 H109 M87 92 H105 M91 68 H101"/>
-          <path d="M84 116 L108 92 M109 116 L87 92 M88 92 L104 68 M105 92 L91 68"/>
-          <path class="hq-antenna" d="M96 43 V22 M88 35 H104 M91 28 H101"/>
-          <path class="hq-wire" d="M95 49 L57 142 M97 49 L137 143"/>
-        </g>
-        <path class="hq-dish" d="M74 66 Q95 45 116 66 Q96 78 74 66 Z"/>
-        <rect class="hq-panel" x="70" y="80" width="9" height="18" rx="1" transform="rotate(-8 74 89)"/>
-        <g class="hq-layer hq-front">
-          <path class="hq-antenna" d="M219 121 V25 M211 105 H227 M209 87 H229 M207 69 H231 M212 49 H226"/>
-          <path class="hq-antenna-fine" d="M211 105 L227 87 M227 105 L209 87 M209 87 L231 69 M229 87 L207 69 M207 69 L226 49 M231 69 L212 49"/>
-          <path class="hq-wire" d="M218 36 L170 142 M220 36 L269 142"/>
-          <path class="hq-dish" d="M188 48 Q219 22 250 48 Q221 64 188 48 Z"/>
-          <rect x="217.3" y="9" width="3.4" height="20"/>
-          <path class="hq-antenna-fine" d="M206 17 H232 M211 13 H227"/>
-        </g>
-        <g class="hq-layer hq-front">
-          <path class="hq-antenna" d="M341 139 V39 M332 139 L341 39 L350 139"/>
-          <path class="hq-antenna-fine" d="M335 111 H347 M333 87 H349 M336 63 H346 M335 111 L349 87 M347 111 L333 87 M333 87 L346 63 M349 87 L336 63"/>
-          <rect class="hq-panel" x="350" y="52" width="17" height="27" rx="1" transform="rotate(7 358 65)"/>
-          <rect class="hq-panel" x="316" y="73" width="15" height="23" rx="1" transform="rotate(-8 323 84)"/>
-          <path class="hq-wire" d="M341 47 L296 143 M342 47 L389 143"/>
-        </g>
-        <g>
-          <circle class="hq-led steady safety" cx="219" cy="8" r=".72"/>
-          <circle class="hq-led pulse" cx="96" cy="21" r=".62"/>
-          <circle class="hq-led tx" cx="341" cy="38" r=".62"/>
-          <circle class="hq-led tx2" cx="358" cy="54" r=".56"/>
-          <circle class="hq-led pulse" cx="76" cy="82" r=".56" style="animation-delay:1.2s"/>
-          <circle class="hq-led steady" cx="219" cy="94" r=".52"/>
-          <circle class="hq-led tx2" cx="197" cy="156" r=".50" style="animation-delay:.5s"/>
-          <circle class="hq-led tx" cx="263" cy="156" r=".50" style="animation-delay:1.5s"/>
-        </g>
-      </svg>
-      <span id="noen-hq-root"></span>
-    </span>
-  </button>
 
-  <div class="fab" id="living-fab">
-    <nav class="fab__fan" id="fab-menu" aria-label="BarbPH destinations" aria-hidden="true">
-      <a class="fab__word" href="/partnership.html" tabindex="-1">Partnership</a>
-      <a class="fab__word" href="/products" tabindex="-1">Products</a>
-      <a class="fab__word" href="/programs" tabindex="-1">Programs</a>
-    </nav>
-    <button class="fab__orb" id="fab-orb" type="button" aria-label="Open Partnership, Products and Programs" aria-expanded="false" aria-controls="fab-menu"></button>
-  </div>
 
-  <script src="/assets/ticker-bones.js"></script>
-  <script>
-  (()=>{
-    'use strict';
-    const world=document.getElementById('world');
-    const fail=document.getElementById('load-fail');
-    let assetTimer=null;
-    const safeText=v=>String(v||'').replace(/[<>]/g,'');
-    async function getJSON(url,ms=14000){const c=new AbortController();const t=setTimeout(()=>c.abort(),ms);try{const r=await fetch(url,{signal:c.signal,cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.json()}finally{clearTimeout(t)}}
-    function clearWorld(){clearInterval(assetTimer);assetTimer=null;world.innerHTML='';fail.classList.remove('is-visible')}
-    function preloadImage(src,ms=10000){return new Promise(resolve=>{const img=new Image();const t=setTimeout(()=>finish(false),ms);const finish=ok=>{clearTimeout(t);img.onload=null;img.onerror=null;resolve(ok)};img.onload=()=>finish(true);img.onerror=()=>finish(false);img.src=src})}
-    async function renderDaily(data){clearWorld();const candidates=Array.isArray(data.assets)?data.assets.filter(a=>/^https:\/\//i.test(a.image||'')):[];if(!candidates.length)throw new Error('No Daily Discover assets');const checks=await Promise.all(candidates.map(a=>preloadImage(a.image)));const assets=candidates.filter((a,i)=>checks[i]);if(!assets.length)throw new Error('Daily Discover images did not load');const nodes=assets.map((a,i)=>{const d=document.createElement('div');d.className='world__asset'+(i===0?' is-active':'');d.style.backgroundImage=`url("${String(a.image).replace(/"/g,'%22')}")`;d.dataset.title=safeText(a.title);world.appendChild(d);return d});let i=0;const sec=Math.max(8,Number(data?.daily_settings?.rotation_seconds)||18);if(nodes.length>1)assetTimer=setInterval(()=>{nodes[i].classList.remove('is-active');i=(i+1)%nodes.length;nodes[i].classList.add('is-active')},sec*1000)}
-    function appendFallback(){const f=document.createElement('div');f.className='world__fallback';world.appendChild(f);return f}
-    function renderSponsor(s){clearWorld();appendFallback();if(s.media_type==='video'){const v=document.createElement('video');v.className='world__video';v.src=s.media_url;v.autoplay=true;v.muted=true;v.loop=true;v.playsInline=true;v.addEventListener('error',()=>v.remove(),{once:true});world.appendChild(v);v.play().catch(()=>{})}else{const d=document.createElement('div');d.className='world__asset is-active';d.style.backgroundImage=`url("${String(s.media_url).replace(/"/g,'%22')}")`;world.appendChild(d)}if(s.overlay_text||s.brand_name){const a=document.createElement(s.overlay_link?'a':'div');a.className='world__sponsor-copy';if(s.overlay_link){a.href=s.overlay_link;a.target='_blank';a.rel='noopener noreferrer'}const strong=document.createElement('strong');strong.textContent=safeText(s.brand_name);const span=document.createElement('span');span.textContent=safeText(s.overlay_text||'');a.append(strong,span);world.appendChild(a)}}
-    function renderTheme(s){clearWorld();const seed=[...String(s.theme_name||'BarbPH')].reduce((a,c)=>a+c.charCodeAt(0),0);const h1=seed%360,h2=(seed*3+80)%360,h3=(seed*7+160)%360;const d=document.createElement('div');d.className='world__fallback';d.style.background=`radial-gradient(circle at 20% 18%,hsla(${h1},48%,74%,.62),transparent 34%),radial-gradient(circle at 82% 28%,hsla(${h2},45%,76%,.5),transparent 35%),radial-gradient(circle at 58% 85%,hsla(${h3},38%,75%,.42),transparent 34%),linear-gradient(145deg,#fbf8f1,#f2eee5 48%,#e9e2d2)`;world.appendChild(d)}
-    async function bootWorld(){try{const p=await getJSON('/.netlify/functions/homepage-priority');if(p.selected_mode==='sponsor_takeover')renderSponsor(p.selected);else if(p.selected_mode==='theme_override')renderTheme(p.selected);else{const d=await getJSON(p?.selected?.endpoint||'/.netlify/functions/daily-discover-production');await renderDaily(d)}}catch(e){console.error('BarbPH world:',e);clearInterval(assetTimer);assetTimer=null;fail.classList.add('is-visible')}}
-    bootWorld();
-    const lines=[...document.querySelectorAll('.prebirth__line')];let li=0;const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;if(lines.length>1&&!reduce)setInterval(()=>{lines[li].classList.remove('is-active');li=(li+1)%lines.length;lines[li].classList.add('is-active')},5200);
-    const form=document.getElementById('newsletter-form');const email=document.getElementById('newsletter-email');const status=document.getElementById('newsletter-status');const joinButton=form.querySelector('button');
-    form.addEventListener('submit',async e=>{e.preventDefault();status.className='prebirth__status';status.setAttribute('role','status');status.textContent='';email.value=email.value.trim();if(!email.reportValidity())return;joinButton.disabled=true;joinButton.textContent='Joining…';const c=new AbortController(),t=setTimeout(()=>c.abort(),12000);try{const r=await fetch('/.netlify/functions/newsletter-submit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:email.value}),signal:c.signal});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok)throw new Error(d.error||'Could not join right now.');status.classList.add('is-success');status.textContent=d.message||'You’re on the list. ✦';form.reset()}catch(err){status.setAttribute('role','alert');status.classList.add('is-error');status.textContent=err?.name==='AbortError'?'The request timed out. Please try again.':(err.message||'Could not join right now.')}finally{clearTimeout(t);joinButton.disabled=false;joinButton.textContent='Join'}});
-    const fab=document.getElementById('living-fab');const orb=document.getElementById('fab-orb');const menu=document.getElementById('fab-menu');const items=[...menu.querySelectorAll('.fab__word')];let fabOpen=false;
-    function enabledItems(){return items.filter(x=>x.getAttribute('aria-disabled')!=='true')}
-    function setFabOpen(next,focusFirst=false){fabOpen=Boolean(next);fab.classList.toggle('is-open',fabOpen);orb.setAttribute('aria-expanded',String(fabOpen));menu.setAttribute('aria-hidden',fabOpen?'false':'true');items.forEach(x=>x.setAttribute('tabindex','-1'));if(fabOpen){const e=enabledItems();e.forEach((x,i)=>x.setAttribute('tabindex',i===0?'0':'-1'));if(focusFirst&&e[0])requestAnimationFrame(()=>e[0].focus())}}
-    orb.addEventListener('click',()=>setFabOpen(!fabOpen));
-    orb.addEventListener('keydown',e=>{if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();setFabOpen(true,true)}});
-    menu.addEventListener('keydown',e=>{const enabled=enabledItems(),i=enabled.indexOf(document.activeElement);if(i<0)return;if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();const n=enabled[(i+1)%enabled.length];enabled.forEach(x=>x.tabIndex=-1);n.tabIndex=0;n.focus()}if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();const n=enabled[(i-1+enabled.length)%enabled.length];enabled.forEach(x=>x.tabIndex=-1);n.tabIndex=0;n.focus()}if(e.key==='Escape'){e.preventDefault();setFabOpen(false);orb.focus()}});
-    document.addEventListener('pointerdown',e=>{if(fabOpen&&!fab.contains(e.target))setFabOpen(false)});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&fabOpen){setFabOpen(false);orb.focus()}});
-    const hq=document.getElementById('noen-hq');const mount=document.getElementById('noen-hq-root');const allowedStates=new Set(['building','standby','waking','patrolling','verifying','offline']);let hqHref='';let mountedModule='';
-    async function mountNoenModule(url,statusData){if(!url||mountedModule===url||!url.startsWith('https://noen.barbph.com/'))return;try{const mod=await import(url);const fn=mod.mountNoen||mod.mount||window.mountNoen;if(typeof fn==='function'){fn(mount,statusData);mountedModule=url}}catch(err){console.warn('NOEN module not available yet.',err)}}
-    function applyNoenStatus(data){const state=allowedStates.has(String(data?.status||'').toLowerCase())?String(data.status).toLowerCase():'building';hq.dataset.state=state;const live=!['building','offline'].includes(state);hqHref=live&&typeof data?.href==='string'&&data.href.startsWith('https://')?data.href:'';hq.setAttribute('aria-disabled',hqHref?'false':'true');hq.setAttribute('aria-label',hqHref?`NOEN Headquarters. ${state}. Open headquarters.`:`NOEN Headquarters. ${state}.`);if(live&&data?.module)mountNoenModule(String(data.module),data)}
-    async function refreshNoen(){try{const c=new AbortController();const t=setTimeout(()=>c.abort(),3500);const r=await fetch('https://noen.barbph.com/status.json',{cache:'no-store',signal:c.signal});clearTimeout(t);if(!r.ok)throw new Error('NOEN status unavailable');applyNoenStatus(await r.json())}catch{applyNoenStatus({status:'building'})}}
-    hq.addEventListener('click',()=>{if(hqHref)location.href=hqHref});refreshNoen();setInterval(refreshNoen,60000);
-    if(!reduce){window.addEventListener('pointermove',e=>{const x=((e.clientX/window.innerWidth)-.5)*4;hq.style.setProperty('--hq-back-shift',`${(-x*.25).toFixed(2)}px`);hq.style.setProperty('--hq-mid-shift',`${(-x*.5).toFixed(2)}px`);hq.style.setProperty('--hq-front-shift',`${(-x).toFixed(2)}px`)},{passive:true})}
-    const behind=document.getElementById('behind-the-builds');function updateOverlayContrast(){const r=behind.getBoundingClientRect();const sampleY=window.innerHeight-70;const overDark=r.top<=sampleY&&r.bottom>=sampleY;hq.classList.toggle('is-over-dark',overDark);fab.classList.toggle('over-dark',overDark)}updateOverlayContrast();window.addEventListener('scroll',updateOverlayContrast,{passive:true});window.addEventListener('resize',updateOverlayContrast);
-    let peekStopped=false;window.addEventListener('scroll',()=>{if(!peekStopped&&window.scrollY>10){peekStopped=true;behind.classList.add('peek-still')}},{passive:true});
-  })();
-  </script>
+<script id="barbph-production-world-newsletter">
+(() => {
+  'use strict';
 
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"WebSite",
-    "name":"BarbPH",
-    "url":"https://barbph.com/"
+  const world = document.getElementById('world');
+  const fail = document.getElementById('load-fail');
+  const lines = [...document.querySelectorAll('.prebirth__line')];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let assetTimer = null;
+
+  if (!world) return;
+
+  const safeText = value => String(value || '').replace(/[<>]/g, '');
+
+  async function getJSON(url, ms = 14000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), ms);
+    try {
+      const response = await fetch(url, { signal: controller.signal, cache: 'no-store' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } finally {
+      clearTimeout(timer);
+    }
   }
-  </script>
+
+  function clearWorld() {
+    clearInterval(assetTimer);
+    assetTimer = null;
+    world.innerHTML = '';
+    fail?.classList.remove('is-visible');
+  }
+
+  function appendFallback() {
+    const fallback = document.createElement('div');
+    fallback.className = 'world__fallback';
+    world.appendChild(fallback);
+    return fallback;
+  }
+
+  function preloadImage(src, ms = 10000) {
+    return new Promise(resolve => {
+      const img = new Image();
+      const timer = setTimeout(() => finish(false), ms);
+      const finish = ok => {
+        clearTimeout(timer);
+        img.onload = null;
+        img.onerror = null;
+        resolve(ok);
+      };
+      img.onload = () => finish(true);
+      img.onerror = () => finish(false);
+      img.src = src;
+    });
+  }
+
+  async function renderDaily(data) {
+    clearWorld();
+    const candidates = Array.isArray(data.assets)
+      ? data.assets.filter(asset => /^https:\/\//i.test(asset.image || ''))
+      : [];
+    if (!candidates.length) throw new Error('No Daily Discover assets');
+
+    const checks = await Promise.all(candidates.map(asset => preloadImage(asset.image)));
+    const assets = candidates.filter((asset, index) => checks[index]);
+    if (!assets.length) throw new Error('Daily Discover images did not load');
+
+    const nodes = assets.map((asset, index) => {
+      const node = document.createElement('div');
+      node.className = 'world__asset' + (index === 0 ? ' is-active' : '');
+      node.style.backgroundImage = `url("${String(asset.image).replace(/"/g, '%22')}")`;
+      node.dataset.title = safeText(asset.title);
+      world.appendChild(node);
+      return node;
+    });
+
+    let current = 0;
+    const seconds = Math.max(8, Number(data?.daily_settings?.rotation_seconds) || 18);
+    if (nodes.length > 1 && !reduce) {
+      assetTimer = setInterval(() => {
+        nodes[current].classList.remove('is-active');
+        current = (current + 1) % nodes.length;
+        nodes[current].classList.add('is-active');
+      }, seconds * 1000);
+    }
+  }
+
+  function renderSponsor(sponsor) {
+    clearWorld();
+    appendFallback();
+
+    if (sponsor.media_type === 'video') {
+      const video = document.createElement('video');
+      video.className = 'world__video';
+      video.src = sponsor.media_url;
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.addEventListener('error', () => video.remove(), { once: true });
+      world.appendChild(video);
+      video.play().catch(() => {});
+    } else if (sponsor.media_url) {
+      const node = document.createElement('div');
+      node.className = 'world__asset is-active';
+      node.style.backgroundImage = `url("${String(sponsor.media_url).replace(/"/g, '%22')}")`;
+      world.appendChild(node);
+    }
+
+    if (sponsor.overlay_text || sponsor.brand_name) {
+      const label = document.createElement(sponsor.overlay_link ? 'a' : 'div');
+      label.className = 'world__sponsor-copy';
+      if (sponsor.overlay_link) {
+        label.href = sponsor.overlay_link;
+        label.target = '_blank';
+        label.rel = 'noopener noreferrer';
+      }
+      const strong = document.createElement('strong');
+      strong.textContent = safeText(sponsor.brand_name);
+      const span = document.createElement('span');
+      span.textContent = safeText(sponsor.overlay_text || '');
+      label.append(strong, span);
+      world.appendChild(label);
+    }
+  }
+
+  function renderTheme(theme) {
+    clearWorld();
+    const seed = [...String(theme.theme_name || 'BarbPH')]
+      .reduce((total, char) => total + char.charCodeAt(0), 0);
+    const h1 = seed % 360;
+    const h2 = (seed * 3 + 80) % 360;
+    const h3 = (seed * 7 + 160) % 360;
+    const node = document.createElement('div');
+    node.className = 'world__fallback';
+    node.style.background =
+      `radial-gradient(circle at 20% 18%,hsla(${h1},48%,74%,.62),transparent 34%),` +
+      `radial-gradient(circle at 82% 28%,hsla(${h2},45%,76%,.5),transparent 35%),` +
+      `radial-gradient(circle at 58% 85%,hsla(${h3},38%,75%,.42),transparent 34%),` +
+      `linear-gradient(145deg,#fbf8f1,#f2eee5 48%,#e9e2d2)`;
+    world.appendChild(node);
+  }
+
+  async function bootWorld() {
+    try {
+      const priority = await getJSON('/.netlify/functions/homepage-priority');
+      if (priority.selected_mode === 'sponsor_takeover') {
+        renderSponsor(priority.selected || {});
+      } else if (priority.selected_mode === 'theme_override') {
+        renderTheme(priority.selected || {});
+      } else {
+        const endpoint = priority?.selected?.endpoint || '/.netlify/functions/daily-discover-production';
+        const daily = await getJSON(endpoint);
+        await renderDaily(daily);
+      }
+    } catch (error) {
+      console.warn('BarbPH visual world fallback:', error);
+      clearWorld();
+      appendFallback();
+    }
+  }
+
+  bootWorld();
+
+  if (lines.length > 1 && !reduce) {
+    let lineIndex = 0;
+    setInterval(() => {
+      lines[lineIndex].classList.remove('is-active');
+      lineIndex = (lineIndex + 1) % lines.length;
+      lines[lineIndex].classList.add('is-active');
+    }, 5200);
+  }
+
+  const form = document.getElementById('newsletter-form');
+  const email = document.getElementById('newsletter-email');
+  const status = document.getElementById('newsletter-status');
+  const button = form?.querySelector('button');
+
+  if (form && email && status && button) {
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      status.className = 'prebirth__status';
+      status.textContent = '';
+      email.value = email.value.trim();
+      if (!email.reportValidity()) return;
+
+      button.disabled = true;
+      button.textContent = 'Joining…';
+
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 12000);
+
+      try {
+        const response = await fetch('/.netlify/functions/newsletter-submit', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ email: email.value }),
+          signal: controller.signal
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.ok) throw new Error(data.error || 'Could not join right now.');
+        status.classList.add('is-success');
+        status.textContent = data.message || 'You’re on the list. ✦';
+        form.reset();
+      } catch (error) {
+        status.setAttribute('role', 'alert');
+        status.classList.add('is-error');
+        status.textContent = error?.name === 'AbortError'
+          ? 'The request timed out. Please try again.'
+          : (error.message || 'Could not join right now.');
+      } finally {
+        clearTimeout(timer);
+        button.disabled = false;
+        button.textContent = 'Join';
+      }
+    });
+  }
+})();
+</script>
+
+
+
+<script id="barbph-production-image-optimizer">
+(() => {
+  if (location.protocol === 'file:') return;
+  document.querySelectorAll('img[data-webp]').forEach(img => {
+    const next = img.getAttribute('data-webp');
+    if (next) img.src = next;
+  });
+})();
+</script>
+
+<script id="barbph-local-file-routing">
+(() => {
+  if (location.protocol !== 'file:') return;
+  const localRoutes = {
+    products: 'products.html',
+    programs: 'programs.html',
+    partnership: 'partnership.html',
+    publications: 'publications.html'
+  };
+  for (const [key, href] of Object.entries(localRoutes)) {
+    const node = document.querySelector(`[data-tab-key="${key}"]`);
+    if (node) node.setAttribute('href', href);
+  }
+})();
+</script>
+<script id="barbph-folder-tab-controller">
+(() => {
+  const root = document.querySelector('[data-barb-ticker]');
+  const panel = root?.querySelector('[data-ticker-panel]');
+  const topbar = document.querySelector('[data-ticker-topbar]');
+  const tickerTab = document.querySelector('[data-ticker-handle]');
+  const connectTab = document.querySelector('[data-connect-handle]');
+  const connectDrawer = document.getElementById('barb-connect-drawer');
+  const tabs = [...document.querySelectorAll('.folder-tab')];
+
+  if (!root || !panel || !topbar || !tickerTab || !connectTab || !connectDrawer) return;
+
+  const clearActive = () => tabs.forEach(tab => tab.classList.remove('is-active'));
+
+  const setTicker = (open) => {
+    if (open) {
+      topbar.classList.remove('is-connect-open');
+      connectTab.setAttribute('aria-expanded','false');
+      connectDrawer.setAttribute('aria-hidden','true');
+    }
+    root.classList.toggle('is-open',open);
+    tickerTab.setAttribute('aria-expanded',open ? 'true' : 'false');
+    panel.setAttribute('aria-hidden',open ? 'false' : 'true');
+    clearActive();
+    if (open) tickerTab.classList.add('is-active');
+  };
+
+  const setConnect = (open) => {
+    if (open) {
+      root.classList.remove('is-open');
+      tickerTab.setAttribute('aria-expanded','false');
+      panel.setAttribute('aria-hidden','true');
+    }
+    topbar.classList.toggle('is-connect-open',open);
+    connectTab.setAttribute('aria-expanded',open ? 'true' : 'false');
+    connectDrawer.setAttribute('aria-hidden',open ? 'false' : 'true');
+    clearActive();
+    if (open) connectTab.classList.add('is-active');
+  };
+
+  tickerTab.addEventListener('click', () => setTicker(!root.classList.contains('is-open')));
+  connectTab.addEventListener('click', () => setConnect(!topbar.classList.contains('is-connect-open')));
+
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    if (root.classList.contains('is-open')) {
+      setTicker(false);
+      tickerTab.focus({preventScroll:true});
+    } else if (topbar.classList.contains('is-connect-open')) {
+      setConnect(false);
+      connectTab.focus({preventScroll:true});
+    }
+  });
+
+  /* Navigation tabs automatically become active on their own landing pages. */
+  const path = location.pathname.replace(/\/+$/,'') || '/';
+  const navMatch = tabs.find(tab => {
+    const route = tab.getAttribute('data-route');
+    return route && route.replace(/\/+$/,'') === path;
+  });
+  if (navMatch) navMatch.classList.add('is-active');
+
+  root.classList.remove('is-open');
+  topbar.classList.remove('is-connect-open');
+  tickerTab.setAttribute('aria-expanded','false');
+  connectTab.setAttribute('aria-expanded','false');
+  panel.setAttribute('aria-hidden','true');
+  connectDrawer.setAttribute('aria-hidden','true');
+})();
+</script>
+
+
+<script id="barbph-connect-plus-controller">
+(() => {
+  const modeButtons = [...document.querySelectorAll('[data-connect-mode]')];
+  const modePanels = [...document.querySelectorAll('[data-connect-panel]')];
+
+  function setMode(mode) {
+    modeButtons.forEach(button => {
+      const active = button.dataset.connectMode === mode;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    modePanels.forEach(panel => {
+      panel.hidden = panel.dataset.connectPanel !== mode;
+    });
+  }
+
+  modeButtons.forEach(button => {
+    button.addEventListener('click', () => setMode(button.dataset.connectMode));
+  });
+
+  const messageForm = document.getElementById('barbph-message-form');
+  const messageStatus = document.getElementById('message-status');
+  const testimonialForm = document.getElementById('barbph-testimonial-form');
+  const testimonialStatus = document.getElementById('testimonial-status');
+
+  function setBusy(form, status, text) {
+    const button = form?.querySelector('[type="submit"]');
+    if (button) button.disabled = true;
+    if (status) status.textContent = text;
+  }
+
+  function clearBusy(form) {
+    const button = form?.querySelector('[type="submit"]');
+    if (button) button.disabled = false;
+  }
+
+  function showSubmissionSuccess(status, form, message) {
+    if (!status) return;
+
+    const oldActions = status.parentElement?.querySelector('.submit-success-actions');
+    if (oldActions) oldActions.remove();
+
+    status.textContent = message;
+
+    const actions = document.createElement('span');
+    actions.className = 'submit-success-actions';
+
+    const back = document.createElement('a');
+    back.textContent = 'Back to BarbPH ↑';
+    back.href = location.protocol === 'file:' ? 'index.html' : '/';
+
+    actions.appendChild(back);
+    status.insertAdjacentElement('afterend', actions);
+
+    if (form) form.reset();
+  }
+
+  const messageFrame = document.getElementById('message-submit-frame');
+  let messageSubmissionPending = false;
+  let messageResultReceived = false;
+
+  if (messageForm && messageStatus) {
+    messageForm.addEventListener('submit', event => {
+      const concern = messageForm.elements.concern?.value.trim() || '';
+      const email = messageForm.elements.email?.value.trim() || '';
+      const phone = messageForm.elements.phone?.value.trim() || '';
+
+      if (!messageForm.checkValidity()) {
+        event.preventDefault();
+        messageForm.reportValidity();
+        return;
+      }
+
+      if (!email && !phone) {
+        event.preventDefault();
+        messageStatus.textContent = 'Please leave at least one way for us to reply.';
+        messageForm.elements.email?.focus();
+        return;
+      }
+
+      if (concern.length < 3) {
+        event.preventDefault();
+        messageStatus.textContent = 'Please tell us a little more about your concern.';
+        messageForm.elements.concern?.focus();
+        return;
+      }
+
+      messageSubmissionPending = true;
+      messageResultReceived = false;
+      setBusy(messageForm, messageStatus, 'Sending…');
+    });
+  }
+
+  if (messageFrame) {
+    messageFrame.addEventListener('load', () => {
+      if (!messageSubmissionPending || messageResultReceived) return;
+
+      setTimeout(() => {
+        if (!messageSubmissionPending || messageResultReceived) return;
+
+        messageSubmissionPending = false;
+        clearBusy(messageForm);
+        showSubmissionSuccess(messageStatus, messageForm, 'Message sent. Thank you.');
+      }, 350);
+    });
+  }
+
+  const testimonialFrame = document.getElementById('testimonial-submit-frame');
+  let testimonialSubmissionPending = false;
+  let testimonialResultReceived = false;
+
+  if (testimonialForm && testimonialStatus) {
+    testimonialForm.addEventListener('submit', event => {
+      if (!testimonialForm.checkValidity()) {
+        event.preventDefault();
+        testimonialForm.reportValidity();
+        return;
+      }
+      testimonialSubmissionPending = true;
+      testimonialResultReceived = false;
+      setBusy(testimonialForm, testimonialStatus, 'Sending…');
+    });
+  }
+
+  if (testimonialFrame) {
+    testimonialFrame.addEventListener('load', () => {
+      if (!testimonialSubmissionPending || testimonialResultReceived) return;
+
+      setTimeout(() => {
+        if (!testimonialSubmissionPending || testimonialResultReceived) return;
+
+        testimonialSubmissionPending = false;
+        clearBusy(testimonialForm);
+        showSubmissionSuccess(testimonialStatus, testimonialForm, 'Thank you — your testimonial was received for review.');
+      }, 350);
+    });
+  }
+
+  window.addEventListener('message', event => {
+    const data = event.data || {};
+
+    if (data.type === 'barbph-message-result' && messageForm && messageStatus) {
+      messageResultReceived = true;
+      messageSubmissionPending = false;
+      clearBusy(messageForm);
+      if (data.ok) {
+        showSubmissionSuccess(messageStatus, messageForm, data.message || 'Message sent. Thank you.');
+      } else {
+        messageStatus.textContent = data.message || 'Could not send your message.';
+      }
+    }
+
+    if (data.type === 'barbph-testimonial-result' && testimonialForm && testimonialStatus) {
+      testimonialResultReceived = true;
+      testimonialSubmissionPending = false;
+      clearBusy(testimonialForm);
+      if (data.ok) {
+        showSubmissionSuccess(testimonialStatus, testimonialForm, data.message || 'Thank you — your testimonial was received for review.');
+      } else {
+        testimonialStatus.textContent = data.message || 'Could not submit your testimonial.';
+      }
+    }
+  });
+
+  setMode('message');
+})();
+</script>
+
+
+<style id="barbph-first-tab-look-last-word">
+/* Approved tab-face sizing only. Positioning is controlled by barbph-final-tab-spacing. */
+.folder-tab--builds{
+  --tab-w:118px !important;
+  --tab-h:64px !important;
+  width:118px !important;
+  height:64px !important;
+  flex:0 0 118px !important;
+}
+@media(max-width:720px){
+  .folder-tab--builds{
+    --tab-w:108px !important;
+    width:108px !important;
+    flex-basis:108px !important;
+  }
+}
+</style>
 </body>
 </html>

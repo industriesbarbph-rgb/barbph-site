@@ -1,11 +1,23 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Heart — Chaotic Shoreline Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&family=Syncopate:wght@700&display=swap" rel="stylesheet">
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Partnerships | BarbPH</title>
+<meta content="Explore BarbPH partnership opportunities, submit a proposal, and learn how BarbPH collaborations work." name="description"/>
+<meta content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" name="robots"/>
+<link href="https://barbph.com/partnership" rel="canonical"/>
+<meta content="website" property="og:type"/>
+<meta content="Partnerships | BarbPH" property="og:title"/>
+<meta content="Explore BarbPH partnership opportunities, submit a proposal, and learn how BarbPH collaborations work." property="og:description"/>
+<meta content="https://barbph.com/partnership" property="og:url"/>
+<meta content="BarbPH" property="og:site_name"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Partnerships | BarbPH" name="twitter:title"/>
+<meta content="Explore BarbPH partnership opportunities, submit a proposal, and learn how BarbPH collaborations work." name="twitter:description"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&amp;family=Syncopate:wght@700&amp;display=swap" rel="stylesheet"/>
+<style>
         :root {
             --bg-color: #ffffff;
             --orb-size: 380px;
@@ -37,7 +49,8 @@
         /* 1. THE SIGNATURE */
         .powered-by-signature {
             position: absolute;
-            bottom: calc(50% - 212px); 
+            top: calc(50% + 208px);
+            bottom: auto; 
             font-family: 'Syncopate', sans-serif;
             font-size: 0.62rem;
             font-weight: 700;
@@ -147,6 +160,13 @@
         @media (max-width: 768px) {
             :root {
                 --orb-size: 280px; 
+            }
+
+            .powered-by-signature {
+                top: calc(50% + 158px);
+                font-size: 0.50rem;
+                letter-spacing: 0.32em;
+                white-space: nowrap;
             }
             .choice-bubble {
                 width: 120px; 
@@ -299,106 +319,321 @@
             .proposal-send { width: 96px; height: 96px; }
         }
 
+
+        .back-to-barbph {
+            position: fixed;
+            top: 22px;
+            right: 24px;
+            z-index: 50;
+            color: rgba(17,17,16,0.42);
+            text-decoration: none;
+            font: 700 0.66rem/1 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(17,17,16,0.12);
+            padding-bottom: 3px;
+            transition: color .25s ease, border-color .25s ease, opacity .25s ease;
+        }
+
+        .back-to-barbph:hover,
+        .back-to-barbph:focus-visible {
+            color: rgba(17,17,16,0.78);
+            border-bottom-color: rgba(17,17,16,0.42);
+            outline: none;
+        }
+
+        @media (max-width: 768px) {
+            .back-to-barbph {
+                top: 16px;
+                right: 16px;
+                font-size: 0.60rem;
+                letter-spacing: 0.10em;
+            }
+        }
+
+
+        /* Minimal self-drawing square-return arrow.
+           No text, no stars, no extra decoration. */
+        .square-return {
+            position: fixed;
+            top: 20px;
+            right: 22px;
+            z-index: 60;
+            width: 54px;
+            height: 54px;
+            display: block;
+            color: rgba(17,17,16,0.42);
+            text-decoration: none;
+            transition: color .25s ease, transform .25s ease;
+        }
+
+        .square-return:hover,
+        .square-return:focus-visible {
+            color: rgba(17,17,16,0.76);
+            transform: scale(1.035);
+            outline: none;
+        }
+
+        .square-return svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .square-return .square-path,
+        .square-return .square-head {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.15;
+            stroke-linecap: square;
+            stroke-linejoin: miter;
+            vector-effect: non-scaling-stroke;
+        }
+
+        /* A mathematically square 32×32 route. */
+        .square-return .square-path {
+            stroke-dasharray: 128;
+            stroke-dashoffset: 128;
+            animation: draw-perfect-square 3.8s cubic-bezier(.65,0,.20,1) infinite;
+        }
+
+        .square-return .square-head {
+            stroke-dasharray: 16;
+            stroke-dashoffset: 16;
+            animation: draw-square-head 3.8s cubic-bezier(.65,0,.20,1) infinite;
+        }
+
+        @keyframes draw-perfect-square {
+            0%, 8% {
+                stroke-dashoffset: 128;
+                opacity: .08;
+            }
+            54% {
+                stroke-dashoffset: 0;
+                opacity: 1;
+            }
+            82% {
+                stroke-dashoffset: 0;
+                opacity: 1;
+            }
+            100% {
+                stroke-dashoffset: -128;
+                opacity: .08;
+            }
+        }
+
+        @keyframes draw-square-head {
+            0%, 46% {
+                stroke-dashoffset: 16;
+                opacity: 0;
+            }
+            60%, 82% {
+                stroke-dashoffset: 0;
+                opacity: 1;
+            }
+            100% {
+                stroke-dashoffset: -16;
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .square-return {
+                top: 14px;
+                right: 14px;
+                width: 48px;
+                height: 48px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .square-return .square-path,
+            .square-return .square-head {
+                animation: none;
+                stroke-dashoffset: 0;
+                opacity: 1;
+            }
+        }
+
     </style>
-</head>
+<meta content="https://barbph.com/3stars1sun%20%283%29.png" property="og:image"/><meta content="https://barbph.com/3stars1sun%20%283%29.png" name="twitter:image"/></head>
 <body>
-
-    <div class="portal-wrapper" id="portal">
-        <div class="powered-by-signature">Powered by Barb The Builder</div>
-
-        <div class="orb-container" id="mainOrb">
-            <div class="oil-container">
-                <div class="blob blob-top"></div>
-                <div class="blob blob-left"></div>
-                <div class="blob blob-right"></div>
-                <div class="blob blob-bottom"></div> 
-            </div>
-            <div class="glass-lens"></div>
-            <div class="word-wrapper">
-                <h1 class="impactful-word">Partnerships</h1>
-            </div>
-        </div>
-
-        <section class="proposal-panel" aria-label="Partnership proposal form">
-            <h2>Tell us what you have in mind.</h2>
-            <p>If it fits one of our partnership paths, great. If it doesn’t, send it anyway.</p>
-
-            <form class="proposal-form" id="proposalForm" action="https://script.google.com/macros/s/AKfycbwJYsFiAIdFjeraVIrIirCt5MBZXrvVoTqNJNMoLx1EDxWD2c1BeQ1mXTTcGAwHOg75XQ/exec" method="post" target="submissionFrame" novalidate>
-                <input class="honeypot" type="text" name="website" tabindex="-1" autocomplete="off">
-                <input type="hidden" name="source_page" value="barbph-partnership-world">
-
-                <label>
+<a aria-label="Return to BarbPH homepage" class="square-return" href="index.html" title="Return to BarbPH">
+<svg aria-hidden="true" role="img" viewbox="0 0 54 54">
+<!-- one continuous line draws a perfect 32×32 square -->
+<path class="square-path" d="M11 43 L11 11 L43 11 L43 43 L11 43"></path>
+<!-- small arrowhead appears only when the square finishes drawing -->
+<path class="square-head" d="M17 37 L11 43 L17 49"></path>
+</svg>
+</a>
+<div class="portal-wrapper" id="portal">
+<div class="powered-by-signature">Powered by Barb The Builder</div>
+<div class="orb-container" id="mainOrb">
+<div class="oil-container">
+<div class="blob blob-top"></div>
+<div class="blob blob-left"></div>
+<div class="blob blob-right"></div>
+<div class="blob blob-bottom"></div>
+</div>
+<div class="glass-lens"></div>
+<div class="word-wrapper">
+<h1 class="impactful-word">Partnerships</h1>
+</div>
+</div>
+<section aria-label="Partnership proposal form" class="proposal-panel">
+<h2>Tell us what you have in mind.</h2>
+<p>If it fits one of our partnership paths, great. If it doesn’t, send it anyway.</p>
+<form action="https://script.google.com/macros/s/AKfycbwJYsFiAIdFjeraVIrIirCt5MBZXrvVoTqNJNMoLx1EDxWD2c1BeQ1mXTTcGAwHOg75XQ/exec" class="proposal-form" id="proposalForm" method="post" novalidate="" target="submissionFrame">
+<input autocomplete="off" class="honeypot" name="website" tabindex="-1" type="text"/>
+<input name="source_page" type="hidden" value="barbph-partnership-world"/>
+<label>
                     Email
-                    <input id="proposalEmail" name="email" type="email" autocomplete="email" required>
-                </label>
-
-                <label>
+                    <input autocomplete="email" id="proposalEmail" name="email" required="" type="email"/>
+</label>
+<label>
                     Proposal letter
-                    <textarea id="proposalLetter" name="proposal_letter" maxlength="10000" required></textarea>
-                </label>
-
-                <fieldset class="proposal-type">
-                    <legend>Which best describes your proposal?</legend>
-
-                    <label class="proposal-choice">
-                        <input type="radio" name="proposal_type" value="standard" checked>
-                        <span>It fits one of BarbPH’s partnership paths.</span>
-                    </label>
-
-                    <label class="proposal-choice">
-                        <input type="radio" name="proposal_type" value="other">
-                        <span>I have something different in mind.</span>
-                    </label>
-                </fieldset>
-
-                <label class="other-wrap" id="otherWrap">
+                    <textarea id="proposalLetter" maxlength="10000" name="proposal_letter" required=""></textarea>
+</label>
+<fieldset class="proposal-type">
+<legend>Which best describes your proposal?</legend>
+<label class="proposal-choice">
+<input checked="" name="proposal_type" type="radio" value="standard"/>
+<span>It fits one of BarbPH’s partnership paths.</span>
+</label>
+<label class="proposal-choice">
+<input name="proposal_type" type="radio" value="other"/>
+<span>I have something different in mind.</span>
+</label>
+</fieldset>
+<label class="other-wrap" id="otherWrap">
                     Tell us what makes it different
-                    <textarea id="otherIdea" name="other_idea" maxlength="3000"></textarea>
-                </label>
-
-                <div class="proposal-actions">
-                    <a class="proposal-link" href="https://script.google.com/macros/s/AKfycbwJYsFiAIdFjeraVIrIirCt5MBZXrvVoTqNJNMoLx1EDxWD2c1BeQ1mXTTcGAwHOg75XQ/exec?go=partnership-info" target="_blank" rel="noopener">
+                    <textarea id="otherIdea" maxlength="3000" name="other_idea"></textarea>
+</label>
+<div class="proposal-actions">
+<a class="proposal-link" href="#" id="partnershipInfoLink" rel="noopener" target="_blank">
                         How BarbPH Partnerships Work →
                     </a>
-                    <button class="proposal-send" id="proposalSend" type="submit">Send</button>
-                </div>
-
-                <div class="proposal-status" id="proposalStatus" role="status" aria-live="polite"></div>
-            </form>
-        </section>
-
-        <iframe name="submissionFrame" id="submissionFrame" hidden title="Partnership proposal submission"></iframe>
-    </div>
-
-    <svg class="svg-filters">
-        <defs>
-            <filter id="gooey">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="22" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 32 -16" />
-            </filter>
-            <filter id="refraction">
-                <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="1" result="noise">
-                    <animate attributeName="baseFrequency" values="0.012; 0.008; 0.012" dur="12s" repeatCount="indefinite" />
-                </feTurbulence>
-                <feDisplacementMap in="SourceGraphic" in2="noise" scale="48" xChannelSelector="R" yChannelSelector="G" />
-            </filter>
-        </defs>
-    </svg>
-
-    <script>
+<button class="proposal-send" id="proposalSend" type="submit">Send</button>
+</div>
+<div aria-live="polite" class="proposal-status" id="proposalStatus" role="status"></div>
+</form>
+</section>
+<iframe aria-hidden="true" id="submissionFrame" name="submissionFrame" style="position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none" title="Partnership proposal submission"></iframe>
+</div>
+<svg class="svg-filters">
+<defs>
+<filter id="gooey">
+<fegaussianblur in="SourceGraphic" result="blur" stddeviation="22"></fegaussianblur>
+<fecolormatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 32 -16"></fecolormatrix>
+</filter>
+<filter id="refraction">
+<feturbulence basefrequency="0.012" numoctaves="1" result="noise" type="fractalNoise">
+<animate attributename="baseFrequency" dur="12s" repeatcount="indefinite" values="0.012; 0.008; 0.012"></animate>
+</feturbulence>
+<fedisplacementmap in="SourceGraphic" in2="noise" scale="48" xchannelselector="R" ychannelselector="G"></fedisplacementmap>
+</filter>
+</defs>
+</svg>
+<script>
         const mainOrb = document.getElementById('mainOrb');
         const portal = document.getElementById('portal');
-        
+        const form = document.getElementById('proposalForm');
+        const email = document.getElementById('proposalEmail');
+        const proposalLetter = document.getElementById('proposalLetter');
+        const otherWrap = document.getElementById('otherWrap');
+        const otherIdea = document.getElementById('otherIdea');
+        const status = document.getElementById('proposalStatus');
+        const send = document.getElementById('proposalSend');
+        const frame = document.getElementById('submissionFrame');
+
+        let awaitingSubmission = false;
+
         mainOrb.addEventListener('click', () => {
             portal.classList.add('active');
+            setTimeout(() => email.focus(), 650);
         });
-        
-        // Tap anywhere on the background to reset the animation
-        portal.addEventListener('click', (e) => { 
-            if(e.target === portal) {
-                portal.classList.remove('active'); 
+
+        function syncOther() {
+            const selected = document.querySelector('input[name="proposal_type"]:checked');
+            const isOther = selected && selected.value === 'other';
+
+            otherWrap.classList.toggle('is-visible', isOther);
+            otherIdea.required = isOther;
+
+            if (!isOther) otherIdea.value = '';
+        }
+
+        document.querySelectorAll('input[name="proposal_type"]').forEach((input) => {
+            input.addEventListener('change', syncOther);
+        });
+
+        form.addEventListener('submit', (event) => {
+            const emailValue = email.value.trim();
+            const proposalValue = proposalLetter.value.trim();
+            const selected = document.querySelector('input[name="proposal_type"]:checked');
+            const proposalType = selected ? selected.value : '';
+            const otherValue = otherIdea.value.trim();
+
+            status.textContent = '';
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) {
+                event.preventDefault();
+                status.textContent = 'Please enter a valid email address.';
+                email.focus();
+                return;
+            }
+
+            if (proposalValue.length < 20) {
+                event.preventDefault();
+                status.textContent = 'Please give us a little more detail in your proposal.';
+                proposalLetter.focus();
+                return;
+            }
+
+            if (proposalType === 'other' && otherValue.length < 5) {
+                event.preventDefault();
+                status.textContent = 'Tell us a little about what makes this proposal different.';
+                otherIdea.focus();
+                return;
+            }
+
+            awaitingSubmission = true;
+            send.disabled = true;
+            send.textContent = 'Sending';
+            status.textContent = 'Sending your proposal…';
+
+            // Do not preventDefault here.
+            // The browser performs the real POST into the zero-size iframe.
+        });
+
+        frame.addEventListener('load', () => {
+            if (!awaitingSubmission) return;
+
+            awaitingSubmission = false;
+            send.disabled = false;
+            send.textContent = 'Send';
+            status.textContent = 'Proposal received. Thank you — we’ll review it from here.';
+            form.reset();
+            syncOther();
+        });
+
+        portal.addEventListener('click', (e) => {
+            if (e.target === portal) {
+                portal.classList.remove('active');
+                status.textContent = '';
             }
         });
+
+        syncOther();
     </script>
+<script id="barbph-partnership-info-route">
+(() => {
+  const link = document.getElementById('partnershipInfoLink');
+  if (!link) return;
+  link.href = location.protocol === 'file:'
+    ? 'partnership-guide.html'
+    : '/.netlify/functions/partnership-info';
+})();
+</script>
 </body>
 </html>

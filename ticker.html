@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BarbPH Ticker</title>
+<meta name="description" content="The BarbPH ticker layer is still unfolding. Join the newsletter for launch announcements.">
+<meta name="robots" content="noindex,follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden}
+  body{
+    font-family:'Work Sans',system-ui,sans-serif;
+    background:linear-gradient(180deg,rgba(11,13,17,.89),rgba(7,8,11,.84));
+    color:#fff;
+  }
+  button,input{font:inherit}
+  .visually-hidden{
+    position:absolute!important;
+    width:1px!important;
+    height:1px!important;
+    padding:0!important;
+    margin:-1px!important;
+    overflow:hidden!important;
+    clip:rect(0,0,0,0)!important;
+    white-space:nowrap!important;
+    border:0!important;
+  }
+  .prebirth{
+    height:100%;
+    display:grid;
+    place-items:center;
+    padding:52px clamp(24px,6vw,88px) 34px;
+    text-align:center;
+    background:radial-gradient(circle at 50% 0,rgba(255,255,255,.08),transparent 58%);
+  }
+  .prebirth__inner{
+    width:min(900px,100%);
+    display:grid;
+    justify-items:center;
+    gap:22px;
+  }
+  .prebirth__rotator{
+    position:relative;
+    width:100%;
+    min-height:94px;
+    display:grid;
+    place-items:center;
+  }
+  .prebirth__line{
+    grid-area:1/1;
+    margin:0;
+    max-width:820px;
+    font:400 clamp(24px,4vw,48px)/1.14 'Marcellus',serif;
+    letter-spacing:.018em;
+    color:rgba(255,255,255,.94);
+    opacity:0;
+    transform:translateY(7px);
+    transition:opacity .8s ease,transform .8s ease;
+  }
+  .prebirth__line.is-active{opacity:1;transform:translateY(0)}
+  .prebirth__invite{
+    margin:0;
+    max-width:720px;
+    font-size:clamp(14px,1.7vw,19px);
+    line-height:1.55;
+    color:rgba(255,255,255,.72);
+  }
+  .prebirth__form{
+    width:min(560px,100%);
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin-top:2px;
+  }
+  .prebirth__input{
+    min-width:0;
+    flex:1;
+    height:48px;
+    border:1px solid rgba(255,255,255,.22);
+    border-radius:999px;
+    background:rgba(255,255,255,.08);
+    color:#fff;
+    padding:0 18px;
+    outline:none;
+    font:400 14px/1 'Work Sans',sans-serif;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  .prebirth__input::placeholder{color:rgba(255,255,255,.46)}
+  .prebirth__input:focus{
+    border-color:rgba(255,255,255,.58);
+    box-shadow:0 0 0 3px rgba(255,255,255,.08);
+  }
+  .prebirth__button{
+    height:48px;
+    border:1px solid rgba(255,255,255,.3);
+    border-radius:999px;
+    background:rgba(255,255,255,.14);
+    color:#fff;
+    padding:0 20px;
+    cursor:pointer;
+    font:500 13px/1 'Work Sans',sans-serif;
+  }
+  .prebirth__button:hover{background:rgba(255,255,255,.2)}
+  .prebirth__button:disabled{opacity:.55;cursor:wait}
+  .prebirth__status{
+    min-height:21px;
+    margin:0;
+    font-size:12px;
+    color:rgba(255,255,255,.64);
+  }
+  .prebirth__status.is-success{color:#aaf8c4}
+  .prebirth__status.is-error{color:#ffb2b2}
+  .prebirth__fine{
+    margin:-8px 0 0;
+    font-size:10px;
+    line-height:1.45;
+    color:rgba(255,255,255,.38);
+  }
+
+  @media(max-width:620px){
+    .prebirth{
+      padding:34px 18px 24px;
+    }
+    .prebirth__inner{gap:16px}
+    .prebirth__rotator{min-height:78px}
+    .prebirth__form{
+      width:min(440px,100%);
+      gap:8px;
+    }
+    .prebirth__input{height:44px}
+    .prebirth__button{height:44px;padding:0 17px}
+  }
+</style>
+</head>
+<body>
+  <!--
+    BARBPH TICKER — PERMANENT SWAPPABLE CONTENT FILE
+
+    INDEX.HTML IS NOW FROZEN.
+    When the real ticker is built, change THIS FILE (ticker.html), not index.html.
+
+    Current state:
+      - newsletter / pre-launch ticker face
+
+    Future state:
+      - actual live ticker occupies this same viewport
+      - newsletter remains here as a smaller supporting module
+      - index.html does not need to change
+  -->
+  <main class="prebirth">
+    <div class="prebirth__inner">
+      <div class="prebirth__rotator" aria-live="polite">
+        <p class="prebirth__line is-active">This layer is still unfolding.</p>
+        <p class="prebirth__line">Something is taking shape here.</p>
+        <p class="prebirth__line">The board is getting ready.</p>
+        <p class="prebirth__line">Not everything wakes at once.</p>
+        <p class="prebirth__line">There’s more to this layer.</p>
+        <p class="prebirth__line">This part of BarbPH is still becoming.</p>
+      </div>
+
+      <p class="prebirth__invite">You can always return — or join the BarbPH newsletter. There, we’ll announce when this layer wakes up.</p>
+
+      <form class="prebirth__form" id="newsletter-form" novalidate>
+        <label class="visually-hidden" for="newsletter-email">Email address</label>
+        <input
+          class="prebirth__input"
+          id="newsletter-email"
+          type="email"
+          autocomplete="email"
+          inputmode="email"
+          placeholder="your@email.com"
+          required>
+        <button class="prebirth__button" type="submit">Join</button>
+      </form>
+
+      <p class="prebirth__status" id="newsletter-status" role="status" aria-live="polite"></p>
+      <p class="prebirth__fine">Email only. We’ll use it for BarbPH newsletter announcements.</p>
+    </div>
+  </main>
+
+<script>
+(() => {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const lines = [...document.querySelectorAll('.prebirth__line')];
+
+  if (lines.length > 1 && !reduce) {
+    let lineIndex = 0;
+    setInterval(() => {
+      lines[lineIndex].classList.remove('is-active');
+      lineIndex = (lineIndex + 1) % lines.length;
+      lines[lineIndex].classList.add('is-active');
+    }, 5200);
+  }
+
+  const form = document.getElementById('newsletter-form');
+  const email = document.getElementById('newsletter-email');
+  const status = document.getElementById('newsletter-status');
+  const button = form?.querySelector('button');
+
+  if (!form || !email || !status || !button) return;
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+
+    status.className = 'prebirth__status';
+    status.textContent = '';
+    status.setAttribute('role','status');
+
+    email.value = email.value.trim();
+    if (!email.reportValidity()) return;
+
+    button.disabled = true;
+    button.textContent = 'Joining…';
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 12000);
+
+    try {
+      const endpoint = location.protocol === 'file:'
+        ? null
+        : '/.netlify/functions/newsletter-submit';
+
+      if (!endpoint) {
+        throw new Error('Newsletter signup becomes active after the site is deployed.');
+      }
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {'content-type':'application/json'},
+        body: JSON.stringify({email: email.value}),
+        signal: controller.signal
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || 'Could not join right now.');
+      }
+
+      status.classList.add('is-success');
+      status.textContent = data.message || 'You’re on the list. ✦';
+      form.reset();
+    } catch (error) {
+      status.setAttribute('role','alert');
+      status.classList.add('is-error');
+      status.textContent = error?.name === 'AbortError'
+        ? 'The request timed out. Please try again.'
+        : (error.message || 'Could not join right now.');
+    } finally {
+      clearTimeout(timer);
+      button.disabled = false;
+      button.textContent = 'Join';
+    }
+  });
+})();
+</script>
+</body>
+</html>
