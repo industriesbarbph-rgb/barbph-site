@@ -2182,7 +2182,7 @@ body.barb-ticker-lock{
 <script id="barbph-production-image-optimizer">
 (() => {
   if (location.protocol === 'file:') return;
-  document.querySelectorAll('img[data-webp]').forEach(img => {
+  document.querySelectorAll('img[data-webp][src^="web/"]').forEach(img => {
     const next = img.getAttribute('data-webp');
     if (next) img.src = next;
   });
