@@ -1,0 +1,55 @@
+name: Deploy Final BarbPH Package
+
+on:
+  push:
+    branches:
+      - barbph-launch-2026-08-23
+    paths:
+      - .github/workflows/deploy-final.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy-final:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out production base
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Download exact final package
+        run: |
+          python -m pip install --quiet gdown
+          gdown --id 1G3G0ZpDSdTUtWazsXYdTP6cNLsU7N9Y_ -O /tmp/barbph-final.zip
+
+      - name: Verify package checksum
+        run: |
+          echo "d411b898641adbec4dca082fd557af472014032e78a96a2f020f7078d8746b71  /tmp/barbph-final.zip" | sha256sum -c -
+
+      - name: Replace repository with verified launch package
+        run: |
+          rm -rf /tmp/barbph-unpacked
+          mkdir -p /tmp/barbph-unpacked
+          unzip -q /tmp/barbph-final.zip -d /tmp/barbph-unpacked
+          SRC="/tmp/barbph-unpacked/BarbPH_NETLIFY_PRODUCTION_FINAL_SEO_2026-08-23"
+          test -f "$SRC/index.html"
+          test -f "$SRC/netlify.toml"
+          test -d "$SRC/netlify/functions"
+          COUNT=$(find "$SRC" -type f | wc -l | tr -d ' ')
+          test "$COUNT" = "37"
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a "$SRC"/. .
+          test "$(find . -path ./.git -prune -o -type f -print | wc -l | tr -d ' ')" = "37"
+
+      - name: Commit exact launch package to main
+        run: |
+          git config user.name "barbph-launch"
+          git config user.email "actions@github.com"
+          git add -A
+          git diff --cached --quiet && { echo "Launch package already matches main."; exit 0; }
+          git commit -m "Launch BarbPH production package 2026-08-23"
+          git push origin HEAD:main
