@@ -1641,6 +1641,7 @@ body.barb-ticker-lock{
   }
 </style>
 
+  <link rel="stylesheet" href="/satellite-tab.css">
 </head>
 <body>
   <main>
@@ -1702,6 +1703,29 @@ body.barb-ticker-lock{
       <span class="visually-hidden">Ticker</span>
       <span class="folder-tab__surface folder-tab__icon"><img class="final-tab-art" src="web/ChatGPT Image Aug 22, 2026, 06_39_58 PM (2)(1).webp" data-webp="web/ChatGPT Image Aug 22, 2026, 06_39_58 PM (2)(1).webp" alt="" aria-hidden="true" decoding="sync" fetchpriority="high"></span>
       <span class="folder-tab__hint" aria-hidden="true">Ticker</span>
+    </button>
+
+
+    <button class="folder-tab folder-tab--satellite"
+            type="button"
+            data-satellite-handle
+            data-tab-key="satellite"
+            aria-label="Live telecast transmission log"
+            aria-expanded="false"
+            aria-controls="barb-satellite-drawer"
+            title="Live telecast">
+      <span class="visually-hidden">Live telecast transmission log</span>
+      <span class="folder-tab__surface folder-tab__icon" aria-hidden="true">
+        <svg class="satellite-glyph" viewBox="0 0 64 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="25" y="20" width="14" height="14" rx="2" transform="rotate(-18 32 27)"/>
+            <path d="M21 18l-9-5-5 9 10 4m26 10 9 5 5-9-10-4M28 34l-5 10m13-26 5-10"/>
+            <path d="M38 18c5 1 8 4 9 9m-7-13c7 1 12 6 13 13"/>
+            <circle cx="32" cy="27" r="2.1" fill="currentColor" stroke="none"/>
+          </g>
+        </svg>
+      </span>
+      <span class="folder-tab__hint" aria-hidden="true">Live Telecast</span>
     </button>
 
     <a class="folder-tab folder-tab--products"
@@ -1774,6 +1798,33 @@ body.barb-ticker-lock{
     </a>
 
   </nav>
+
+
+  <section class="satellite-drawer" id="barb-satellite-drawer" aria-hidden="true" aria-label="Live telecast transmission log">
+    <div class="satellite-machine">
+      <div class="satellite-machine__head">
+        <span class="satellite-machine__id">BarbPH · Transmission Register</span>
+        <span class="satellite-machine__signal">Live telecast</span>
+      </div>
+      <div class="satellite-lock" role="group" aria-label="Yesterday, today and tomorrow source assignments">
+        <div class="satellite-reel" data-sat-day="yesterday">
+          <div class="satellite-reel__when">Yesterday</div>
+          <div class="satellite-reel__window"><div class="satellite-reel__source">SYNCING</div><div class="satellite-reel__meta">TRANSMISSION LOG</div></div>
+        </div>
+        <div class="satellite-reel satellite-reel--today" data-sat-day="today">
+          <div class="satellite-reel__when">Today</div>
+          <div class="satellite-reel__window"><div class="satellite-reel__source">SYNCING</div><div class="satellite-reel__meta">TODAY'S ASSIGNMENT</div></div>
+        </div>
+        <div class="satellite-reel" data-sat-day="tomorrow">
+          <div class="satellite-reel__when">Tomorrow</div>
+          <div class="satellite-reel__window"><div class="satellite-reel__source">SYNCING</div><div class="satellite-reel__meta">NEXT ASSIGNMENT</div></div>
+        </div>
+      </div>
+      <a class="satellite-publication" data-sat-publication aria-disabled="true" tabindex="-1">What’s this? Read our publication: Inside BarbPH’s zero-word, zero-scroll build — baked with live telecast.. →</a>
+      <div class="satellite-status" data-sat-status aria-live="polite">SYNCING TRANSMISSION LOG…</div>
+    </div>
+  </section>
+
 
   <div class="connect-drawer" id="barb-connect-drawer" aria-hidden="true">
     <div class="connect-drawer__inner connect-drawer__inner--form">
@@ -2462,5 +2513,6 @@ body.barb-ticker-lock{
   }
 }
 </style>
+  <script src="/satellite-tab.js" defer></script>
 </body>
 </html>
