@@ -10,7 +10,18 @@
 
   const surface = handle.querySelector('.folder-tab__surface');
   if (surface) {
-    surface.innerHTML = '<img class="satellite-tab-art" src="/satellite-tab.png" alt="" aria-hidden="true" decoding="async">';
+    const satelliteArt = new Image();
+    satelliteArt.className = 'satellite-tab-art';
+    satelliteArt.alt = '';
+    satelliteArt.setAttribute('aria-hidden', 'true');
+    satelliteArt.decoding = 'async';
+    satelliteArt.onload = () => {
+      surface.replaceChildren(satelliteArt);
+    };
+    satelliteArt.onerror = () => {
+      // Keep the inline SVG already present in the HTML as the guaranteed visual fallback.
+    };
+    satelliteArt.src = '/satellite-tab.png?v=a88f57b2';
   }
 
   const rows = {
