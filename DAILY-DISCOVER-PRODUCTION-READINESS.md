@@ -25,19 +25,28 @@ The readiness endpoint does not enable any source, write history, create a Daily
 - `READY_TO_ARM` — reserve is ready, but no confirmed source is enabled yet.
 - `ARMED_WITH_RESERVE` — at least one confirmed source is enabled and Barb Originals is ready.
 
-## Verified current state — 2026-08-21 Manila
+## Verified state — 2026-08-21 Manila
 
-The earlier `WAITING_FOR_RESERVE_AND_ARMING` expectation is historical and no longer describes production.
+The earlier `WAITING_FOR_RESERVE_AND_ARMING` expectation became historical once production was armed.
 
-- NASA is deliberately production-armed as a confirmed source.
-- Barb Originals reserve is ready for the automatic fallback path.
+- NASA was deliberately production-armed as a confirmed source.
+- Barb Originals reserve was ready for the automatic fallback path.
 - The first real production set was created before the Aug 20→21 rollover.
-- Shared history is working.
+- Shared history was working.
 - The real Manila-midnight rollover passed: Aug 21 created a new NASA/Mars daily set while loading Aug 20 history.
 - A separate-session request returned the same Aug 21 daily set with `cache_hit:true`, proving the persisted daily lock was read.
-- No additional source was armed by this documentation update.
+- No additional source was armed by that documentation update.
 
 The readiness gate remains diagnostic only; runtime source controls remain the authority for its exact live status value.
+
+## Reconciliation — 2026-08-27 Manila
+
+- The nine-source production eligibility whitelist remains unchanged in the current schedule code.
+- The five parked public worlds remain excluded from automatic production eligibility.
+- Barb Originals remains reserve-only and is documented as ready for fallback.
+- Live enablement/weight values remain controlled by `Theme Sources`; this file must not infer current arming solely from historical Aug 21 evidence.
+- The Satellite schedule feature reads the same production/history state to present Yesterday, Today, and Tomorrow assignments; it does not expand the approved source pool.
+- Current Netlify project state was checked as `ready` during this reconciliation. This documentation update does not itself alter source controls, Blobs history, or schedule state.
 
 ## Endpoint
 `/.netlify/functions/daily-discover-readiness`
