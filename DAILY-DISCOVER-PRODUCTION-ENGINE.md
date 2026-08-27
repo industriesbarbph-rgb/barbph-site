@@ -16,7 +16,7 @@ Only source worlds that have already passed the 3-asset lab test are eligible fo
 
 A source must also be `enabled=yes` in `Theme Sources` and have `weight > 0`. Parked worlds are excluded even if accidentally enabled.
 
-**Current deliberate production arming: NASA.** This document update does not arm any additional source.
+Historical arming evidence: NASA was deliberately production-armed during the Aug 20→21 production verification. Live spreadsheet controls remain authoritative for current arming; this document does not infer that historical setting remains unchanged.
 
 ## Daily duty behavior
 For each Manila date the production endpoint:
@@ -36,18 +36,24 @@ Shared history is also active for cross-day repeat protection. The production pa
 
 ## Real Manila-midnight verification — Aug 20 → Aug 21, 2026
 
-This engine has passed a real clock rollover, not merely a forced/lab date test:
+This engine passed a real clock rollover, not merely a forced/lab date test:
 
 - Aug 20 existed as the prior production/history day.
 - The first request after Manila midnight reported `date_manila: 2026-08-21`, loaded one prior history day, selected/served NASA in primary mode, and created a new Mars-family daily set with `cache_hit:false`.
 - A separate/incognito request returned the same Aug 21 Mars set and same `daily_set_id` with `cache_hit:true`.
-- This proves the observed production path both created the new day's lock and subsequently read that persisted lock.
+- This proved the observed production path both created the new day's lock and subsequently read that persisted lock.
 
 Operational note: browser/edge caching on an identical URL can replay the first response and make `cache_hit:false` appear stale. For lock diagnostics, use a separate/uncached request rather than treating a same-URL refresh as authoritative.
 
 ## Barb Originals reserve
 
-Barb Originals remains emergency reserve only, never a weighted public source. The reserve is now ready for the automatic fallback path. The minimum readiness threshold remains 3 enabled unique valid images; a larger pool is preferred.
+Barb Originals remains emergency reserve only, never a weighted public source. The reserve is documented as ready for the automatic fallback path. The minimum readiness threshold remains 3 enabled unique valid images; a larger pool is preferred.
+
+## Satellite schedule consumer — added Aug 24, reconciled Aug 27
+
+`netlify/functions/daily-discover-schedule.mjs` is a read-only schedule-facing consumer of the same production/history state. It exposes Yesterday, Today, Tomorrow, the scheduled/served distinction, fallback state, and an optional publication URL to the Satellite tab. It does **not** create a second source pool or authorize parked sources.
+
+The schedule function contains the same nine-source `PASSED` whitelist and still requires `enabled=yes` plus positive weight for forecasting. Therefore the 15-entry architecture remains: 9 passed public sources, 5 parked public worlds, and Barb Originals as reserve.
 
 ## Diagnostic mode
 Diagnostics never write the production day record.
