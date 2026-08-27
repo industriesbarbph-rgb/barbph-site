@@ -1,5 +1,119 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><title>Meanwhile, Around the World — Prototype</title>
-<style>:root{color-scheme:light;--soil:#76513a;--clay:#9a6848;--forest:#52725b;--ocean:#4d88a0;--sky:#75a8b7}*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:#fff}body{overflow:hidden;background:radial-gradient(circle at 13% 12%,rgba(136,92,64,.9),transparent 34%),radial-gradient(circle at 84% 14%,rgba(73,135,159,.9),transparent 35%),radial-gradient(circle at 17% 88%,rgba(77,111,86,.92),transparent 32%),radial-gradient(circle at 80% 87%,rgba(103,72,51,.9),transparent 34%),linear-gradient(135deg,#55735a 0%,#7e5b44 34%,#4d8988 66%,#477d99 100%);background-attachment:fixed}.stage{height:100dvh;display:grid;grid-template-rows:118px 1fr auto;gap:10px;padding:12px}.top{display:grid;place-items:center}.orbit-wrap{width:min(1050px,86vw);height:108px;filter:drop-shadow(0 4px 12px rgba(39,55,45,.2))}.orbit{width:100%;height:100%;overflow:visible}.orbit-track{fill:none;stroke:rgba(255,255,255,.36);stroke-width:1}.orbit-text{font-size:14px;letter-spacing:2px;fill:#fff;text-transform:uppercase}.signal{fill:#fff;filter:drop-shadow(0 0 8px #fff);animation:heartbeat 4.8s ease-in-out infinite}@keyframes heartbeat{0%,18%,100%{opacity:.32}5%{opacity:1}10%{opacity:.52}14%{opacity:1}}.grid{min-height:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:8px}.tile{position:relative;min-height:0;overflow:hidden;border:1px solid rgba(255,255,255,.48);border-radius:14px;background:rgba(34,66,58,.25);box-shadow:0 10px 25px rgba(54,42,24,.14);backdrop-filter:blur(8px)}.grid[data-count="5"] .tile:nth-child(-n+3){grid-column:span 2}.grid[data-count="5"] .tile:nth-child(n+4){grid-column:span 3}.grid[data-count="4"] .tile{grid-column:span 3}.grid[data-count="6"] .tile{grid-column:span 2}.tile iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#29443c}.shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(7,22,20,.03),transparent 55%,rgba(10,25,23,.72));z-index:2}.meta{position:absolute;left:10px;right:10px;bottom:9px;z-index:3;display:flex;align-items:end;justify-content:space-between;gap:12px;text-shadow:0 1px 5px #000}.place strong{display:block;font-size:14px}.place span,.state span{font-size:10px;color:rgba(255,255,255,.88)}.state{text-align:right}.state strong{display:block;font-size:12px}.live{position:absolute;top:9px;right:9px;z-index:3;padding:4px 7px;border-radius:999px;background:rgba(55,110,67,.92);font-size:9px;font-weight:700;letter-spacing:.12em}.credit{position:absolute;top:9px;left:9px;z-index:3;max-width:72%;padding:4px 6px;border-radius:999px;background:rgba(35,64,54,.74);font-size:8px}.bottom{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:8px}.foot-card{min-height:54px;padding:9px 12px;border:1px solid rgba(255,255,255,.38);border-radius:12px;background:rgba(244,234,211,.16);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;text-align:center;font-size:10px;line-height:1.4;text-shadow:0 1px 4px rgba(0,0,0,.2)}.foot-card strong{display:block;font-size:12px}.ref strong{font-size:14px;letter-spacing:.08em}.ledger{font-weight:700;letter-spacing:.08em}@media(max-width:760px){body{overflow:auto}.stage{height:auto;min-height:100dvh;grid-template-rows:100px auto auto}.orbit-wrap{width:96vw;height:94px}.orbit-text{font-size:12px}.grid{grid-template-columns:1fr;grid-auto-rows:42vh}.grid .tile{grid-column:1!important}.bottom{grid-template-columns:1fr 1fr}}</style></head>
-<body><main class="stage"><header class="top"><div class="orbit-wrap"><svg class="orbit" viewBox="0 0 1000 110" aria-label="Live Cities One Moment All Seasons Real Time Around the World Coach Doll Patrols"><defs><path id="orbitPath" pathLength="1000" d="M80,55 C80,12 920,12 920,55 C920,98 80,98 80,55 Z"/></defs><use href="#orbitPath" class="orbit-track"/><text class="orbit-text"><textPath href="#orbitPath" startOffset="0"><tspan id="crawlText">LIVE CITIES · ONE MOMENT · ALL SEASONS · REAL TIME AROUND THE WORLD · COACH DOLL PATROLS ·</tspan></textPath></text><circle id="signal" class="signal" r="7" cx="0" cy="0"/></svg></div></header><section id="grid" class="grid"></section><footer class="bottom"><div class="foot-card"><span><strong>Different places. Same moment.</strong>Our world is always alive.</span></div><div class="foot-card"><span><strong>2 minutes</strong>Every 4 hours</span></div><div class="foot-card ref"><span>REFERENCE<br><strong id="utcClock">UTC —</strong>PHT offset +8</span></div><div class="foot-card ledger">TRANSMISSION LEDGER</div></footer></main>
-<script>const feeds=[{id:'london',city:'London',country:'United Kingdom',timezone:'Europe/London',hemisphere:'north',embed_url:'https://portofcams.com/embed/windy-london/',source_name:'Port of Cams',credit_text:'London live camera via Port of Cams'},{id:'venice',city:'Venice',country:'Italy',timezone:'Europe/Rome',hemisphere:'north',embed_url:'https://portofcams.com/embed/venice-canal/',source_name:'Port of Cams',credit_text:'Venice Grand Canal live camera via Port of Cams'},{id:'tokyo',city:'Tokyo',country:'Japan',timezone:'Asia/Tokyo',hemisphere:'north',embed_url:'https://camstreamer.com/embed/gvwteHj04P0qq1ygIgt8sEVQYPotE1ZfaeALWlKl?rel=0',source_name:'CamStreamer',credit_text:'Tokyo Shinjuku live camera via CamStreamer'},{id:'naha',city:'Naha, Okinawa',country:'Japan',timezone:'Asia/Tokyo',hemisphere:'north',embed_url:'https://portofcams.com/embed/windy-naha/',source_name:'Port of Cams',credit_text:'Naha Tomarin Harbour live camera via Port of Cams'},{id:'buenosaires',city:'Buenos Aires',country:'Argentina',timezone:'America/Argentina/Buenos_Aires',hemisphere:'south',embed_url:'https://opencctv.org/cameras/argentina/autonomous-city-of-buenos-aires/autonomous-city-of-buenos-aires/autonomous-city-of-buenos-aires-oficina-externa-301693',source_name:'OpenCCTV',credit_text:'Buenos Aires live camera via OpenCCTV'}];function parts(tz){const f=new Intl.DateTimeFormat('en-US',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,month:'numeric'}),p=Object.fromEntries(f.formatToParts(new Date()).map(x=>[x.type,x.value]));return{time:`${p.hour}:${p.minute}:${p.second}`,hour:+p.hour,month:+p.month}}function season(m,h){let s=[3,4,5].includes(m)?'Spring':[6,7,8].includes(m)?'Summer':[9,10,11].includes(m)?'Autumn':'Winter';return h==='south'?{Spring:'Autumn',Summer:'Winter',Autumn:'Spring',Winter:'Summer'}[s]:s}function daylight(h){return h>=6&&h<18?'Day':'Night'}function tickUTC(){document.getElementById('utcClock').textContent='UTC '+new Intl.DateTimeFormat('en-GB',{timeZone:'UTC',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date())}function tile(f){const p=parts(f.timezone),t=document.createElement('article');t.className='tile';t.dataset.id=f.id;t.innerHTML=`<iframe src="${f.embed_url}" title="${f.city}, ${f.country} live camera" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe><div class="shade"></div><div class="credit">${f.credit_text}</div><div class="live">LIVE</div><div class="meta"><div class="place"><strong>${f.city}, ${f.country}</strong><span>${f.source_name}</span></div><div class="state"><strong>${p.time}</strong><span>${daylight(p.hour)} · ${season(p.month,f.hemisphere)}</span></div></div>`;return t}const grid=document.getElementById('grid');grid.dataset.count=feeds.length;feeds.forEach(f=>grid.append(tile(f)));const textPath=document.querySelector('textPath'),path=document.getElementById('orbitPath'),signal=document.getElementById('signal'),len=path.getTotalLength();let start;function animateOrbit(ts){if(!start)start=ts;const cycle=26000;const p=((ts-start)%cycle)/cycle;const offset=p*1000;textPath.setAttribute('startOffset',offset);const pt=path.getPointAtLength((p*len)%len);signal.setAttribute('cx',pt.x);signal.setAttribute('cy',pt.y);requestAnimationFrame(animateOrbit)}requestAnimationFrame(animateOrbit);tickUTC();setInterval(()=>{tickUTC();document.querySelectorAll('.tile').forEach(t=>{const f=feeds.find(x=>x.id===t.dataset.id),p=parts(f.timezone);t.querySelector('.state').innerHTML=`<strong>${p.time}</strong><span>${daylight(p.hour)} · ${season(p.month,f.hemisphere)}</span>`})},1000);</script></body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Meanwhile, Around the World — Live Telecast</title>
+<style>
+:root{
+  color-scheme:dark;
+  --black:#050505;
+  --ink:#0d0f0e;
+  --bronze:#8a6545;
+  --bronze2:#b18a64;
+  --pearl:#fffdf7;
+  --line:rgba(177,138,100,.42);
+  --glass:rgba(17,15,12,.78);
+  --green:#73c94e;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#020202;color:#fff}
+body{overflow:hidden}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 8% 9%,rgba(255,255,255,.65) 0 1px,transparent 1.5px),
+    radial-gradient(circle at 28% 5%,rgba(255,255,255,.45) 0 1px,transparent 1.5px),
+    radial-gradient(circle at 57% 8%,rgba(255,255,255,.5) 0 1px,transparent 1.5px),
+    radial-gradient(circle at 78% 4%,rgba(255,255,255,.38) 0 1px,transparent 1.5px),
+    radial-gradient(circle at 94% 11%,rgba(255,255,255,.55) 0 1px,transparent 1.5px),
+    linear-gradient(#020202,#080604 42%,#050505 100%);
+  z-index:-4;
+}
+.stage{height:100dvh;display:grid;grid-template-rows:255px 1fr 136px 34px;gap:10px;padding:14px 16px 10px}
+.hero{position:relative;overflow:hidden;border-radius:22px 22px 8px 8px}
+.earth{
+  position:absolute;left:-8%;right:-8%;bottom:-155px;height:315px;border-radius:50% 50% 0 0/38% 38% 0 0;
+  background:
+    radial-gradient(circle at 18% 43%,rgba(255,171,74,.9) 0 1px,transparent 1.6px) 0 0/26px 22px,
+    radial-gradient(circle at 52% 38%,rgba(255,158,48,.8) 0 1px,transparent 1.7px) 0 0/34px 25px,
+    radial-gradient(circle at 76% 48%,rgba(255,192,99,.78) 0 1px,transparent 1.6px) 0 0/31px 24px,
+    radial-gradient(ellipse at 50% 5%,#8b5f37 0%,#4d3424 26%,#1f1a17 58%,#080808 80%);
+  box-shadow:0 -7px 18px rgba(255,242,220,.5),0 -2px 3px #fff,0 -15px 70px rgba(184,122,64,.26);
+  opacity:.98;
+}
+.earth:after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(ellipse at 50% 0%,transparent 0 25%,rgba(0,0,0,.1) 48%,rgba(0,0,0,.72) 86%)}
+.orbit-wrap{position:absolute;left:0;right:0;top:4px;height:155px;display:grid;place-items:center;z-index:4}
+.orbit{width:100%;height:100%;overflow:visible}
+.orbit-band{fill:rgba(113,79,49,.45);stroke:rgba(181,132,77,.82);stroke-width:1.1;filter:drop-shadow(0 0 7px rgba(181,132,77,.18))}
+.orbit-inner{fill:none;stroke:rgba(181,132,77,.55);stroke-width:1}
+.orbit-text{font-size:17px;letter-spacing:1.7px;fill:#060706;font-weight:800;text-transform:uppercase}
+.patrol{fill:var(--pearl);font-weight:900;letter-spacing:2.1px;filter:drop-shadow(0 0 5px rgba(255,255,255,.86))}
+.signal{fill:#fff;filter:drop-shadow(0 0 9px #fff);animation:heartbeat 4.8s ease-in-out infinite}
+@keyframes heartbeat{0%,18%,100%{opacity:.35}5%{opacity:1}10%{opacity:.58}14%{opacity:1}}
+.feed-grid{min-height:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.tile{position:relative;min-width:0;overflow:hidden;border:1px solid rgba(173,125,80,.62);border-radius:6px;background:#0b0b0b;box-shadow:0 10px 28px rgba(0,0,0,.35)}
+.tile iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#050505}
+.tile:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(7,8,8,.4),transparent 32%,transparent 67%,rgba(7,8,8,.72));z-index:2}
+.meta{position:absolute;z-index:3;left:18px;right:14px;top:18px;text-shadow:0 2px 5px rgba(0,0,0,.9)}
+.city-time{font-size:16px;letter-spacing:.04em}
+.city{margin-top:6px;font-size:20px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.country{margin-top:3px;font-size:13px;color:rgba(255,255,255,.88);text-transform:uppercase}
+.conditions{margin-top:22px;font-size:12px;line-height:1.7;color:rgba(255,255,255,.94)}
+.status{display:flex;align-items:center;gap:6px;margin-top:7px}.dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 7px rgba(115,201,78,.4)}
+.source{position:absolute;z-index:3;left:14px;right:14px;bottom:12px;font-size:9px;color:rgba(255,255,255,.78);display:flex;justify-content:space-between;gap:8px;text-shadow:0 1px 4px #000}
+.panels{display:grid;grid-template-columns:1.1fr 1fr 1.45fr 1.25fr .85fr;gap:8px}
+.panel{border:1px solid rgba(144,102,65,.45);border-radius:5px;background:linear-gradient(180deg,rgba(24,20,16,.92),rgba(9,8,7,.96));padding:17px 20px;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.label{font-size:10px;letter-spacing:.04em;color:#fff;text-transform:uppercase}.value{margin-top:11px;font-size:14px}.value.big{font-size:29px;letter-spacing:.06em;color:#d5b28f}.green{color:var(--green)}.small{margin-top:9px;font-size:11px;color:rgba(255,255,255,.78);line-height:1.45}
+.signal-panel{position:relative;padding-right:90px}.radar{position:absolute;right:22px;top:50%;transform:translateY(-50%);width:66px;height:66px;border:1px solid rgba(190,145,92,.8);border-radius:50%}.radar:before,.radar:after{content:"";position:absolute;border:1px solid rgba(190,145,92,.62);border-radius:50%;inset:11px}.radar:after{inset:24px}.radar i{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 0 12px 4px #fff;animation:heartbeat 4.8s ease-in-out infinite}
+.footer{display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:10px;letter-spacing:.06em;color:rgba(184,137,91,.82);text-transform:uppercase}
+@media(max-width:1100px){body{overflow:auto}.stage{height:auto;min-height:100dvh;grid-template-rows:220px auto auto 34px}.feed-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:360px}.feed-grid .tile:last-child{grid-column:1/-1}.panels{grid-template-columns:repeat(2,minmax(0,1fr))}.signal-panel{min-height:120px}.orbit-text{font-size:14px}}
+@media(max-width:700px){.stage{padding:8px;grid-template-rows:190px auto auto 50px}.feed-grid{grid-template-columns:1fr;grid-auto-rows:360px}.feed-grid .tile:last-child{grid-column:auto}.panels{grid-template-columns:1fr}.orbit-text{font-size:11px}.meta{left:14px}.footer{gap:12px;align-items:flex-start;flex-direction:column;justify-content:center}}
+</style>
+</head>
+<body>
+<main class="stage">
+  <section class="hero">
+    <div class="earth"></div>
+    <div class="orbit-wrap">
+      <svg class="orbit" viewBox="0 0 1500 155" role="img" aria-label="Live Cities One Moment All Seasons Real Time Around the World Coach Doll Patrols">
+        <defs>
+          <path id="orbitPath" pathLength="1500" d="M16,79 C16,21 1484,21 1484,79 C1484,137 16,137 16,79 Z"/>
+          <path id="orbitPath2" d="M18,82 C18,34 1482,34 1482,82 C1482,130 18,130 18,82 Z"/>
+        </defs>
+        <path class="orbit-band" d="M16,79 C16,21 1484,21 1484,79 C1484,137 16,137 16,79 Z M18,82 C18,34 1482,34 1482,82 C1482,130 18,130 18,82 Z" fill-rule="evenodd"/>
+        <use href="#orbitPath2" class="orbit-inner"/>
+        <text class="orbit-text"><textPath id="orbitText" href="#orbitPath" startOffset="0"><tspan>LIVE CITIES · ONE MOMENT · ALL SEASONS · REAL TIME AROUND THE WORLD · </tspan><tspan class="patrol">COACH DOLL PATROLS</tspan><tspan> · </tspan></textPath></text>
+        <circle id="orbitSignal" class="signal" r="6"/>
+      </svg>
+    </div>
+  </section>
+  <section id="feedGrid" class="feed-grid"></section>
+  <section class="panels">
+    <div class="panel"><div class="label">System Status</div><div class="value green" id="systemStatus">Broadcast surface active</div><div class="small" id="feedCount">5 feeds configured</div></div>
+    <div class="panel"><div class="label">Time to Next Interlude</div><div class="value big" id="countdown">--:--:--</div></div>
+    <div class="panel signal-panel"><div class="label">Coach Doll Patrols Signal</div><div class="value green">Active</div><div class="small">Heartbeat signal · nominal</div><div class="radar"><i></i></div></div>
+    <div class="panel"><div class="label">Round the World Clock</div><div class="value" id="utcClock">UTC --:--:--</div><div class="small">Reference offset: PHT +8</div></div>
+    <div class="panel"><div class="label">Broadcast ID</div><div class="value" id="broadcastId">MWAW-</div><div class="small green">LIVE TELECAST</div></div>
+  </section>
+  <footer class="footer"><span>Meanwhile, Around the World · Live Telecast</span><span>A Coach Doll Patrols Production</span></footer>
+</main>
+<script>
+const feeds=[
+{id:'london',city:'London',country:'United Kingdom',timezone:'Europe/London',hemisphere:'north',embed:'https://portofcams.com/embed/windy-london/',source:'Port of Cams'},
+{id:'venice',city:'Venice',country:'Italy',timezone:'Europe/Rome',hemisphere:'north',embed:'https://portofcams.com/embed/venice-canal/',source:'Port of Cams'},
+{id:'tokyo',city:'Tokyo',country:'Japan',timezone:'Asia/Tokyo',hemisphere:'north',embed:'https://camstreamer.com/embed/gvwteHj04P0qq1ygIgt8sEVQYPotE1ZfaeALWlKl?rel=0',source:'CamStreamer'},
+{id:'naha',city:'Naha, Okinawa',country:'Japan',timezone:'Asia/Tokyo',hemisphere:'north',embed:'https://portofcams.com/embed/windy-naha/',source:'Port of Cams'},
+{id:'buenosaires',city:'Buenos Aires',country:'Argentina',timezone:'America/Argentina/Buenos_Aires',hemisphere:'south',embed:'https://opencctv.org/cameras/argentina/autonomous-city-of-buenos-aires/autonomous-city-of-buenos-aires/autonomous-city-of-buenos-aires-oficina-externa-301693',source:'OpenCCTV'}
+];
+function parts(tz){const f=new Intl.DateTimeFormat('en-US',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,month:'numeric'});const p=Object.fromEntries(f.formatToParts(new Date()).map(x=>[x.type,x.value]));return{time:`${p.hour}:${p.minute}:${p.second}`,hour:+p.hour,month:+p.month}}
+function season(m,h){let s=[3,4,5].includes(m)?'Spring':[6,7,8].includes(m)?'Summer':[9,10,11].includes(m)?'Autumn':'Winter';return h==='south'?{Spring:'Autumn',Summer:'Winter',Autumn:'Spring',Winter:'Summer'}[s]:s}
+function daylight(h){return h>=6&&h<18?'Daylight':'Night'}
+function createTile(f){const p=parts(f.timezone),el=document.createElement('article');el.className='tile';el.dataset.id=f.id;el.innerHTML=`<iframe title="${f.city}, ${f.country} live camera" src="${f.embed}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="eager"></iframe><div class="meta"><div class="city-time">${p.time}</div><div class="city">${f.city}</div><div class="country">${f.country}</div><div class="conditions"><div>${season(p.month,f.hemisphere)} · ${daylight(p.hour)}</div><div class="status"><span class="dot"></span><span class="load-state">Live source loading</span></div></div></div><div class="source"><span>Source: ${f.source}</span><span>LIVE CAMERA</span></div>`;const frame=el.querySelector('iframe');frame.addEventListener('load',()=>{el.querySelector('.load-state').textContent='Embed loaded'});return el}
+const grid=document.getElementById('feedGrid');feeds.forEach(f=>grid.append(createTile(f)));document.getElementById('feedCount').textContent=`${feeds.length} feeds configured`;
+function tick(){document.querySelectorAll('.tile').forEach(t=>{const f=feeds.find(x=>x.id===t.dataset.id),p=parts(f.timezone);t.querySelector('.city-time').textContent=p.time;t.querySelector('.conditions').firstElementChild.textContent=`${season(p.month,f.hemisphere)} · ${daylight(p.hour)}`});const now=new Date();document.getElementById('utcClock').textContent='UTC '+new Intl.DateTimeFormat('en-GB',{timeZone:'UTC',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(now);const pht=new Date(now.getTime()+8*3600000);const y=pht.getUTCFullYear(),mo=String(pht.getUTCMonth()+1).padStart(2,'0'),d=String(pht.getUTCDate()).padStart(2,'0');document.getElementById('broadcastId').textContent=`MWAW-${String(y).slice(-2)}${mo}${d}`;const ms=now.getTime();const four=4*3600000;const next=Math.ceil(ms/four)*four;let sec=Math.max(0,Math.floor((next-ms)/1000));const hh=String(Math.floor(sec/3600)).padStart(2,'0');sec%=3600;const mm=String(Math.floor(sec/60)).padStart(2,'0');const ss=String(sec%60).padStart(2,'0');document.getElementById('countdown').textContent=`${hh}:${mm}:${ss}`}
+setInterval(tick,1000);tick();
+const tp=document.getElementById('orbitText'),path=document.getElementById('orbitPath'),sig=document.getElementById('orbitSignal'),len=path.getTotalLength();let started;function orbit(ts){if(!started)started=ts;const p=((ts-started)%32000)/32000;tp.setAttribute('startOffset',p*1500);const pt=path.getPointAtLength(p*len);sig.setAttribute('cx',pt.x);sig.setAttribute('cy',pt.y);requestAnimationFrame(orbit)}requestAnimationFrame(orbit);
+</script>
+</body></html>
