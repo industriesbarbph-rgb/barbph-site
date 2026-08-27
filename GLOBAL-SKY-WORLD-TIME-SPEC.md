@@ -1,75 +1,134 @@
-# BarbPH Global Sky / World Time / Seasons — Planned Spec
+# BarbPH Global Sky / World Time / Seasons — Implementation Spec
 
-Status: **concept approved; not yet implemented**.
+Status: **approved for implementation; production not yet changed**.
 
 ## Core idea
 
-The atmospheric sky direction used in the Ticker Bones lab can evolve into a BarbPH global visual/theme layer. It should make the site feel aware of the world in real time without turning the homepage into a conventional dashboard.
+BarbPH keeps the scheduled Daily Discover theme as the main 24-hour visual world. Every **4 hours**, the homepage may enter a **2-minute Global Sky interlude** that shows multiple cleared live city feeds **simultaneously** in one viewport.
 
-## Proposed interlude sequence
+This is not a fixed-city showcase. The system must use a dynamic pool of feeds that are both:
 
-After a Daily Discover source completes its normal image rotation, a World Time interlude may appear.
+1. already cleared for BarbPH use/embedding; and
+2. healthy/live at the moment the interlude is prepared.
 
-1. **City moments** — one major city at a time, full bleed.
-2. Show the city name, country, continent, live local time, and appropriate season context.
-3. Move through the selected major-city set.
-4. **World view** — show the major cities together at the same instant.
-5. Return to the next Daily Discover/source sequence.
+The objective is to show the world **as it is at one shared instant**: some cities in daylight, some at night, some in opposite hemispheres, with different seasonal or climate states visible together.
 
-The exact duration, city list, and transition choreography are not locked yet.
+## Locked cadence
+
+- Main state: scheduled Daily Discover theme for the Manila day.
+- Global Sky cadence: **once every 4 hours**.
+- Global Sky duration: **2 minutes**.
+- After 2 minutes, return to the same scheduled Daily Discover theme.
+- Global Sky must not replace the 24-hour theme or alter the Daily Discover source lock.
+
+Exact transition choreography remains visual-design work and must be approved before production integration.
+
+## Dynamic feed pool — no fixed city list
+
+There is no permanent list of featured cities.
+
+The engine operates from a **cleared live-feed registry**. A feed may enter the active interlude only when it is:
+
+- rights/embedding cleared for BarbPH;
+- currently reachable/healthy;
+- genuinely live or near-live according to the provider's own delivery;
+- associated with a known city/location and IANA timezone;
+- suitable for the simultaneous mosaic layout.
+
+If a cleared feed is offline at interlude time, skip it. When it becomes healthy again, it may automatically re-enter eligibility.
+
+A newly discovered feed does **not** auto-enter production merely because it is reachable. Discovery may be automated, but first-time rights/embedding clearance remains a gate.
+
+## Composition objective
+
+Global Sky should deliberately favor a visually meaningful mix when the healthy pool allows it:
+
+- opposing or distant timezones;
+- daylight and nighttime feeds at the same shared instant;
+- Northern and Southern Hemisphere locations;
+- visibly different seasonal/climate conditions;
+- broad geographic distribution;
+- no requirement that every tile be a famous or predefined "major city".
+
+The system may use scoring/selection logic to maximize contrast and geographic spread, but it must not fabricate weather, daylight, or season states.
+
+## Simultaneous world view
+
+The approved visual direction is a **multi-feed live mosaic in one viewport**, not one city at a time.
+
+Each tile may expose a restrained label layer containing only fields that are factually known, such as:
+
+- city/location;
+- country;
+- live local time;
+- timezone abbreviation or UTC offset;
+- season/climate label when a sound classification model exists;
+- LIVE state.
+
+The live camera remains the dominant content. The page must not become a conventional data-heavy dashboard.
 
 ## Time engine
 
-Prefer a key-free implementation using:
+Use key-free browser/server time-zone handling where practical:
 
-- IANA time-zone IDs such as `Asia/Manila`, `Europe/London`, `America/New_York`
-- JavaScript `Intl.DateTimeFormat`
-- the visitor/device clock as the current instant
+- IANA timezone IDs, e.g. `Asia/Manila`, `Europe/London`, `America/New_York`;
+- JavaScript `Intl.DateTimeFormat`;
+- one shared current instant converted into each city's local timezone.
 
-A paid world-clock API is not required for the basic live-time feature.
+A paid world-clock API is not required for the basic time feature.
 
-## City/theme database — planned fields
+## Day/night state
 
-Potential fields:
+Do not infer day/night from arbitrary clock ranges when a more accurate method is available. The implementation may calculate sun state from location coordinates and current instant, or simply let the live feed visually show the state while the label remains neutral.
 
-- city
-- country
-- continent
-- IANA time zone
-- latitude / longitude
-- hemisphere
-- display priority
-- season model
-- theme tags
-- optional representative image/theme family
+No synthetic claim such as "sunny", "raining", or "snowing" may be published from visual guesswork alone.
 
-The exact schema is not locked until implementation.
+## Seasons and climate truthfulness
 
-## Seasons
+Do not force every location into spring/summer/autumn/winter.
 
-The system may deliberately choose representative cities so all four conventional seasons can be visible around the world at the same moment.
+For temperate locations, a hemisphere/calendar season model may be used if clearly defined. Tropical/equatorial locations may use a locally appropriate seasonal model or omit the season label until one is safely defined.
 
-Guardrail: do not label every city with a simplistic four-season model. Tropical/equatorial locations may use different seasonal patterns. If a location does not naturally fit spring/summer/autumn/winter terminology, the display should use a locally appropriate label or omit the season until a sound model is defined.
+The purpose is to show real differences around Earth at one instant, not to manufacture four conventional season labels simultaneously.
 
-## Visual direction
+## Live-feed failure behavior
 
-- full-bleed atmospheric treatment
-- city/time moments should feel cinematic, not like rows in a spreadsheet
-- world view may use points for countries/continents/cities
-- visual language should coexist with the future homepage controls rather than compete with them
-- exact map treatment is not locked yet
+- No live feed = no tile for that feed.
+- Do not substitute an old static city image and present it as current/live.
+- If a feed fails before it is actually shown, it is skipped and does not count as aired.
+- If a feed fails while already on-screen, the public ledger records the interlude as interrupted for that feed only if the feed truly reached the viewing surface.
+- The remaining healthy tiles may continue if the layout still meets the minimum viable grid rule defined during implementation.
 
 ## Relationship to Daily Discover
 
-World Time is an **interlude/theme layer**, not a replacement for Daily Discover source rotation.
+Global Sky is an **interlude layer**, not a replacement for Daily Discover.
 
-The current concept begins after a source's normal set (currently commonly 3 images) has finished. Any production integration must preserve the existing Sponsor > Theme Override > Daily Discover priority logic.
+Production integration must preserve the existing priority controller and must not alter the locked Daily Discover source selection/history behavior.
 
-## Not included yet
+## Transmission Ledger relationship
 
-- live weather
-- paid weather/time APIs
-- final list of "major cities"
-- final map style
-- final seasonal classification model for all climates
-- production homepage integration
+Every Global Sky interlude that actually reaches the public viewing surface must produce an automated broadcast footprint for the public **Transmission Ledger** at `/transmission-ledger/`.
+
+The ledger records what actually aired, not merely what was scheduled. Full logging rules are defined in `TRANSMISSION-LEDGER-SPEC.md`.
+
+## Implementation phases
+
+1. Cleared-feed registry schema.
+2. Feed-health evaluation layer.
+3. Contrast-aware selection/composition logic.
+4. Off-production simultaneous mosaic prototype.
+5. 4-hour / 2-minute scheduler.
+6. Automated Transmission Ledger event logger/store.
+7. `/transmission-ledger/` public page.
+8. Publication routing link.
+9. Controlled production integration after visual and functional approval.
+
+## Explicitly not locked yet
+
+- minimum/maximum number of simultaneous tiles;
+- exact tile geometry and responsive breakpoints;
+- exact feed providers;
+- weather API usage;
+- exact season/climate taxonomy;
+- transition animation;
+- production activation date.
