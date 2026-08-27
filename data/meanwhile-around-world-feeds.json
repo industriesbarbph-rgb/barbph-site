@@ -1,0 +1,93 @@
+{
+  "version": "2026-08-27-initial-cleared-pool",
+  "feature": "Meanwhile, Around the World",
+  "policy": {
+    "fixed_city_list": false,
+    "selection_rule": "Use every feed that is cleared, enabled, and healthy; prefer a simultaneous mix across daylight state, time zones, and hemispheres.",
+    "interlude_seconds": 120,
+    "cadence_hours": 4,
+    "public_ledger_route": "/transmission-ledger/"
+  },
+  "feeds": [
+    {
+      "id": "london-trafalgar-portofcams",
+      "city": "London",
+      "country": "United Kingdom",
+      "timezone": "Europe/London",
+      "hemisphere": "north",
+      "season_model": "temperate-four-season",
+      "mode": "live-video",
+      "embed_url": "https://portofcams.com/embed/windy-london/",
+      "source_name": "Port of Cams",
+      "source_page": "https://portofcams.com/cameras/windy-london/",
+      "clearance": "cleared",
+      "clearance_basis": "Provider explicitly offers free website embedding and requires the credit line to remain visible.",
+      "credit_text": "London: Trafalgar Square live camera via Port of Cams",
+      "enabled": true
+    },
+    {
+      "id": "venice-grand-canal-portofcams",
+      "city": "Venice",
+      "country": "Italy",
+      "timezone": "Europe/Rome",
+      "hemisphere": "north",
+      "season_model": "temperate-four-season",
+      "mode": "live-video",
+      "embed_url": "https://portofcams.com/embed/venice-canal/",
+      "source_name": "Port of Cams",
+      "source_page": "https://portofcams.com/cameras/venice-canal/",
+      "clearance": "cleared",
+      "clearance_basis": "Provider explicitly offers free website embedding and requires the credit line to remain visible.",
+      "credit_text": "Venice Grand Canal live camera via Port of Cams",
+      "enabled": true
+    },
+    {
+      "id": "tokyo-shinjuku-camstreamer",
+      "city": "Tokyo",
+      "country": "Japan",
+      "timezone": "Asia/Tokyo",
+      "hemisphere": "north",
+      "season_model": "temperate-four-season",
+      "mode": "live-video",
+      "embed_url": "https://camstreamer.com/embed/gvwteHj04P0qq1ygIgt8sEVQYPotE1ZfaeALWlKl?rel=0",
+      "source_name": "CamStreamer live gallery",
+      "source_page": "https://camstreamer.com/live/stream/877907-live-dong-jing-dou-xin-su-24shi-jian-raibukamera-tokyo",
+      "clearance": "cleared",
+      "clearance_basis": "The live-gallery page exposes a public Embed video iframe for this feed.",
+      "credit_text": "Tokyo Shinjuku live camera via CamStreamer",
+      "enabled": true
+    },
+    {
+      "id": "buenos-aires-opencctv",
+      "city": "Buenos Aires",
+      "country": "Argentina",
+      "timezone": "America/Argentina/Buenos_Aires",
+      "hemisphere": "south",
+      "season_model": "temperate-four-season",
+      "mode": "live-image-refresh",
+      "embed_url": "https://opencctv.org/cameras/argentina/autonomous-city-of-buenos-aires/autonomous-city-of-buenos-aires/autonomous-city-of-buenos-aires-oficina-externa-301693",
+      "source_name": "OpenCCTV",
+      "source_page": "https://opencctv.org/cameras/argentina/autonomous-city-of-buenos-aires/autonomous-city-of-buenos-aires/autonomous-city-of-buenos-aires-oficina-externa-301693",
+      "clearance": "cleared",
+      "clearance_basis": "Provider states that every camera has a public page that may be embedded by iframe.",
+      "credit_text": "Buenos Aires live camera via OpenCCTV",
+      "enabled": true
+    },
+    {
+      "id": "auckland-viaduct-view",
+      "city": "Auckland",
+      "country": "New Zealand",
+      "timezone": "Pacific/Auckland",
+      "hemisphere": "south",
+      "season_model": "temperate-four-season",
+      "mode": "live-video",
+      "embed_url": "https://www.youtube.com/embed/live_stream?channel=UCfNoVlW5-BHsoCKTGs_F0WQ&autoplay=1&mute=1",
+      "source_name": "Auckland Viaduct View",
+      "source_page": "https://aucklandviaductview.co.nz/",
+      "clearance": "candidate",
+      "clearance_basis": "The provider publishes embed code at no cost for hotels, restaurants, tourism operators, and Auckland-based businesses. BarbPH is not yet confirmed within that permission scope.",
+      "credit_text": "Auckland Viaduct Harbour live camera",
+      "enabled": false
+    }
+  ]
+}
