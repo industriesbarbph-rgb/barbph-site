@@ -28,3 +28,11 @@ Visitors simply see the acting source for the day. A failed scheduled source doe
 
 ## Lab behavior
 Manual source test buttons should continue exposing source failures instead of silently using Barb Originals. This keeps the lab useful for diagnostics. Emergency reserve takeover belongs to automatic/production mode.
+
+## Reconciliation — 2026-08-27 Manila
+
+- Barb Originals is now documented as **ready for the automatic fallback path**; the older waiting state belongs to the Aug 20 source-accounting snapshot.
+- Its architectural role has **not changed**: it remains the single emergency reserve, not one of the nine passed public sources and not one of the five parked public worlds.
+- The Satellite Yesterday/Today/Tomorrow schedule may report a fallback by comparing `scheduled_source` and `served_source`; that reporting does not change reserve selection rules.
+- No parked public source is permitted to substitute for Barb Originals.
+- This reconciliation changes documentation only. It does not add reserve assets, enable sources, or mutate production history.
