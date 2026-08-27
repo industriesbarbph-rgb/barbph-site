@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "status": "prototype",
+  "policy": {
+    "fixed_city_list": false,
+    "require_clearance": true,
+    "require_health_check": true,
+    "public_airing_requires_visible_playback": true
+  },
+  "feeds": []
+}
