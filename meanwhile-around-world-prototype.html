@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Meanwhile, Around the World — Prototype</title>
+<style>
+:root{color-scheme:dark;--bg:#05070a;--panel:#0b0f14;--line:rgba(255,255,255,.16);--muted:rgba(255,255,255,.62);--soft:rgba(255,255,255,.08)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:#fff;font-family:Arial,Helvetica,sans-serif}body{overflow:hidden}.stage{height:100dvh;display:grid;grid-template-rows:auto 1fr auto;gap:12px;padding:14px}.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}.title h1{margin:0;font-size:clamp(22px,3vw,42px);font-weight:700;letter-spacing:-.03em}.title p{margin:5px 0 0;color:var(--muted);font-size:12px;letter-spacing:.12em;text-transform:uppercase}.clock{text-align:right}.clock strong{display:block;font-size:clamp(16px,2vw,26px)}.clock span{display:block;margin-top:3px;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}.grid{min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:8px}.tile{position:relative;min-height:0;overflow:hidden;border:1px solid var(--line);background:var(--panel)}.tile iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}.shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.06),transparent 56%,rgba(0,0,0,.74));z-index:2}.meta{position:absolute;left:10px;right:10px;bottom:9px;z-index:3;display:flex;align-items:end;justify-content:space-between;gap:12px;text-shadow:0 1px 5px #000}.place strong{display:block;font-size:14px}.place span,.state span{font-size:10px;color:rgba(255,255,255,.8)}.state{text-align:right}.state strong{display:block;font-size:12px}.live{position:absolute;top:9px;right:9px;z-index:3;padding:4px 7px;border-radius:999px;background:rgba(184,0,0,.9);font-size:9px;font-weight:700;letter-spacing:.12em}.credit{position:absolute;top:9px;left:9px;z-index:3;max-width:70%;padding:4px 6px;background:rgba(0,0,0,.55);font-size:8px;color:rgba(255,255,255,.76)}.bottom{display:flex;justify-content:space-between;gap:12px;align-items:center;color:var(--muted);font-size:10px}.bottom strong{color:#fff}.empty{height:100%;display:grid;place-items:center;border:1px solid var(--line);background:var(--panel);text-align:center;padding:28px}.empty strong{font-size:22px}.empty p{max-width:640px;line-height:1.5;color:var(--muted)}
+@media(min-width:1000px){.grid[data-count="3"],.grid[data-count="4"],.grid[data-count="5"],.grid[data-count="6"],.grid[data-count="7"],.grid[data-count="8"],.grid[data-count="9"]{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:700px){body{overflow:auto}.stage{height:auto;min-height:100dvh}.grid{grid-template-columns:1fr;grid-auto-rows:42vh}.top{align-items:flex-start}.clock{font-size:10px}.bottom{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+<main class="stage">
+  <header class="top">
+    <div class="title"><h1>Meanwhile, Around the World</h1><p>Real places. Same moment.</p></div>
+    <div class="clock"><strong id="manilaClock">—</strong><span>Manila · PHT · UTC+8</span></div>
+  </header>
+  <section id="grid" class="grid" aria-live="polite"></section>
+  <footer class="bottom"><span><strong>Prototype:</strong> cleared feeds only; no fixed city list.</span><span>Production cadence: 2 minutes every 4 hours</span></footer>
+</main>
+<script>
+const feeds=[
+{id:"london",city:"London",country:"United Kingdom",timezone:"Europe/London",hemisphere:"north",embed_url:"https://portofcams.com/embed/windy-london/",source_name:"Port of Cams",credit_text:"London live camera via Port of Cams"},
+{id:"venice",city:"Venice",country:"Italy",timezone:"Europe/Rome",hemisphere:"north",embed_url:"https://portofcams.com/embed/venice-canal/",source_name:"Port of Cams",credit_text:"Venice Grand Canal live camera via Port of Cams"},
+{id:"tokyo",city:"Tokyo",country:"Japan",timezone:"Asia/Tokyo",hemisphere:"north",embed_url:"https://camstreamer.com/embed/gvwteHj04P0qq1ygIgt8sEVQYPotE1ZfaeALWlKl?rel=0",source_name:"CamStreamer",credit_text:"Tokyo Shinjuku live camera via CamStreamer"},
+{id:"buenosaires",city:"Buenos Aires",country:"Argentina",timezone:"America/Argentina/Buenos_Aires",hemisphere:"south",embed_url:"https://opencctv.org/cameras/argentina/autonomous-city-of-buenos-aires/autonomous-city-of-buenos-aires/autonomous-city-of-buenos-aires-oficina-externa-301693",source_name:"OpenCCTV",credit_text:"Buenos Aires live camera via OpenCCTV"}
+];
+function parts(tz){const f=new Intl.DateTimeFormat('en-US',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,month:'numeric'});const p=Object.fromEntries(f.formatToParts(new Date()).map(x=>[x.type,x.value]));return{time:`${p.hour}:${p.minute}:${p.second}`,hour:+p.hour,month:+p.month}}
+function season(month,hemisphere){let s;if([3,4,5].includes(month))s='Spring';else if([6,7,8].includes(month))s='Summer';else if([9,10,11].includes(month))s='Autumn';else s='Winter';if(hemisphere==='south')s={Spring:'Autumn',Summer:'Winter',Autumn:'Spring',Winter:'Summer'}[s];return s}
+function daylight(hour){return hour>=6&&hour<18?'Day':'Night'}
+function updateManila(){document.getElementById('manilaClock').textContent=new Intl.DateTimeFormat('en-PH',{timeZone:'Asia/Manila',hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true}).format(new Date())}
+function renderTile(feed){const p=parts(feed.timezone);const tile=document.createElement('article');tile.className='tile';tile.dataset.id=feed.id;const frame=document.createElement('iframe');frame.src=feed.embed_url;frame.title=`${feed.city}, ${feed.country} live camera`;frame.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';frame.allowFullscreen=true;frame.loading='eager';tile.append(frame);tile.insertAdjacentHTML('beforeend',`<div class="shade"></div><div class="credit">${feed.credit_text||feed.source_name}</div><div class="live">LIVE</div><div class="meta"><div class="place"><strong>${feed.city}, ${feed.country}</strong><span>${feed.source_name}</span></div><div class="state"><strong>${p.time}</strong><span>${daylight(p.hour)} · ${season(p.month,feed.hemisphere)}</span></div></div>`);return tile}
+function diversify(feeds){if(feeds.length<2)return feeds;const tagged=feeds.map(f=>{const p=parts(f.timezone);return{f,day:daylight(p.hour),hemi:f.hemisphere}});const out=[];const push=x=>{if(x&&!out.includes(x.f))out.push(x.f)};push(tagged.find(x=>x.day==='Day'));push(tagged.find(x=>x.day==='Night'));push(tagged.find(x=>x.hemi==='north'));push(tagged.find(x=>x.hemi==='south'));tagged.forEach(push);return out.slice(0,9)}
+function boot(){updateManila();setInterval(updateManila,1000);const active=diversify(feeds);const grid=document.getElementById('grid');grid.dataset.count=String(active.length);active.forEach(f=>grid.append(renderTile(f)));setInterval(()=>{document.querySelectorAll('.tile').forEach(t=>{const f=active.find(x=>x.id===t.dataset.id);if(!f)return;const p=parts(f.timezone);const el=t.querySelector('.state');if(el)el.innerHTML=`<strong>${p.time}</strong><span>${daylight(p.hour)} · ${season(p.month,f.hemisphere)}</span>`})},1000)}
+boot();
+</script>
+</body>
+</html>
