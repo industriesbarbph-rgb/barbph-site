@@ -1,88 +1,32 @@
 # BarbPH — Source of Truth
 
-Last reconciled: **2026-08-21 (Manila)**
+Last reconciled: **2026-08-27 (Manila)**
 
-This file is the master current-state record for the BarbPH site build. When older notes conflict with this file or a more specific locked spec, use this file plus the named locked spec.
+This file is the master current-state record for the BarbPH site build. Older dated specs and verification notes remain historical evidence; when they conflict with this file on current state, use this file plus the relevant locked spec.
 
 ## Status vocabulary
 
-- **PROVEN** — verified in the deployed/prod-capable system or by a real production-state test.
-- **PROTOTYPE-ONLY** — implemented and testable, but not the official root homepage.
-- **PENDING** — intentionally not launched, not locked, or still requires a product/operational decision.
+- **PROVEN** — verified in deployed/prod-capable state or by a real production-state test.
+- **IMPLEMENTED** — present in current source.
+- **PENDING** — intentionally unfinished, not visually approved, or still requires an operational decision.
+- **HISTORICAL** — accurate for the date recorded but no longer the current state.
 
 ## Current production posture
 
-- Netlify project: `barbphproducts`
-- GitHub repo: `industriesbarbph-rgb/barbph-site`
-- Main branch is auto-deployed to Netlify.
-- There is intentionally **no official `index.html` homepage yet**. **PENDING / intentionally withheld.**
-- Daily Discover is now **production-armed with NASA** as a confirmed source. **PROVEN.**
-- Barb Originals emergency reserve is populated/readied for automatic fallback. **PROVEN.**
-- Internal diagnostic/prototype pages remain `noindex,nofollow` and outside the sitemap.
-- None of the Aug 20–21 verification work constitutes root-homepage launch.
+- Netlify project: `barbphproducts`.
+- GitHub repo: `industriesbarbph-rgb/barbph-site`.
+- Main branch is connected to Netlify deployment.
+- A production `index.html` homepage now exists. Earlier notes stating that no official homepage existed are **HISTORICAL**.
+- Netlify project state was checked as **ready** during the Aug 27 reconciliation.
+- Internal diagnostic/lab pages remain separate from ordinary public navigation and must continue to respect their noindex/test-surface role where configured.
 
-## Official future homepage — locked direction
+## Daily Discover — source architecture
 
-The future homepage is a full-bleed visual stage with no permanent center-stage copy by default.
+The source accounting is locked as:
 
-Exactly three persistent hero controls are planned:
+**15 total entries = 9 confirmed lab-success public sources + 5 parked/waiting public worlds + 1 emergency reserve.**
 
-1. top-center Ticker Bones triangle
-2. roaming Coach Doll Patroller
-3. bottom-right Alive FAB
-
-The lower/footer world retains the starfield direction and the exact phrase **Behind the Builds**.
-
-Homepage priority is locked as:
-
-1. Sponsor Takeover
-2. Theme Override
-3. Daily Discover
-
-The priority controller exists, but no official homepage shell has been promoted to `index.html`.
-
-## Ticker Bones — approved interaction; pre-birthday shell only
-
-Ticker Bones v2 is implemented as a prototype and its current interaction/visual identity is approved.
-
-- panel opens to about 48% of viewport height
-- Testimonials occupy the top 37.5% of the panel
-- remaining 62.5% is a six-line exchange board
-- three Product rows and three Program rows
-- VT323 terminal/ticker typography
-- black board with blue, green, white, and black-on-white treatments
-- names plus short descriptions scroll continuously
-- dramatic self-drawing, glowing, downward-tugging triangle
-- drag/click/keyboard accessibility preserved and hardened against interrupted pointer/focus states
-- Publications and The Bulletin are no longer part of Ticker Bones; they are reserved for future Patroller responsibilities
-- the Ticker **pre-birthday shell works in the launch prototype**. **PROTOTYPE-ONLY / verified.**
-
-Ticker's own birthday/launch remains a separate milestone from the BarbPH homepage launch. Do not treat prototype presence as Ticker's birthday.
-
-See `TICKER-BONES-SPEC.md` and `BARBPH-LAUNCH-HARDENING-2026-08-21.md`.
-
-## Alive FAB — interaction approved, skin pending
-
-The wordless bottom-right orb interaction is implemented and approved:
-
-- closed state contains no visible words
-- opens Products, Programs, Partnerships
-- Products and Programs are active
-- Partnerships remains visible but inactive until its page exists
-- accessibility/focus behavior has been hardened in the prototype
-- final material/glow/skin is **not locked yet**
-
-Status: **PROTOTYPE-ONLY** until the official homepage is launched.
-
-See `ALIVE-FAB-SPEC.md`.
-
-## Daily Discover — verified production state
-
-Source accounting shorthand remains:
-
-**15/15 entries accounted for — 9 confirmed lab-success public sources, 5 parked/waiting public entries, plus Barb Originals emergency reserve.**
-
-Confirmed lab-success public sources:
+### Nine confirmed public sources
 
 - The Met Open Access
 - NASA
@@ -94,121 +38,106 @@ Confirmed lab-success public sources:
 - Cleveland Museum of Art
 - National Gallery of Art
 
-Current arming:
+The current schedule code explicitly whitelists these same nine sources in its `PASSED` set. Production eligibility additionally requires live `Theme Sources` controls to have `enabled=yes` and positive weight. Historical Aug 21 evidence proved NASA production duty and a real Manila-midnight rollover, but live spreadsheet controls remain the authority for current arming.
 
-- **NASA is production-armed. PROVEN.**
-- Other confirmed sources remain eligible only if deliberately enabled/weighted; this reconciliation does not arm any additional source.
+### Five parked/waiting public worlds
 
-Parked/waiting public entries:
+- Europeana — adapter built; requires `EUROPEANA_API_KEY`.
+- New York Public Library — adapter built; requires `NYPL_API_TOKEN`.
+- Biodiversity Heritage Library — adapter built; requires `BHL_API_KEY`.
+- Getty Open Content — rights-safe retrieval has not yet yielded enough explicit CC0 image records.
+- Wildcard — intentionally parked until a pre-approved rights-safe pool is defined.
 
-- Europeana
-- New York Public Library
-- Biodiversity Heritage Library
-- Getty Open Content
-- Wildcard
+Parked/unverified worlds must not enter automatic production rotation without later explicit validation.
 
-### Real production evidence — Aug 20 → Aug 21 Manila
+### Barb Originals emergency reserve
 
-The production engine has now passed a real Manila-date rollover rather than only a synthetic/lab test:
+Barb Originals is the single emergency reserve, not a normal weighted public source.
 
-- an Aug 20 production day existed and was retained in shared history;
-- after real Manila midnight, the first Aug 21 request created a **new** daily set with `date_manila: 2026-08-21` and `cache_hit:false`;
-- NASA was both `scheduled_source` and `served_source`, in `service_mode: primary`;
-- the Aug 21 set contained a new Mars-family world and loaded one prior history day;
-- a separate/incognito request returned the **same Aug 21 Mars set / same daily_set_id** with `cache_hit:true`, proving the persisted daily lock was being read rather than regenerated;
-- shared history and the cross-day anti-repeat layer are therefore operational in the observed production path.
+- Minimum readiness threshold: 3 enabled unique valid images.
+- Reserve readiness was documented as proven/ready after the Aug 20 snapshot.
+- If the scheduled public source cannot safely serve the required set, production may switch the Manila day to Barb Originals.
+- If the reserve also cannot serve safely, the system must prefer a hard safe fallback rather than questionable third-party media.
 
-Status: **PROVEN.** Same-URL browser/edge caching can make an old first-response `cache_hit:false` remain visible; use a separate/uncached request for lock diagnostics.
+See `DAILY-DISCOVER-SOURCE-STATUS.md`, `DAILY-DISCOVER-PRODUCTION-ENGINE.md`, `DAILY-DISCOVER-PRODUCTION-READINESS.md`, and `DAILY-DISCOVER-EMERGENCY-RESERVE.md`.
 
-## Barb Originals emergency reserve
+## Production verification retained from Aug 20→21
 
-Barb Originals is an emergency safety pool only; it does not compete by weight with public source worlds.
+The Daily Discover production engine passed a real Manila-date rollover:
 
-- Reserve readiness is now **PROVEN / ready** for the current production fallback path.
-- **3 enabled unique images is the minimum readiness threshold, not a maximum.**
-- More than 3 images are encouraged.
-- All valid enabled unique reserve images may be available to the reserve selector.
-- A larger pool reduces repetition and increases resilience.
-- Future family/category labels may be used to improve variety, but are not required for basic readiness.
+- Aug 20 was retained in shared history.
+- The first Aug 21 production request created a new locked day set.
+- NASA was the scheduled and served source in primary mode for that verification.
+- A separate/incognito request returned the same persisted daily set with `cache_hit:true`.
+- Shared daily locking and cross-day history were therefore proven in the observed production path.
 
-See `DAILY-DISCOVER-EMERGENCY-RESERVE.md`.
+These statements are retained as historical verification evidence; they do not by themselves claim the live Aug 27 source-control values.
 
-## Newsletter — headless capture verified
+## Satellite Live Telecast / transmission schedule
 
-- The homepage prototype posts newsletter email headlessly through `newsletter-submit` rather than navigating the visitor away. **PROTOTYPE-ONLY / verified.**
-- Server-side email validation, dynamic Google Form field discovery, required hidden-field completion, explicit success/error JSON, timeout/error recovery, and button restoration are implemented.
-- The Newsletter mirror formula has been corrected and is treated as **FIXED / verified tonight**.
-- This does not launch the root homepage; it verifies the capture path used by the prototype.
+Implemented in the current BarbPH source:
 
-## Patroller boundary — separate project and separate birthday
+- `satellite-tab.css`
+- `satellite-tab.js`
+- `satellite-tab.png`
+- `netlify/functions/daily-discover-schedule.mjs`
 
-The Coach Doll Patrollers are a separate project track from BarbPH homepage production. Their development may proceed independently; the old instruction to “not begin Patroller prematurely” is retired because it incorrectly coupled the two tracks.
+The feature places a Satellite tab after EE and exposes a Yesterday / Today / Tomorrow transmission schedule derived from Daily Discover production/history state.
 
-- BarbPH homepage launch does **not** equal a Patroller birthday.
-- Ticker birthday does **not** equal a Patroller birthday.
-- A Patroller's own launch/birthday must be recorded separately.
-- Patroller runtime/deployment work must not mutate BarbPH production state merely because the projects can later appear together visually.
+The schedule function:
 
-## Global Sky / World Time / Seasons — approved concept, not built
+- uses the same nine-source approved whitelist;
+- reports scheduled versus served source and fallback state;
+- forecasts Tomorrow from eligible enabled sources;
+- reads an optional publication URL from Theme Sources;
+- does not authorize parked sources or create a second source architecture.
 
-A future theme/interlude system has been approved conceptually:
+### Satellite tab image state
 
-- the existing atmospheric sky direction can become a global visual layer
-- after a Daily Discover source rotation, a World Time interlude may run
-- major cities can appear one at a time in full bleed with live local time, country, continent, and season context
-- after individual city moments, major cities can be shown together at the same instant
-- representative locations may be chosen to show all four seasons concurrently
-- live time should use IANA time zones/browser time formatting where possible, avoiding a paid time API
-- season labels must not falsely force tropical/equatorial climates into four-season terminology
-- live weather is a separate future decision and is not required for time/season functionality
+History preserved:
 
-Status: **PENDING / concept approved, not built.**
+- Aug 24: satellite tab feature added.
+- Aug 24: a dedicated `satellite-tab.png` asset repair commit replaced the earlier bad asset state.
+- Aug 27: image loading was hardened so the built-in SVG remains as a fallback and the PNG only replaces it after successful preload; the PNG request is cache-busted.
 
-See `GLOBAL-SKY-WORLD-TIME-SPEC.md`.
+Current source therefore has a nonblank fallback path even if the PNG itself fails. Visual acceptance of the final satellite artwork remains separate from loading reliability.
+
+### Mechanical schedule visual state
+
+The Yesterday / Today / Tomorrow mechanism is **implemented but visually not approved**. The current direction under discussion is to replace the web-styled mechanical treatment with a more physically believable machine-like design. No such redesign is recorded as completed yet.
+
+### Publication link
+
+The code supports a publication URL through `publication_url` / `live_telecast_publication_url` in Theme Sources. No specific publication URL was verified during this Aug 27 reconciliation, so link completion remains **PENDING**.
+
+## Live-telecast page design principle
+
+The current concept is a zero-word, zero-scroll live-transmission experience in which the live broadcast/telecast is treated as the primary page object rather than ordinary content placed below explanatory copy. The visual theme is derived from transmission itself: satellite, signal, receiving/broadcast equipment, machinery, and schedule/time.
+
+The final public wording for this concept is still being refined; do not treat earlier shorthand such as “baked in” as locked publication language.
+
+## Ticker / Alive / other historical specs
+
+Dated or component-specific specs remain authoritative for their locked implementation details unless later explicitly superseded. Earlier statements that tied all Patroller work to Daily Discover sequencing are historical; Patroller/NOEN remains a separate project track and must not be merged into BarbPH production history.
 
 ## SEO state
 
-Completed:
+Completed historical work includes Programs SEO repair and sitewide crawl plumbing. Search Console/domain/indexing work should be evaluated against the current production homepage rather than the earlier pre-homepage assumptions.
 
-- Programs SEO repair
-- sitewide crawl plumbing
-- robots/sitemap policy for current real pages
+## Current unfinished tasks — Aug 27
 
-Pending hands-on checkpoint:
-
-- Google Search Console verification for `barbph.com`
-- submit sitemap
-- inspect/request indexing for current public pages after canonical custom-domain behavior is confirmed
-- add homepage root only after official homepage launch
-
-## Internal diagnostics and prototype hardening
-
-Diagnostic hardening is complete. The safe-system lab checks important guardrails without creating a homepage. The Aug 21 launch hardening pass additionally improved Daily Discover image admission/fallback, sponsor-media fallback, newsletter timeout/error behavior, Ticker pointer interruption handling, and Alive FAB focus/accessibility behavior.
-
-See `DIAGNOSTIC-HARDENING.md`, `BARBPH-PROTOTYPE-AUDIT-2026-08-21.md`, and `BARBPH-LAUNCH-HARDENING-2026-08-21.md`.
-
-## Current build sequence
-
-1. Programs SEO — COMPLETE
-2. Sitewide SEO plumbing — COMPLETE
-3. Alive FAB interaction shell — COMPLETE / PROTOTYPE-ONLY
-4. Ticker Bones v2 — COMPLETE / APPROVED / PRE-BIRTHDAY PROTOTYPE
-5. Diagnostic hardening — COMPLETE
-6. Daily Discover production engine — ARMED WITH NASA / REAL MIDNIGHT ROLLOVER PROVEN
-7. Barb Originals reserve — READY
-8. Headless newsletter capture — WORKING IN PROTOTYPE; MIRROR FORMULA FIXED
-9. Repo/source-of-truth reconciliation — COMPLETE through 2026-08-21
-10. Official root homepage (`index.html`) — PENDING / intentionally not launched
-11. Ticker birthday — SEPARATE PENDING MILESTONE
-12. Coach Doll Patroller birthday(s) — SEPARATE PROJECT MILESTONE(S)
+1. Verify the Satellite tab image/fallback behavior visually on the deployed homepage.
+2. Redesign the Yesterday / Today / Tomorrow mechanism conceptually toward a realistic physical machine before touching production styling.
+3. Supply and verify the publication link used by the Satellite schedule feature.
+4. Keep the nine-source production whitelist and five parked public worlds accurately documented; do not silently promote parked sources.
+5. Preserve Barb Originals as reserve-only.
 
 ## Do not accidentally do these
 
-- do not create or replace the official homepage just to test a component
-- do not arm additional Daily Discover sources merely because NASA is armed
-- do not enable parked/unverified sources
-- do not treat Barb Originals as a weighted public source
-- do not treat Ticker prototype presence as its birthday
-- do not treat Patroller development or deployment as the BarbPH homepage launch
-- do not treat the current Alive FAB skin or decorative footer globe as final
-- do not move Publications/The Bulletin back into Ticker Bones unless the user explicitly changes that decision
+- do not enable parked/unverified source worlds without explicit validation;
+- do not treat Barb Originals as a weighted public source;
+- do not infer current live source arming from the Aug 21 NASA verification alone;
+- do not treat the current mechanical Satellite schedule visual as approved;
+- do not claim the Satellite publication link is complete until a URL is verified;
+- do not merge NOEN/Patroller history into BarbPH history;
+- do not treat old pre-homepage statements as current production truth.
