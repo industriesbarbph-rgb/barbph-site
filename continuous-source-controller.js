@@ -23,11 +23,13 @@
   function clearTimer(ref) { if (ref) clearTimeout(ref); }
   function scheduleFetch(ms = 30000, resync = false) {
     clearTimer(fetchTimer);
-    fetchTimer = setTimeout(() => refresh({ resync }), Math.max(5000, ms));
+    fetchTimer = setTimeout(() => refresh({ resync }), Math.max(1000, ms));
   }
   function safeMs(data, fallback = 30000) {
-    const next = Date.parse(data?.stream?.next_retry_at || '');
-    if (Number.isFinite(next)) return Math.max(5000, Math.min(300000, next - Date.now() + 1000));
+    const retry = Date.parse(data?.stream?.next_retry_at || '');
+    if (Number.isFinite(retry)) return Math.max(5000, Math.min(300000, retry - Date.now() + 1000));
+    const due = Number(data?.stream?.refresh_due_at || 0);
+    if (Number.isFinite(due) && due > 0) return Math.max(1000, Math.min(300000, due - Date.now() + 1000));
     return fallback;
   }
   function preload(src) {
@@ -49,15 +51,14 @@
     world.appendChild(node);
     return node;
   }
-  function removeOldContinuousNodes() {
-    world.querySelectorAll('[data-continuous-source-asset="true"]').forEach(n => n.remove());
+  function removeDailyAssetNodes() {
+    world.querySelectorAll('.world__asset').forEach(n => n.remove());
   }
   function activate(i) {
     if (!nodes.length || !nodes[i]) return;
     nodes.forEach((n, j) => n.classList.toggle('is-active', j === i));
     index = i;
-    const asset = nodes[i];
-    currentImage = asset.style.backgroundImage || currentImage;
+    currentImage = nodes[i].style.backgroundImage || currentImage;
   }
   function nextDelay(data) {
     return Math.max(8000, Number(data?.daily_settings?.rotation_seconds || 18) * 1000);
@@ -66,7 +67,7 @@
     clearTimer(rotateTimer);
     if (reduce || nodes.length <= 1) {
       activate(0);
-      scheduleFetch(Math.min(60000, Math.max(15000, Number(data?.daily_settings?.refresh_seconds || 600) * 1000)));
+      scheduleFetch(safeMs(data, 60000));
       return;
     }
     const delay = nextDelay(data);
@@ -74,11 +75,10 @@
       if (!nodes.length) return;
       if (index >= nodes.length - 1) {
         activate(nodes.length - 1);
-        scheduleFetch(8000);
+        scheduleFetch(1000);
         return;
       }
       activate(index + 1);
-      if (index >= nodes.length - 4) refresh().catch(() => {});
       rotateTimer = setTimeout(tick, delay);
     };
     rotateTimer = setTimeout(tick, delay);
@@ -97,7 +97,7 @@
 
     const newGeneration = data?.stream?.generation ?? null;
     if (generation !== null && newGeneration === generation && nodes.length) {
-      scheduleFetch(Math.min(30000, safeMs(data, 30000)));
+      scheduleFetch(safeMs(data, 30000));
       return;
     }
 
@@ -109,7 +109,7 @@
     if (!usable.length) throw new Error('Continuous source images failed preload');
 
     clearTimer(rotateTimer);
-    removeOldContinuousNodes();
+    removeDailyAssetNodes();
     nodes = usable.map(makeNode);
     generation = newGeneration;
     index = 0;
