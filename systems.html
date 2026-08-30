@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>BarbPH Systems | Continuous Transmission & Systems Ledger</title>
+  <meta name="description" content="BarbPH Systems is the public continuous transmission and systems ledger for sourced themes, Watchtower intervals, recoveries, and operational events.">
+  <meta name="robots" content="index,follow,max-snippet:-1">
+  <link rel="canonical" href="https://barbph.com/systems">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/systems.css?v=20260830-1">
+</head>
+<body>
+  <main class="systems-shell">
+    <header class="systems-head">
+      <div class="systems-head__top">
+        <a class="systems-back" href="/" aria-label="Return to BarbPH">←</a>
+        <span class="systems-live-dot" aria-hidden="true"></span>
+      </div>
+
+      <div class="systems-title-block">
+        <p class="systems-kicker">BARBPH SYSTEMS</p>
+        <h1>BARBPH SYSTEMS</h1>
+        <p class="systems-subtitle">Continuous Transmission &amp; Systems Ledger</p>
+      </div>
+
+      <section class="systems-handnote" aria-label="About this systems ledger">
+        <div class="systems-sources" data-systems-sources aria-live="polite">Loading deployed sources…</div>
+        <p class="systems-handnote__sentence">
+          This webpage is architected around sourced
+          <span class="systems-themes">theme<span class="systems-theme-s">s</span><svg class="systems-source-arrow" viewBox="0 0 84 74" aria-hidden="true"><path d="M6 69 C22 58 26 43 26 31 C26 18 40 9 62 8"/><path d="M50 2 L64 8 L54 19"/></svg></span>
+          and a global live Watchtower, hence this system log receipt.
+        </p>
+        <a class="systems-publication-link" href="/publications#PUB-0001">Read our official Publication to know more →</a>
+      </section>
+    </header>
+
+    <section class="systems-return" data-return-panel hidden>
+      <div>
+        <span class="systems-return__label">LAST VISIT</span>
+        <strong data-last-visit>FIRST VISIT</strong>
+      </div>
+      <div>
+        <span class="systems-return__label">SINCE YOU LAST CHECKED</span>
+        <strong data-new-count>0 NEW SYSTEM EVENTS</strong>
+      </div>
+    </section>
+
+    <section class="systems-controls" aria-label="Systems ledger controls">
+      <div class="systems-range" role="group" aria-label="Report period">
+        <button type="button" class="is-active" data-range="today">TODAY</button>
+        <button type="button" data-range="week">WEEK</button>
+        <button type="button" data-range="month">MONTH</button>
+        <button type="button" data-range="year">YEAR</button>
+        <button type="button" data-range="all">ALL</button>
+      </div>
+      <div class="systems-date-nav">
+        <button type="button" data-prev-day aria-label="Previous day">←</button>
+        <input type="date" data-ledger-date aria-label="Ledger date">
+        <button type="button" data-next-day aria-label="Next day">→</button>
+      </div>
+      <div class="systems-actions">
+        <button type="button" data-refresh>REFRESH</button>
+        <button type="button" data-pdf>PDF</button>
+      </div>
+    </section>
+
+    <section class="systems-summary" aria-label="Period summary" data-summary>
+      <div><span>TRANSMISSIONS</span><strong data-summary-transmissions>0</strong></div>
+      <div><span>INCIDENTS</span><strong data-summary-incidents>0</strong></div>
+      <div><span>RECOVERIES</span><strong data-summary-recoveries>0</strong></div>
+      <div><span>BARB ORIGINALS</span><strong data-summary-reserve>0</strong></div>
+      <div><span>WATCHTOWER</span><strong data-summary-watchtower>0</strong></div>
+      <div><span>UNRESOLVED</span><strong data-summary-unresolved>0</strong></div>
+      <div class="systems-summary__status"><span>OVERALL STATUS</span><strong data-summary-status>NORMAL</strong></div>
+    </section>
+
+    <section class="systems-away" data-away hidden>
+      <span>WHILE YOU WERE AWAY</span>
+      <p data-away-copy></p>
+    </section>
+
+    <section class="systems-receipt" aria-live="polite">
+      <div class="systems-receipt__meta">
+        <span data-period-label>MANILA DATE</span>
+        <span data-generated>SYNCING</span>
+      </div>
+      <div class="systems-rule"></div>
+      <div class="systems-grid systems-grid--head" aria-hidden="true">
+        <span>Time</span>
+        <span>System</span>
+        <span>Expected</span>
+        <span>What happened</span>
+        <span>Engine action</span>
+        <span>Result</span>
+      </div>
+      <div class="systems-events" data-events>
+        <div class="systems-loading">SYNCING SYSTEMS LEDGER…</div>
+      </div>
+      <div class="systems-rule"></div>
+      <p class="systems-ledger-note" data-ledger-note></p>
+    </section>
+  </main>
+  <script src="/systems.js?v=20260830-1" defer></script>
+</body>
+</html>

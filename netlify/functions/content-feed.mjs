@@ -1,4 +1,3 @@
-
 const SID="1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM";
 function clean(v){return String(v??"").trim()}
 function parseCSV(text){const rows=[];let row=[],field="",q=false;for(let i=0;i<text.length;i++){const c=text[i];if(q){if(c=='"'&&text[i+1]=='"'){field+='"';i++}else if(c=='"')q=false;else field+=c}else if(c=='"')q=true;else if(c==','){row.push(field);field=""}else if(c=='\n'){row.push(field);rows.push(row);row=[];field=""}else if(c!='\r')field+=c}if(field||row.length){row.push(field);rows.push(row)}return rows}
@@ -7,4 +6,4 @@ function json(body,status=200){return Response.json(body,{status,headers:{"cache
 
 function norm(v){v=clean(v);if(!v)return"";return /^https?:\/\//i.test(v)?v:"https://"+v}
 function displayDate(v){const d=new Date(`${clean(v)}T00:00:00`);return Number.isNaN(d.getTime())?clean(v):new Intl.DateTimeFormat("en-US",{year:"numeric",month:"long",day:"numeric"}).format(d)}
-export default async req=>{if(req.method!=="GET")return json({error:"Method not allowed"},405);try{const [p,b]=await Promise.all([sheet("Publications","title"),sheet("The Bulletin","message")]);return json({publications:p.filter(x=>clean(x.published).toLowerCase()==="yes"&&x.title).map(x=>({title:x.title,date:x.date,date_display:displayDate(x.date),body:x.body||"",photo_url:norm(x.photo_url),link:norm(x.link)})),bulletin:b.filter(x=>clean(x.published).toLowerCase()==="yes"&&x.message).map(x=>({message:x.message,link:norm(x.link)}))})}catch(e){return json({error:e.message},502)}};
+export default async req=>{if(req.method!=="GET")return json({error:"Method not allowed"},405);try{const [p,b]=await Promise.all([sheet("Publications","title"),sheet("The Bulletin","message")]);return json({publications:p.filter(x=>clean(x.published).toLowerCase()==="yes"&&x.title).map(x=>({publication_id:clean(x.publication_id),title:x.title,date:x.date,date_display:displayDate(x.date),body:x.body||"",photo_url:norm(x.photo_url),link:norm(x.link)})),bulletin:b.filter(x=>clean(x.published).toLowerCase()==="yes"&&x.message).map(x=>({message:x.message,link:norm(x.link)}))})}catch(e){return json({error:e.message},502)}};

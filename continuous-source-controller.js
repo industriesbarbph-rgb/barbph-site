@@ -18,6 +18,7 @@
   let fetching = false;
   let currentImage = '';
   let watchtowerWasActive = false;
+  let watchtowerReturnInFlight = false;
   const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
 
   function clearTimer(ref) { if (ref) clearTimeout(ref); }
@@ -117,11 +118,18 @@
     activate(0);
     runBatch(data);
   }
-  async function refresh({ resync = false } = {}) {
+  async function refresh({ resync = false, watchtower = null } = {}) {
     if (!enabled || fetching) return;
     fetching = true;
     try {
-      const url = resync ? `${ENDPOINT}?resync=1` : ENDPOINT;
+      const params = new URLSearchParams();
+      if (resync) params.set('resync', '1');
+      if (watchtower?.slot) {
+        params.set('watchtower_slot', String(watchtower.slot));
+        params.set('watchtower_outcome', watchtower.outcome === 'offline' ? 'offline' : 'normal');
+        if (Number.isFinite(Number(watchtower.readyAt))) params.set('watchtower_ready_at', String(Number(watchtower.readyAt)));
+      }
+      const url = params.size ? `${ENDPOINT}?${params}` : ENDPOINT;
       const r = await fetch(url);
       if (!r.ok) throw new Error(`Daily stream HTTP ${r.status}`);
       const data = await r.json();
@@ -131,6 +139,7 @@
       scheduleFetch(30000);
     } finally {
       fetching = false;
+      watchtowerReturnInFlight = false;
     }
   }
   async function boot() {
@@ -146,11 +155,23 @@
     }
   }
   function observeWatchtower() {
+    window.addEventListener('barbph:watchtower-return', event => {
+      if (!enabled || watchtowerReturnInFlight) return;
+      const detail = event?.detail || {};
+      const slot = Number(detail.slot);
+      if (!Number.isFinite(slot)) return;
+      watchtowerReturnInFlight = true;
+      refresh({
+        resync: true,
+        watchtower: { slot, outcome: detail.outcome === 'offline' ? 'offline' : 'normal', readyAt: Number(detail.readyAt) || null }
+      });
+    });
+
     const attach = overlay => {
       watchtowerWasActive = overlay.classList.contains('is-active');
       const observer = new MutationObserver(() => {
         const active = overlay.classList.contains('is-active');
-        if (watchtowerWasActive && !active && enabled) refresh({ resync: true });
+        if (watchtowerWasActive && !active && enabled && !watchtowerReturnInFlight) refresh({ resync: true });
         watchtowerWasActive = active;
       });
       observer.observe(overlay, { attributes: true, attributeFilter: ['class'] });

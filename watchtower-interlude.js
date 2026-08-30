@@ -46,6 +46,15 @@
   let previousBodyOverflow = '';
   let previousHtmlOverflow = '';
   let previousFocus = null;
+  let frameReadyAt = null;
+
+  function reportWatchtowerReturn(slot, outcome = 'normal') {
+    const value = Number(slot);
+    if (!Number.isFinite(value) || value % HOUR_MS !== 0) return;
+    window.dispatchEvent(new CustomEvent('barbph:watchtower-return', {
+      detail: { slot: value, outcome: outcome === 'offline' ? 'offline' : 'normal', readyAt: frameReadyAt }
+    }));
+  }
 
   function slotStartAt(ms) {
     return Math.floor(ms / HOUR_MS) * HOUR_MS;
@@ -78,6 +87,7 @@
     frame = null;
     frameLoaded = false;
     frameSlot = null;
+    frameReadyAt = null;
     overlay.classList.remove('is-frame-ready');
     if (host) host.replaceChildren();
   }
@@ -98,8 +108,11 @@
 
     frame.addEventListener('load', () => {
       frameLoaded = true;
+      frameReadyAt = Date.now();
       clearLoadGrace();
-      if (activeSlot === slot) overlay.classList.add('is-frame-ready');
+      if (activeSlot === slot) {
+        overlay.classList.add('is-frame-ready');
+      }
     }, { once: true });
 
     host.appendChild(frame);
@@ -142,22 +155,27 @@
       loadGraceTimer = setTimeout(() => {
         if (activeSlot !== slot || frameLoaded) return;
         failedSlot = slot;
-        hide({ unload: true, restoreFocus: true });
+        hide({ unload: true, restoreFocus: true, slot, reportEnd: true, outcome: 'offline' });
       }, LOAD_GRACE_MS);
     }
   }
 
-  function hide({ unload = true, restoreFocus = false } = {}) {
+  function hide({ unload = true, restoreFocus = false, slot = activeSlot, reportEnd = false, outcome = 'normal' } = {}) {
     if (!activeSlot && !overlay.classList.contains('is-active')) {
       if (unload) unloadFrame();
       return;
     }
 
+    const endingSlot = Number.isFinite(Number(slot)) ? Number(slot) : activeSlot;
     activeSlot = null;
     clearLoadGrace();
     overlay.classList.remove('is-active', 'is-frame-ready');
     overlay.setAttribute('aria-hidden', 'true');
     unlockPage();
+
+    if (reportEnd && Number.isFinite(Number(endingSlot))) {
+      reportWatchtowerReturn(endingSlot, outcome);
+    }
 
     if (unload) unloadFrame();
     if (restoreFocus && previousFocus && document.contains(previousFocus)) {
@@ -175,7 +193,10 @@
       return;
     }
 
-    if (activeSlot !== null) hide({ unload: true, restoreFocus: true });
+    if (activeSlot !== null) {
+      const endingSlot = activeSlot;
+      hide({ unload: true, restoreFocus: true, slot: endingSlot, reportEnd: true });
+    }
 
     const next = nextSlotStart(now);
     const untilNext = next - now;
@@ -203,14 +224,15 @@
       const testSlot = Date.now();
       show(testSlot);
       setTimeout(() => {
-        if (activeSlot === testSlot) hide({ unload: true, restoreFocus: true });
+        if (activeSlot === testSlot) hide({ unload: true, restoreFocus: true, slot: testSlot, reportEnd: true });
       }, safeSeconds * 1000);
     },
     stop() {
       clearInterval(interval);
       document.removeEventListener('visibilitychange', reconcile);
       window.removeEventListener('pageshow', reconcile);
-      hide({ unload: true, restoreFocus: true });
+      const endingSlot = activeSlot;
+      hide({ unload: true, restoreFocus: true, slot: endingSlot, reportEnd: false });
     }
   });
 
