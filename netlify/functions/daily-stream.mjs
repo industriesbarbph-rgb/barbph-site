@@ -14,7 +14,7 @@ function nowISO(){return new Date().toISOString()}
 function dateManila(){const p=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),g=t=>p.find(x=>x.type===t)?.value;return`${g("year")}-${g("month")}-${g("day")}`}
 function addDays(date,n){const d=new Date(`${date}T00:00:00Z`);d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)}
 function prod(){return Netlify.context?.deploy?.context==="production"}
-function store(){return prod()?getStore(STORE_NAME,{consistency:"strong"}):getDeployStore(STORE_NAME,{consistency:"strong"})}
+function store(lab=false){if(lab)return getDeployStore(`${STORE_NAME}-lab`);return prod()?getStore(STORE_NAME,{consistency:"strong"}):getDeployStore(STORE_NAME)}
 function json(body,status=200,lab=false){return Response.json(body,{status,headers:{"cache-control":lab||status!==200?"no-store":"public, max-age=30, s-maxage=60, stale-while-revalidate=300"}})}
 async function getText(url,ms=10000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.text()}finally{clearTimeout(t)}}
 function parseCSV(text){const rows=[];let row=[],field="",quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(quoted){if(c==='"'&&text[i+1]==='"'){field+='"';i++}else if(c==='"')quoted=false;else field+=c}else if(c==='"')quoted=true;else if(c===','){row.push(field);field=""}else if(c==='\n'){row.push(field);rows.push(row);row=[];field=""}else if(c!=='\r')field+=c}if(field||row.length){row.push(field);rows.push(row)}return rows}
@@ -36,7 +36,7 @@ async function serveReserve({s,origin,date,control,state,health,reason,eventType
 
 export default async request=>{
   if(request.method!=="GET")return json({error:"Method not allowed"},405);
-  const url=new URL(request.url),lab=url.searchParams.get("lab")==="1",forced=lab?clean(url.searchParams.get("force_source")):"",forceFail=lab&&url.searchParams.get("force_fail")==="1",resync=url.searchParams.get("resync")==="1",date=dateManila(),origin=url.origin,s=store(),now=Date.now();
+  const url=new URL(request.url),lab=url.searchParams.get("lab")==="1",forced=lab?clean(url.searchParams.get("force_source")):"",forceFail=lab&&url.searchParams.get("force_fail")==="1",resync=url.searchParams.get("resync")==="1",date=dateManila(),origin=url.origin,s=store(lab),now=Date.now();
   let rows;try{rows=await themeRows()}catch(e){return json({status:"CONTROL_UNAVAILABLE",date_manila:date,error:e.message},503,lab)}
   let control;try{control=await selectControl(s,rows,date,forced)}catch(e){return json({status:"NOT_ARMED",date_manila:date,error:e.message},503,lab)}
   const stateKey=`continuous/day/${date}/stream`,seenKey=`continuous/day/${date}/seen`,cacheKey=`continuous/day/${date}/last-known-good`,healthKey=`continuous/day/${date}/health`;
