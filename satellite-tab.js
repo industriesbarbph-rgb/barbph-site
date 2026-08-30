@@ -116,3 +116,13 @@
     if (event.key === 'Escape' && topbar.classList.contains('is-satellite-open')) setOpen(false);
   });
 })();
+
+(() => {
+  'use strict';
+  if (window.BarbPHWatchtowerInterlude || document.querySelector('script[data-watchtower-interlude-loader]')) return;
+  const script = document.createElement('script');
+  script.src = '/watchtower-interlude.js?v=20260830-1';
+  script.defer = true;
+  script.dataset.watchtowerInterludeLoader = 'true';
+  document.head.appendChild(script);
+})();
