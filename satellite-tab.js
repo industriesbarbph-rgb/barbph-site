@@ -218,3 +218,13 @@
   script.dataset.watchtowerInterludeLoader = 'true';
   document.head.appendChild(script);
 })();
+
+(() => {
+  'use strict';
+  if (window.BarbPHContinuousSource || document.querySelector('script[data-continuous-source-loader]')) return;
+  const script = document.createElement('script');
+  script.src = '/continuous-source-controller.js?v=20260830-1';
+  script.defer = true;
+  script.dataset.continuousSourceLoader = 'true';
+  document.head.appendChild(script);
+})();
