@@ -1,123 +1,26 @@
 import { getStore } from "@netlify/blobs";
 
-const SID = "1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM";
-const TZ = "Asia/Manila";
-const PASSED = new Set([
-  "The Met Open Access",
-  "NASA",
-  "Smithsonian Open Access",
-  "Library of Congress",
-  "NOAA",
-  "USGS",
-  "Art Institute of Chicago",
-  "Cleveland Museum of Art",
-  "National Gallery of Art",
-]);
-const PARKED = {
-  "Europeana": "credential required; live proof pending",
-  "New York Public Library": "credential required; live proof pending",
-  "Biodiversity Heritage Library": "credential required; live proof pending",
-  "Getty Open Content": "rights-safe retrieval needs refinement",
-  "Barb Originals": "emergency reserve only; not an ordinary rotation source",
-  "Wildcard": "pre-approved rights-safe pool not defined",
-};
-const EXPECTED_WORLD_COUNT = 15;
-
-function dateManila(){
-  const p=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
-  const g=t=>p.find(x=>x.type===t)?.value;
-  return `${g("year")}-${g("month")}-${g("day")}`;
-}
-function response(body,status=200){return Response.json(body,{status,headers:{"cache-control":"no-store"}})}
+const SID="1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM",TZ="Asia/Manila",ENGINE_VERSION="2026-08-30-continuous-v1";
+const READY=new Set(["PRODUCTION_READY","PRODUCTION"]),SAFE_INACTIVE=new Set(["HOLD","BUILDING","PARKED","PENDING_API_KEY","INGESTION_REQUIRED","EMERGENCY_RESERVE"]);
+function clean(v){return String(v??"").replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim()}
+function dateManila(){const p=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),g=t=>p.find(x=>x.type===t)?.value;return`${g("year")}-${g("month")}-${g("day")}`}
+function json(body,status=200){return Response.json(body,{status,headers:{"cache-control":"no-store"}})}
+async function text(url,ms=10000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.text()}finally{clearTimeout(t)}}
 function parseCSV(s){const out=[];let r=[],f="",q=false;for(let i=0;i<s.length;i++){const c=s[i];if(q){if(c==='"'&&s[i+1]==='"'){f+='"';i++}else if(c==='"')q=false;else f+=c}else if(c==='"')q=true;else if(c===','){r.push(f);f=""}else if(c==='\n'){r.push(f);out.push(r);r=[];f=""}else if(c!=='\r')f+=c}if(f||r.length){r.push(f);out.push(r)}return out}
-function table(raw,header){const rr=parseCSV(raw),h=rr.findIndex(r=>String(r[0]||"").trim().toLowerCase()===header.toLowerCase());if(h<0)throw new Error(`${header} header not found`);const heads=rr[h].map(x=>String(x).trim());return rr.slice(h+1).filter(r=>r.some(Boolean)).map(r=>Object.fromEntries(heads.map((k,i)=>[k,String(r[i]||"").trim()]))) }
-async function fetchText(url,ms=9000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.text()}finally{clearTimeout(t)}}
-async function readSheet(sheet,header,gid=""){
-  const urls=gid?[`https://docs.google.com/spreadsheets/d/${SID}/export?format=csv&gid=${gid}`,`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheet)}&headers=0`]:[`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheet)}&headers=0`];
-  let last="";
-  for(const url of urls){try{const raw=await fetchText(url);if(/<html|accounts\.google\.com|sign in/i.test(raw)){last=`${sheet} is not anonymously readable`;continue}return table(raw,header)}catch(e){last=e.message||"fetch failed"}}
-  throw new Error(last||`${sheet} unavailable`);
-}
-function normalizeImage(value){const v=String(value||"").trim();if(!v)return"";try{const u=new URL(v);if(!/^https?:$/.test(u.protocol))return"";return u.href}catch{return""}}
-function reserveSummary(rows){const seen=new Set(),families=new Set();let enabled=0;for(const r of rows){if(String(r.enabled||"").toLowerCase()!=="yes")continue;const image=normalizeImage(r.media_url);if(!image||seen.has(image))continue;seen.add(image);enabled++;if(r.family)families.add(String(r.family).trim())}return{enabled_unique_images:enabled,minimum_required:3,ready:enabled>=3,families:[...families].filter(Boolean)}}
-function sourceSummary(rows){
-  const configured=rows.map(r=>({source_name:r.source_name,enabled:String(r.enabled||"").toLowerCase()==="yes",weight:Number(r.weight)||0,daily_asset_count:Number(r.daily_asset_count)||3,rotation_seconds:Number(r.rotation_seconds)||18,passed:PASSED.has(r.source_name),parked_reason:PARKED[r.source_name]||null}));
-  const production_enabled=configured.filter(x=>x.passed&&x.enabled&&x.weight>0);
-  const armable=configured.filter(x=>x.passed&&x.weight>0);
-  const unsafe_enabled=configured.filter(x=>!x.passed&&x.enabled);
-  return{configured,production_enabled,armable,unsafe_enabled};
-}
-function credentialStatus(){return{
-  europeana:{configured:!!Netlify.env.get("EUROPEANA_API_KEY")},
-  nypl:{configured:!!Netlify.env.get("NYPL_API_TOKEN")},
-  bhl:{configured:!!Netlify.env.get("BHL_API_KEY")},
-  smithsonian:{configured:!!Netlify.env.get("SMITHSONIAN_API_KEY"),optional:true},
-}}
-function overallState({sources,reserve,themeOk,reserveOk}){
-  if(!themeOk)return"BLOCKED_THEME_SOURCES";
-  if(sources.unsafe_enabled.length)return"BLOCKED_UNVERIFIED_SOURCE_ENABLED";
-  const armed=sources.production_enabled.length>0;
-  if(!reserveOk&&!armed)return"WAITING_FOR_RESERVE_AND_ARMING";
-  if(!reserveOk&&armed)return"ARMED_WITHOUT_RESERVE";
-  if(reserveOk&&!armed)return"READY_TO_ARM";
-  return"ARMED_WITH_RESERVE";
-}
-function prodContext(){return Netlify.context?.deploy?.context==="production"}
-
+function table(raw,header){const rows=parseCSV(raw),i=rows.findIndex(r=>clean(r[0]).toLowerCase()===header.toLowerCase());if(i<0)throw new Error(`${header} header not found`);const h=rows[i].map(clean);return rows.slice(i+1).filter(r=>r.some(Boolean)).map(r=>Object.fromEntries(h.map((k,j)=>[k,clean(r[j])]))) }
+async function sheet(name,header,gid=""){const urls=gid?[`https://docs.google.com/spreadsheets/d/${SID}/export?format=csv&gid=${gid}`,`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}&headers=0`]:[`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}&headers=0`];let last="";for(const u of urls){try{const raw=await text(u);if(/<html|accounts\.google\.com|sign in/i.test(raw)){last=`${name} is not anonymously readable`;continue}return table(raw,header)}catch(e){last=e.message}}throw new Error(last||`${name} unavailable`)}
+function sourceRows(rows){return rows.map(r=>{const status=clean(r.production_status).toUpperCase(),enabled=clean(r.enabled).toLowerCase()==="yes",weight=Number(r.weight)||0,adapter=clean(r.adapter_key);return{source_name:clean(r.source_name),enabled,weight,status,adapter_key:adapter,country_region:clean(r.country_region),operating_mode:clean(r.operating_mode),pause_reason:clean(r.pause_reason||r.notes),what_unlocks_it:clean(r.what_unlocks_it),stream_batch_size:Number(r.stream_batch_size)||0,refresh_seconds:Number(r.refresh_seconds)||0,ready:READY.has(status)&&!!adapter,active:enabled&&weight>0&&READY.has(status)&&!!adapter}})}
+function reserve(rows){const seen=new Set();for(const r of rows){if(clean(r.enabled).toLowerCase()!=="yes")continue;try{const u=new URL(clean(r.media_url));if(/^https?:$/.test(u.protocol))seen.add(u.href)}catch{}}return{available_count:seen.size,minimum_required:3,ready:seen.size>=3}}
+function prod(){return Netlify.context?.deploy?.context==="production"}
 export default async request=>{
-  if(request.method!=="GET")return response({error:"Method not allowed"},405);
-  const checkedAt=new Date().toISOString(),date=dateManila(),checks={theme_sources:{ok:false,error:null},barb_originals:{ok:false,error:null},shared_store:{ok:false,error:null}};
-  let themeRows=[],barbRows=[];
-  try{themeRows=await readSheet("Theme Sources","source_name","342757810");checks.theme_sources.ok=true}catch(e){checks.theme_sources.error=e.message}
-  try{barbRows=await readSheet("Barb Originals","asset_name");checks.barb_originals.ok=true}catch(e){checks.barb_originals.error=e.message}
-  const sources=sourceSummary(themeRows),reserve=reserveSummary(barbRows),credentials=credentialStatus();
-  let today=null,history=null;
-  if(prodContext()){
-    try{
-      const store=getStore("barbph-daily-discover",{consistency:"strong"});
-      [today,history]=await Promise.all([store.get(`day/${date}`,{type:"json"}),store.get("history/recent",{type:"json"})]);
-      checks.shared_store.ok=true;
-    }catch(e){checks.shared_store.error=e.message}
-  }else checks.shared_store.error="Readiness endpoint is not running in production context";
-  const historyDays=Array.isArray(history?.days)?history.days.length:0;
-  const state=overallState({sources,reserve,themeOk:checks.theme_sources.ok,reserveOk:checks.barb_originals.ok&&reserve.ready});
-  const blockers=[];
-  if(!checks.theme_sources.ok)blockers.push("Theme Sources cannot be read");
-  if(sources.unsafe_enabled.length)blockers.push("At least one unverified/parked source is enabled");
-  if(!reserve.ready)blockers.push(`Barb Originals reserve has ${reserve.enabled_unique_images}/3 enabled unique images`);
-  if(!sources.production_enabled.length)blockers.push("No confirmed source is production-enabled yet");
-  const sourceInventory={
-    expected_total:EXPECTED_WORLD_COUNT,
-    sheet_configured_rows:sources.configured.length,
-    confirmed_passed:PASSED.size,
-    parked_waiting:Object.keys(PARKED).length,
-    accounted:PASSED.size+Object.keys(PARKED).length,
-    complete:PASSED.size+Object.keys(PARKED).length===EXPECTED_WORLD_COUNT&&sources.configured.length===EXPECTED_WORLD_COUNT,
-    parked_sources:Object.entries(PARKED).map(([source_name,reason])=>({source_name,reason})),
-  };
-  const productionArmed=sources.production_enabled.length>0;
-  return response({
-    system:"BARBPH DAILY DISCOVER — PRODUCTION READINESS",
-    checked_at:checkedAt,
-    timezone:TZ,
-    date_manila:date,
-    state,
-    production_armed:productionArmed,
-    safety_guards:{
-      daily_discover_intentionally_off:!productionArmed,
-      no_unverified_source_enabled:sources.unsafe_enabled.length===0,
-      reserve_required_before_arm:true,
-    },
-    source_inventory:sourceInventory,
-    production_enabled_sources:sources.production_enabled.map(x=>x.source_name),
-    confirmed_passed_sources:[...PASSED],
-    armable_confirmed_sources:sources.armable.map(x=>x.source_name),
-    unverified_enabled_sources:sources.unsafe_enabled.map(x=>x.source_name),
-    reserve,
-    credentials,
-    shared_state:{today_locked:!!today,today_served_source:today?.served_source||null,today_daily_set_id:today?.daily_set_id||null,history_days:historyDays,history_updated_at:history?.updated_at||null},
-    checks,
-    blockers,
-    note:"Read-only readiness diagnostic. It does not enable sources, change spreadsheet controls, write history, or create a Daily Discover set."
-  },checks.theme_sources.ok?200:503)
+  if(request.method!=="GET")return json({error:"Method not allowed"},405);
+  const checked_at=new Date().toISOString(),date=dateManila(),checks={theme_sources:{ok:false,error:null},barb_originals:{ok:false,error:null},shared_store:{ok:false,error:null}};let theme=[],barb=[];
+  try{theme=await sheet("Theme Sources","source_name","342757810");checks.theme_sources.ok=true}catch(e){checks.theme_sources.error=e.message}
+  try{barb=await sheet("Barb Originals","asset_name");checks.barb_originals.ok=true}catch(e){checks.barb_originals.error=e.message}
+  const sources=sourceRows(theme),active=sources.filter(x=>x.active),ready=sources.filter(x=>x.ready),paused=sources.filter(x=>!x.active&&x.status!=="EMERGENCY_RESERVE"),unsafe=sources.filter(x=>x.enabled&&(!READY.has(x.status)||!x.adapter_key)),reserveState=reserve(barb);let control=null,stream=null,health=null,events=null,history=null;
+  if(prod())try{const s=getStore("barbph-daily-discover",{consistency:"strong"});[control,stream,health,events,history]=await Promise.all([s.get(`continuous/day/${date}/control`,{type:"json"}),s.get(`continuous/day/${date}/stream`,{type:"json"}),s.get(`continuous/day/${date}/health`,{type:"json"}),s.get(`continuous/events/${date}`,{type:"json"}),s.get("continuous/history/days",{type:"json"})]);checks.shared_store.ok=true}catch(e){checks.shared_store.error=e.message}else checks.shared_store.error="Not running in production context";
+  const blockers=[];if(!checks.theme_sources.ok)blockers.push("Theme Sources cannot be read");if(unsafe.length)blockers.push("A source is enabled while not production-ready or has no adapter");if(!active.length)blockers.push("No production-ready source is enabled with weight above zero");if(!reserveState.ready)blockers.push(`Barb Originals reserve has ${reserveState.available_count}/3 enabled unique images`);
+  const warnings=[];for(const x of paused){if(!SAFE_INACTIVE.has(x.status)&&!READY.has(x.status))warnings.push(`${x.source_name}: unknown production_status ${x.status||"blank"}`)}
+  const state=blockers.length?"BLOCKED":warnings.length?"READY_WITH_WARNINGS":"READY_FOR_PRODUCTION";
+  return json({system:"BARBPH CONTINUOUS SOURCE ENGINE — READINESS",engine_version:ENGINE_VERSION,checked_at,timezone:TZ,date_manila:date,state,production_armed:active.length>0&&reserveState.ready&&unsafe.length===0,safety_guards:{one_source_per_manila_day:true,continuous_batches:true,same_source_cache:true,barb_originals_final_fallback:true,admin_kill_switch:true,watchtower_resync:true,unverified_sources_cannot_enter_rotation:true},counts:{configured_sources:sources.length,production_ready_sources:ready.length,production_enabled_sources:active.length,paused_or_disabled_sources:paused.length},production_enabled_sources:active.map(x=>x.source_name),production_ready_sources:ready.map(x=>x.source_name),paused_sources:paused.map(x=>({source_name:x.source_name,status:x.status,pause_reason:x.pause_reason,what_unlocks_it:x.what_unlocks_it})),unsafe_enabled_sources:unsafe.map(x=>x.source_name),reserve:reserveState,shared_state:{today_locked:!!control,scheduled_source:control?.scheduled_source||null,served_source:stream?.served_source||null,service_mode:stream?.service_mode||null,source_health:health?.state||stream?.stream?.source_health||null,next_retry_at:health?.next_retry_at||null,generation:stream?.generation||null,event_count:Array.isArray(events?.events)?events.events.length:0,history_days:Array.isArray(history?.days)?history.days.length:0},checks,blockers,warnings,note:"Read-only diagnostic. It never changes the Admin Sheet, source state, history, or Netlify configuration."},checks.theme_sources.ok?200:503)
 };
