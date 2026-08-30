@@ -2,7 +2,7 @@
   'use strict';
   if (window.BarbPHContinuousSource) return;
 
-  const ENDPOINT = '/.netlify/functions/daily-stream';
+  const ENDPOINT = '/.netlify/functions/daily-stream-public';
   const PRIORITY = '/.netlify/functions/homepage-priority';
   const world = document.querySelector('.world');
   if (!world) return;
