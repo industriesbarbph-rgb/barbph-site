@@ -1,3 +1,7 @@
+/* Satellite / Live Telecast tab retired from the BarbPH public interface. */
+.folder-tab--satellite,
+.satellite-drawer{display:none!important}
+
 /* BarbPH satellite live-telecast preview. Isolated from existing tab/drawer styling. */
 .folder-tab--satellite{z-index:7!important}
 .folder-tab--satellite .folder-tab__surface{overflow:hidden!important}
