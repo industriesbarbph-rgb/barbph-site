@@ -83,7 +83,7 @@
     };
     rotateTimer = setTimeout(tick, delay);
   }
-  async function render(data) {
+  async function render(data, { resync = false } = {}) {
     const assets = Array.isArray(data?.assets) ? data.assets.filter(a => /^https:\/\//i.test(a?.image || '')) : [];
     if (!assets.length) throw new Error('Continuous source returned no usable assets');
 
@@ -97,6 +97,7 @@
 
     const newGeneration = data?.stream?.generation ?? null;
     if (generation !== null && newGeneration === generation && nodes.length) {
+      if (resync && nodes.length > 1) activate((index + 1) % nodes.length);
       scheduleFetch(safeMs(data, 30000));
       return;
     }
@@ -121,10 +122,10 @@
     fetching = true;
     try {
       const url = resync ? `${ENDPOINT}?resync=1` : ENDPOINT;
-      const r = await fetch(url, { cache: 'no-store' });
+      const r = await fetch(url);
       if (!r.ok) throw new Error(`Daily stream HTTP ${r.status}`);
       const data = await r.json();
-      await render(data);
+      await render(data, { resync });
     } catch (error) {
       console.warn('BarbPH continuous source:', error);
       scheduleFetch(30000);
@@ -134,7 +135,7 @@
   }
   async function boot() {
     try {
-      const r = await fetch(PRIORITY, { cache: 'no-store' });
+      const r = await fetch(PRIORITY);
       if (!r.ok) return;
       const priority = await r.json();
       if (priority?.selected_mode !== 'daily_discover') return;
