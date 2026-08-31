@@ -25,14 +25,69 @@ function absURL(base,value){try{return new URL(String(value||""),base).href.repl
 async function collectNHCP(seed,count){const pages=[];const start=1+(Math.abs(seed)%8);for(let n=0;n<3;n++)pages.push(1+((start+n-1)%12));const out=[];for(const page of pages){const url=`https://memory.nhcp.gov.ph/collections/page/${page}/`;const html=await getText(url,12000).catch(()=>"");if(!html)continue;const cardRe=/<(?:article|div)[^>]*>([\s\S]{0,12000}?)<\/\s*(?:article|div)>/gi;let m;while((m=cardRe.exec(html))&&out.length<count*4){const block=m[1];if(!/Level\s*:?\s*Level\s*1/i.test(block))continue;const href=block.match(/href=["']([^"']+)["']/i)?.[1]||"";const src=block.match(/<img[^>]+(?:src|data-src)=["']([^"']+)["']/i)?.[1]||"";const title=clean((block.match(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/i)?.[1]||block.match(/title=["']([^"']+)["']/i)?.[1]||"NHCP National Memory Project"));const image=absURL(url,src),sourceURL=absURL(url,href);if(!image||!/memory\.nhcp\.gov\.ph/i.test(image))continue;out.push({id:`nhcp:${hash(sourceURL||image)}`,title,creator:"National Historical Commission of the Philippines",family:"level-1-open-access",image,sourceURL:sourceURL||"https://memory.nhcp.gov.ph/collections/",rightsLabel:"NHCP Open Access Level 1 · item must remain Level 1"})}}
 if(!out.length)throw new Error("NHCP Level 1 cards returned no directly usable images");return usable(rotate(out,seed),count)}
 
+/* NDL Image Bank states that its exhibition images are digitized public-domain content and may be reused commercially with source attribution. */
+async function collectNDL(seed,count){
+  const themes=["fugaku100","60meisho","100saishoku","neko","inu","yukigeshiki","saibi","shokoku100","omochae","sakurazukushi","momijigari","noryo","yumejishikibijin"];
+  const start=Math.abs(seed)%themes.length,out=[];
+  for(let n=0;n<Math.min(5,themes.length)&&out.length<Math.max(count*2,40);n++){
+    const slug=themes[(start+n*5)%themes.length],url=`https://www.ndl.go.jp/en/imagebank/theme/${slug}`;
+    const html=await getText(url,10000).catch(()=>"");if(!html)continue;
+    const title=clean(html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1]||html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]||"NDL Image Bank");
+    const re=/https?:\/\/(?:www\.)?dl\.ndl\.go\.jp\/api\/iiif\/[^"'<>\s]+?\/default\.jpg/gi;let m;
+    while((m=re.exec(html))&&out.length<Math.max(count*2,40)){
+      const image=m[0].replace(/&amp;/g,"&").replace(/^http:/i,"https:");
+      out.push({id:`ndl:${hash(image)}`,title,creator:"National Diet Library, Japan",family:slug,image,sourceURL:url,rightsLabel:"Public Domain · NDL Image Bank · source attribution required"});
+    }
+  }
+  const ready=usable(rotate(out,seed),count);if(!ready.length)throw new Error("NDL Image Bank returned no directly usable IIIF images");return ready;
+}
+
+function deepStrings(obj,out=[]){if(typeof obj==="string")out.push(obj);else if(Array.isArray(obj)){for(const v of obj)deepStrings(v,out)}else if(obj&&typeof obj==="object"){for(const v of Object.values(obj))deepStrings(v,out)}return out}
+function gettyCC0Visuals(obj){const out=[];function walk(v){if(!v||typeof v!=="object")return;if(Array.isArray(v)){for(const x of v)walk(x);return}if(v.type==="VisualItem"&&/^https:\/\/data\.getty\.edu\/media\/image\//i.test(String(v.id||""))){const ids=deepStrings(v.subject_to||[]);if(ids.includes("https://creativecommons.org/publicdomain/zero/1.0/"))out.push(v)}for(const x of Object.values(v))walk(x)}walk(obj);return out}
+/* Getty's Museum Collection API is public. Images enter this stream only when the image-level VisualItem explicitly carries CC0. */
+async function collectGetty(seed,count){
+  const root=await getJSON("https://data.getty.edu/museum/collection/activity-stream",10000,{Accept:"application/ld+json, application/json"});
+  const strings=deepStrings(root),lastURL=String(root?.last?.id||root?.last||strings.find(x=>/\/activity-stream\/page\/\d+$/i.test(x))||"");
+  const lastNum=Number(lastURL.match(/\/page\/(\d+)/i)?.[1]||0);if(!lastNum)throw new Error("Getty ActivityStream did not expose a usable last page");
+  const out=[],seenObjects=new Set(),pageStart=Math.max(1,lastNum-(Math.abs(seed)%20));
+  for(let p=0;p<4&&out.length<Math.max(count*2,40);p++){
+    const page=Math.max(1,pageStart-p),feed=await getJSON(`https://data.getty.edu/museum/collection/activity-stream/page/${page}`,10000,{Accept:"application/ld+json, application/json"}).catch(()=>null);if(!feed)continue;
+    const ids=deepStrings(feed).filter(x=>/^https:\/\/data\.getty\.edu\/museum\/collection\/object\/[0-9a-f-]+$/i.test(x));
+    const unique=[...new Set(ids)].filter(x=>!seenObjects.has(x)).slice(0,24);for(const x of unique)seenObjects.add(x);
+    const records=await Promise.all(unique.map(u=>getJSON(u,7000,{Accept:"application/ld+json, application/json"}).catch(()=>null)));
+    for(const r of records.filter(Boolean)){
+      const visuals=gettyCC0Visuals(r);if(!visuals.length)continue;
+      const title=clean(r._label||r.label||r.identified_by?.find?.(x=>x?.content)?.content||"Getty Open Content");
+      for(const v of visuals){const uuid=String(v.id).match(/\/image\/([0-9a-f-]+)$/i)?.[1];if(!uuid)continue;out.push({id:`getty:${uuid}`,title,creator:"J. Paul Getty Museum",family:"open-content",image:`https://media.getty.edu/iiif/image/${uuid}/full/1000,/0/default.jpg`,thumbnail:`https://media.getty.edu/iiif/image/${uuid}/full/600,/0/default.jpg`,sourceURL:String(r.id||"https://www.getty.edu/art/collection/"),rightsLabel:"CC0 · Getty Open Content"});if(out.length>=Math.max(count*2,40))break}
+      if(out.length>=Math.max(count*2,40))break;
+    }
+  }
+  const ready=usable(rotate(out,seed),count);if(!ready.length)throw new Error("Getty API returned no image-level CC0 Open Content records");return ready;
+}
+
+/* Keyless NPM Open Data route. Only pages that explicitly expose the CC0 presentation-image statement are accepted. */
+function npmDetailItem(html,url){
+  if(!/Lower\s*\/\s*Presentation\s*Size\s*Image\s*\(CC0\)|100萬像素圖檔下載\s*\(CC0\)|\bCC0\b/i.test(html))return null;
+  const title=clean(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]||"National Palace Museum Open Data").replace(/\s*-\s*National Palace Museum\s*$/i,"");
+  const re=/(?:https?:\/\/digitalarchive\.npm\.gov\.tw)?\/opendata\/Image\/GetImage\?[^"'<>\s]+/gi,m=html.match(re)||[];
+  const raw=m.find(x=>/imageId=/i.test(x));if(!raw)return null;const image=absURL(url,raw.replace(/&amp;/g,"&"));if(!/^https:\/\/digitalarchive\.npm\.gov\.tw\/opendata\/Image\/GetImage\?/i.test(image))return null;
+  const id=url.match(/\/DetailEng\/(\d+)/i)?.[1]||hash(url);return{id:`npm:${id}:${hash(image)}`,title,creator:"National Palace Museum, Taipei",family:"open-data-cc0",image,sourceURL:url,rightsLabel:"CC0 1MP · National Palace Museum Open Data"};
+}
+async function collectNPM(seed,count){
+  const listURL="https://digitalarchive.npm.gov.tw/opendata/Pub/EngVersion",list=await getText(listURL,10000);
+  const ids=[...new Set([...list.matchAll(/\/opendata\/Pub\/DetailEng\/(\d+)/gi)].map(m=>Number(m[1])).filter(Number.isFinite))];if(!ids.length)throw new Error("NPM Open Data list returned no detail identifiers");
+  const anchors=rotate(ids,seed),candidates=[...anchors];for(let off=1;off<=8&&candidates.length<96;off++){for(const anchor of anchors){for(const d of [anchor+off,anchor-off])if(d>0&&!candidates.includes(d))candidates.push(d);if(candidates.length>=96)break}if(candidates.length>=96)break}
+  const out=[];for(let i=0;i<candidates.length&&out.length<Math.max(count*2,40);i+=18){const batch=candidates.slice(i,i+18),pages=await Promise.all(batch.map(id=>{const u=`https://digitalarchive.npm.gov.tw/opendata/Pub/DetailEng/${id}?dep=U&mode=full`;return getText(u,7000).then(h=>npmDetailItem(h,u)).catch(()=>null)}));for(const x of pages)if(x)out.push(x)}
+  const ready=usable(rotate(out,seed),count);if(ready.length<Math.min(6,count))throw new Error(`NPM keyless Open Data route returned only ${ready.length} usable CC0 images`);return ready;
+}
+
 async function collectCatalogue(sourceName,seed,count){const rows=await sheet("Source Catalogue","source_name"),wanted=clean(sourceName).toLowerCase(),out=[];for(const r of rows){if(clean(r.source_name).toLowerCase()!==wanted||clean(r.enabled).toLowerCase()!=="yes")continue;if(!/^https:\/\//i.test(r.image_url)||!r.rights_label)continue;out.push({id:`catalog:${r.asset_id||hash(r.image_url)}`,title:r.title||sourceName,creator:sourceName,family:r.family||"curated",image:r.image_url,sourceURL:r.source_url||r.image_url,rightsLabel:r.rights_label})}if(!out.length)throw new Error(`${sourceName} has no enabled rights-cleared Source Catalogue records`);return usable(rotate(out,seed),count)}
 
 function firstImage(obj){if(!obj||typeof obj!=="object")return"";for(const [k,v] of Object.entries(obj)){if(typeof v==="string"&&/image|img|iiif|photo|picture/i.test(k)&&/^https:\/\//i.test(v))return v;if(v&&typeof v==="object"){const hit=firstImage(v);if(hit)return hit}}return""}
-async function collectNPM(seed,count){const key=Netlify.env.get("NPM_TAIWAN_API_KEY");if(!key)throw new Error("NPM_TAIWAN_API_KEY is not configured");const offset=(Math.abs(seed)%1000);const s=await getJSON(`https://openapi.npm.gov.tw/v1/rest/collection/search/?limit=${Math.max(count*2,30)}&offset=${offset}&lang=eng`,12000,{apiKey:key});const out=[];for(const r of s?.result||[]){const id=String(r.Serial_No||r.serial_no||r.id||"");const img=firstImage(r);if(!id||!img)continue;out.push({id:`npm:${id}`,title:r.ArticleSubject||r.title||id,creator:"National Palace Museum, Taipei",family:r.CateGory||"collection",image:img,sourceURL:`https://digitalarchive.npm.gov.tw/opendata/Pub/Detail?mode=full&dep=P&id=${encodeURIComponent(id)}`,rightsLabel:"CC0 1MP preferred · National Palace Museum"})}if(!out.length)throw new Error("NPM API returned metadata but no usable image URLs; detail mapping requires live-key verification");return usable(out,count)}
 async function collectKorea(seed,count){const key=Netlify.env.get("NFM_KOREA_API_KEY"),endpoint=Netlify.env.get("NFM_KOREA_API_URL");if(!key)throw new Error("NFM_KOREA_API_KEY is not configured");if(!endpoint)throw new Error("NFM_KOREA_API_URL is not configured; use the approved endpoint supplied with the service application");const u=new URL(endpoint);u.searchParams.set("serviceKey",key);u.searchParams.set("pageNo",String(1+(Math.abs(seed)%50)));u.searchParams.set("numOfRows",String(Math.max(count*2,30)));u.searchParams.set("type","json");const s=await getJSON(u.href,12000);const candidates=s?.response?.body?.items?.item||s?.items||s?.data||[];const list=Array.isArray(candidates)?candidates:[candidates];const out=[];for(const r of list){const img=firstImage(r);if(!img)continue;const id=String(r.id||r.resourceId||r.identifier||hash(img));out.push({id:`nfm:${id}`,title:r.title||r.resourceName||r.name||"Korean Folk Archive Photo",creator:"National Folk Museum of Korea",family:r.subject||r.keyword||"folk-archive",image:img,sourceURL:r.url||r.link||"https://www.data.go.kr/data/15104971/openapi.do",rightsLabel:"Public-data use unrestricted · verify per-record attribution metadata"})}if(!out.length)throw new Error("Korea API returned no usable image URLs; field mapping requires live-key verification");return usable(out,count)}
 
-export const DIRECT_ADAPTERS = new Set(["met","nasa","smithsonian","loc","noaa","usgs","aic","cma","nga","nhb_singapore","nhcp_memory","npm_taiwan","nfm_korea"]);
-export const CATALOGUE_ADAPTERS = new Set(["ndl_imagebank","hk_old_photos","khastara_id"]);
+export const DIRECT_ADAPTERS = new Set(["met","nasa","smithsonian","loc","noaa","usgs","aic","cma","nga","nhb_singapore","nhcp_memory","ndl_imagebank","getty","npm_taiwan","nfm_korea"]);
+export const CATALOGUE_ADAPTERS = new Set(["hk_old_photos","khastara_id"]);
 export async function collectSource({adapterKey,sourceName,origin,seed,count}){
   const k=clean(adapterKey).toLowerCase();
   if(k==="met")return collectMet(seed,count);
@@ -43,6 +98,8 @@ export async function collectSource({adapterKey,sourceName,origin,seed,count}){
   if(k==="cma")return collectCMA(seed,count);
   if(k==="nhb_singapore")return collectSingapore(seed,count);
   if(k==="nhcp_memory")return collectNHCP(seed,count);
+  if(k==="ndl_imagebank")return collectNDL(seed,count);
+  if(k==="getty")return collectGetty(seed,count);
   if(k==="npm_taiwan")return collectNPM(seed,count);
   if(k==="nfm_korea")return collectKorea(seed,count);
   if(CATALOGUE_ADAPTERS.has(k))return collectCatalogue(sourceName,seed,count);
