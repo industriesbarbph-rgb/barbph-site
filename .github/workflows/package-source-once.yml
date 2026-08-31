@@ -1,0 +1,28 @@
+name: Package BarbPH Source Once
+
+on:
+  push:
+    paths:
+      - ".github/workflows/package-source-once.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@v4
+
+      - name: Create source archive
+        run: |
+          zip -r barbph-source.zip . -x ".git/*" "barbph-source.zip"
+
+      - name: Upload source artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: barbph-production-source
+          path: barbph-source.zip
+          if-no-files-found: error
+          retention-days: 1
