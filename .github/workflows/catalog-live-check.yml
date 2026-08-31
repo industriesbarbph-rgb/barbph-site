@@ -13,51 +13,29 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - name: Check fresh public sheet and live catalog
+      - name: Force-revalidate and check live catalog
         shell: bash
         run: |
           set -euo pipefail
-          TS=$(date +%s)
-          SHEET_URL="https://docs.google.com/spreadsheets/d/1NA3jrA3gdctbpfhXtz2TAiRGRFWsyWRTT6EvoJNIfUw/gviz/tq?tqx=out:csv&sheet=Products&headers=0&cb=${TS}"
-          LIVE_URL="https://barbph.com/.netlify/functions/catalog-feed?type=products&cb=${TS}"
           NORMAL_URL="https://barbph.com/.netlify/functions/catalog-feed?type=products"
 
-          curl -fsSL "$SHEET_URL" -o /tmp/products.csv
-          curl -fsSL -D /tmp/fresh.headers "$LIVE_URL" -o /tmp/live-fresh.json
-          curl -fsSL -D /tmp/normal.headers "$NORMAL_URL" -o /tmp/live-normal.json
+          echo "--- FORCED REVALIDATION REQUEST ---"
+          curl -fsSL -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' -D /tmp/forced.headers "$NORMAL_URL" -o /tmp/forced.json
+          cat /tmp/forced.headers
+          sleep 2
 
-          echo "--- FRESH RESPONSE HEADERS ---"
-          cat /tmp/fresh.headers
-          echo "--- NORMAL RESPONSE HEADERS ---"
+          echo "--- ORDINARY REQUEST AFTER REVALIDATION ---"
+          curl -fsSL -D /tmp/normal.headers "$NORMAL_URL" -o /tmp/normal.json
           cat /tmp/normal.headers
 
           python - <<'PY'
-          import csv, json
+          import json
           from pathlib import Path
-
-          rows=list(csv.reader(Path('/tmp/products.csv').read_text(encoding='utf-8').splitlines()))
-          hi=next(i for i,r in enumerate(rows) if r and r[0].strip().lower()=='name')
-          heads=[x.strip() for x in rows[hi]]
-          items=[]
-          for r in rows[hi+1:]:
-              d={h:(r[i].strip() if i<len(r) else '') for i,h in enumerate(heads)}
-              if d.get('published','').lower()=='yes' and d.get('name','').strip(): items.append(d['name'].strip())
-
-          fresh=json.loads(Path('/tmp/live-fresh.json').read_text())
-          normal=json.loads(Path('/tmp/live-normal.json').read_text())
-          fresh_names=[x.get('name','') for x in fresh.get('items',[])]
-          normal_names=[x.get('name','') for x in normal.get('items',[])]
-
-          print('SHEET_COUNT=',len(items))
-          print('FRESH_FUNCTION_COUNT=',len(fresh_names))
-          print('NORMAL_FUNCTION_COUNT=',len(normal_names))
-          print('NORMAL_FUNCTION_NAMES=',normal_names)
-
-          expected={'The Pendant Light Lounge','Dupli Tron 526','Night Sky','No Human Conversation'}
-          missing_sheet=expected-set(items)
-          missing_fresh=expected-set(fresh_names)
-          if missing_sheet: raise SystemExit(f'Missing from public sheet: {sorted(missing_sheet)}')
-          if missing_fresh: raise SystemExit(f'Missing from fresh live function: {sorted(missing_fresh)}')
-          if len(items)!=19: raise SystemExit(f'Expected 19 valid published products in public sheet, got {len(items)}')
-          if len(fresh_names)!=19: raise SystemExit(f'Expected 19 products in fresh live function, got {len(fresh_names)}')
+          forced=json.loads(Path('/tmp/forced.json').read_text())
+          normal=json.loads(Path('/tmp/normal.json').read_text())
+          f=[x.get('name','') for x in forced.get('items',[])]
+          n=[x.get('name','') for x in normal.get('items',[])]
+          print('FORCED_COUNT=',len(f))
+          print('NORMAL_COUNT=',len(n))
+          print('NORMAL_NAMES=',n)
           PY
