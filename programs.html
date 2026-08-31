@@ -376,7 +376,7 @@
 <main>
 <div class="filter-tags" id="filter-tags">
 <!-- BARBPH-AUTOGEN:PROGRAMS-FILTERS-START -->
-<button class="filter-tag active" data-filter="all">All</button>
+<button class="filter-tag active" data-filter="all" type="button" onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSc-BEWzz5ipuGMjwVwNHZm-YLGZfEwRqw-OmFK_vL9EEkE0hg/viewform?usp=preview','_blank','noopener,noreferrer')">BOOK A SESSION</button>
 <!-- BARBPH-AUTOGEN:PROGRAMS-FILTERS-END -->
 </div>
 <section class="grid" id="programs-grid">
@@ -592,8 +592,6 @@
       : `<div class="card-photo card-photo--empty" aria-hidden="true"></div>`;
     const links=[];
     if(x.story_link) links.push(`<a href="${esc(x.story_link)}" target="_blank" rel="noopener">Read the story</a>`);
-    const sessionLink = x.book_a_session || x.try_link;
-    if(sessionLink) links.push(`<a href="${esc(sessionLink)}" target="_blank" rel="noopener">Book A Session</a>`);
     if(x.buy_link) links.push(`<a href="${esc(x.buy_link)}" target="_blank" rel="noopener" class="primary">Buy it</a>`);
     return `<article class="card">${media}<div class="card-body"><div class="card-name">${esc(x.name)}</div><div class="card-desc">${esc(x.description)}</div><div class="card-actions">${links.join('')}</div></div></article>`;
   };
