@@ -1,0 +1,42 @@
+name: One-shot BarbPH Reconcile
+
+on:
+  push:
+    branches:
+      - repair-docs-2026-08-31
+    paths:
+      - .reconcile-trigger
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repair branch
+        uses: actions/checkout@v4
+        with:
+          ref: repair-docs-2026-08-31
+          fetch-depth: 0
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run reconciliation
+        run: python3 scripts/one-shot-reconcile.py
+
+      - name: Commit reconciled files to repair branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git reset .reconcile-trigger .github/workflows/one-shot-reconcile.yml scripts/one-shot-reconcile.py
+          if git diff --cached --quiet; then
+            echo "No reconciled file changes produced."
+            exit 1
+          fi
+          git commit -m "Reconcile current BarbPH system and repair catalog"
+          git push origin HEAD:repair-docs-2026-08-31
