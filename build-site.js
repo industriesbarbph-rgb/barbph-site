@@ -375,7 +375,7 @@ function preflight() {
   }
 
   const publicFiles = walk(OUT);
-  const leaks = publicFiles.filter(f => /\.(md|txt)$/i.test(f) || INTERNAL_HTML.test(path.basename(f)) || f.includes(`${path.sep}overnight-work-log${path.sep}`));
+  const leaks = publicFiles.filter(f => ((/\.(md|txt)$/i.test(f)) && path.basename(f).toLowerCase() !== 'robots.txt') || INTERNAL_HTML.test(path.basename(f)) || f.includes(`${path.sep}overnight-work-log${path.sep}`));
   if (leaks.length) throw new Error(`Internal files leaked into dist:\n${leaks.join('\n')}`);
 
   const deployedFunctionFiles = walk(FUNCTIONS_OUT).filter(f => /\.(mjs|js|cjs)$/i.test(f));

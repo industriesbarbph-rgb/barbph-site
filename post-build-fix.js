@@ -54,7 +54,7 @@ const publicFiles = walk('dist');
 const leaks = publicFiles.filter(file => {
   const rel = path.relative('dist', file).replaceAll('\\', '/');
   return /(^|\/)(?:overnight-work-log)(\/|$)/i.test(rel)
-    || /\.(?:md|txt|ya?ml)$/i.test(rel)
+    || (/\.(?:md|txt|ya?ml)$/i.test(rel) && rel.toLowerCase() !== 'robots.txt')
     || /(?:^|[-_.])(test|prototype|diagnostic)(?:[-_.]|$)/i.test(path.basename(rel))
     || /^(?:partnerships|overnight-work-ruler|systems)\.html$/i.test(path.basename(rel));
 });
