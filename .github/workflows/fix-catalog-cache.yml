@@ -1,0 +1,49 @@
+name: Fix BarbPH Catalog Cache
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/fix-catalog-cache.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch catalog freshness rules
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('build-site.js')
+          s=p.read_text()
+          old='function json(body,status=200){const ok=status===200;return Response.json(body,{status,headers:{"cache-control":ok?"public, max-age=60":"no-store","Netlify-CDN-Cache-Control":ok?"public, durable, s-maxage=3600, stale-while-revalidate=3600":"no-store"}})}'
+          new='function json(body,status=200){const ok=status===200;return Response.json(body,{status,headers:{"cache-control":ok?"public, max-age=0, must-revalidate":"no-store","Netlify-CDN-Cache-Control":ok?"public, durable, s-maxage=60":"no-store"}})}'
+          if old not in s:
+              raise SystemExit('Expected one-hour cache transform not found')
+          s=s.replace(old,new,1)
+          s=s.replace("html = html.replace(\"fetch('/.netlify/functions/catalog-feed?type=products', {cache:'no-store'})\", \"fetch('/.netlify/functions/catalog-feed?type=products')\");", "html = html.replace(\"fetch('/.netlify/functions/catalog-feed?type=products')\", \"fetch('/.netlify/functions/catalog-feed?type=products', {cache:'no-store'})\");")
+          s=s.replace("html = html.replace(\"fetch('/.netlify/functions/content-feed', {cache:'no-store'})\", \"fetch('/.netlify/functions/content-feed')\");", "html = html.replace(\"fetch('/.netlify/functions/content-feed')\", \"fetch('/.netlify/functions/content-feed', {cache:'no-store'})\");")
+          p.write_text(s)
+          PY
+          node --check build-site.js
+          node build-site.js
+          grep -q 's-maxage=60' dist-functions/catalog-feed.mjs
+          ! grep -q 'stale-while-revalidate' dist-functions/catalog-feed.mjs
+          grep -q "cache:'no-store'" dist/products.html
+      - name: Commit freshness fix
+        shell: bash
+        run: |
+          git config user.name "barbph-cache-fix"
+          git config user.email "actions@github.com"
+          git add build-site.js
+          if git diff --cached --quiet; then
+            echo "No change needed."
+          else
+            git commit -m "Fix BarbPH admin catalog freshness [skip netlify]"
+            git push
+          fi
