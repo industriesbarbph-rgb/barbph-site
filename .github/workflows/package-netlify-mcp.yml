@@ -1,0 +1,29 @@
+name: Package Netlify Deploy Runtime
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/package-netlify-mcp.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Netlify deploy runtime
+        shell: bash
+        run: |
+          mkdir runtime
+          cd runtime
+          npm init -y >/dev/null 2>&1
+          npm install --no-audit --no-fund @netlify/mcp@latest
+          node -e "const p=require('./node_modules/@netlify/mcp/package.json'); console.log(JSON.stringify({version:p.version,bin:p.bin},null,2))" > RUNTIME_INFO.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: netlify-mcp-runtime
+          path: runtime
+          include-hidden-files: true
+          retention-days: 1
