@@ -32,28 +32,49 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Build catalog from safe public control sheet
+      - name: Point runtime reads to the safe public control sheet
         run: |
           node - <<'NODE'
           const fs = require('fs');
-          const oldId = '1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM';
+          const path = require('path');
           const publicId = '1NA3jrA3gdctbpfhXtz2TAiRGRFWsyWRTT6EvoJNIfUw';
-          const source = fs.readFileSync('build-catalog.js', 'utf8').replaceAll(oldId, publicId);
-          fs.writeFileSync('.catalog-build.mjs', source);
-          NODE
-          node .catalog-build.mjs
-          rm -f .catalog-build.mjs
+          const publicThemeGid = '2000682467';
+          const buildPath = 'build-catalog.js';
+          const buildText = fs.readFileSync(buildPath, 'utf8');
+          const legacy = buildText.match(/\bconst\s+SHEET_ID\s*=\s*["']([A-Za-z0-9_-]+)["']/)?.[1] || publicId;
 
-      - name: Commit updated catalog pages only when data changed
+          function walk(dir) {
+            const out = [];
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              const p = path.join(dir, entry.name);
+              if (entry.isDirectory()) out.push(...walk(p));
+              else if (entry.isFile()) out.push(p);
+            }
+            return out;
+          }
+
+          const files = [buildPath, ...walk('netlify/functions').filter(f => /\.(?:mjs|js|cjs)$/i.test(f))];
+          for (const file of files) {
+            let text = fs.readFileSync(file, 'utf8');
+            text = text.replaceAll(legacy, publicId);
+            text = text.replace(/gid=\d+/g, m => m === 'gid=342757810' ? `gid=${publicThemeGid}` : m);
+            fs.writeFileSync(file, text);
+          }
+          NODE
+
+      - name: Build catalog from safe public control sheet
+        run: node build-catalog.js
+
+      - name: Commit safe control migration and catalog changes only when needed
         run: |
           git config user.name "barbph-auto-build"
           git config user.email "actions@github.com"
 
-          git add products.html programs.html
+          git add build-catalog.js netlify/functions products.html programs.html
 
           if git diff --cached --quiet; then
-            echo "No catalog changes to commit."
+            echo "No catalog or control-source changes to commit."
           else
-            git commit -m "Auto-rebuild Products and Programs from safe public control sheet [skip netlify]"
+            git commit -m "Use safe public control sheet for BarbPH runtime data [skip netlify]"
             git push
           fi

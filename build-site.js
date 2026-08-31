@@ -6,7 +6,6 @@ const ROOT = process.cwd();
 const OUT = path.join(ROOT, 'dist');
 const FUNCTIONS_OUT = path.join(ROOT, 'dist-functions');
 const SOURCE_FUNCTIONS = path.join(ROOT, 'netlify', 'functions');
-const OLD_SHEET_ID = '1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM';
 const PUBLIC_SHEET_ID = '1NA3jrA3gdctbpfhXtz2TAiRGRFWsyWRTT6EvoJNIfUw';
 const OLD_THEME_SOURCES_GID = '342757810';
 const PUBLIC_THEME_SOURCES_GID = '2000682467';
@@ -25,7 +24,8 @@ const DIR_INTERNAL = new Set([
   'dist', 'dist-functions'
 ]);
 
-const INTERNAL_HTML = /(?:^|[-_.])(test|prototype|diagnostic)(?:[-_.]|$)|^partnerships\.html$|^overnight-work-ruler\.html$/i;
+const INTERNAL_HTML = /(?:^|[-_.])(test|prototype|diagnostic)(?:[-_.]|$)|^partnerships\.html$|^overnight-work-ruler\.html$|^systems\.html$/i;
+const INTERNAL_FUNCTIONS = new Set(['google-form-probe.mjs', 'randomizer-tantrum-lab.mjs']);
 
 function resetDir(dir) {
   fs.rmSync(dir, { recursive: true, force: true });
@@ -61,12 +61,19 @@ function copyPublicTree(src, dst, rel = '') {
   }
 }
 
+function retargetSheetRefs(text) {
+  text = text.replace(/(\bconst\s+(?:SID|SHEET_ID)\s*=\s*["'])[A-Za-z0-9_-]+(["'])/g, `$1${PUBLIC_SHEET_ID}$2`);
+  text = text.replace(/(docs\.google\.com\/spreadsheets\/d\/)[A-Za-z0-9_-]+/g, `$1${PUBLIC_SHEET_ID}`);
+  text = text.replaceAll(`gid=${OLD_THEME_SOURCES_GID}`, `gid=${PUBLIC_THEME_SOURCES_GID}`);
+  return text;
+}
+
 function runCatalogBuild() {
   const source = path.join(ROOT, 'build-catalog.js');
   if (!fs.existsSync(source)) return;
   const temp = path.join(ROOT, '.barbph-catalog-build.mjs');
   let code = fs.readFileSync(source, 'utf8');
-  code = code.replaceAll(OLD_SHEET_ID, PUBLIC_SHEET_ID);
+  code = retargetSheetRefs(code);
   fs.writeFileSync(temp, code);
   try {
     execFileSync(process.execPath, [temp], { cwd: ROOT, stdio: 'inherit' });
@@ -80,11 +87,10 @@ function rewriteFunctions() {
   copyRecursive(SOURCE_FUNCTIONS, FUNCTIONS_OUT);
   const files = walk(FUNCTIONS_OUT).filter(f => /\.(?:mjs|js|cjs|json)$/i.test(f));
   for (const file of files) {
-    let text = fs.readFileSync(file, 'utf8');
-    text = text.replaceAll(OLD_SHEET_ID, PUBLIC_SHEET_ID);
-    text = text.replaceAll(`gid=${OLD_THEME_SOURCES_GID}`, `gid=${PUBLIC_THEME_SOURCES_GID}`);
-
     const name = path.basename(file);
+    if (INTERNAL_FUNCTIONS.has(name)) { fs.rmSync(file, { force: true }); continue; }
+    let text = retargetSheetRefs(fs.readFileSync(file, 'utf8'));
+
     if (name === 'catalog-feed.mjs' || name === 'content-feed.mjs') {
       text = text.replace(
         'function json(body,status=200){return Response.json(body,{status,headers:{"cache-control":"no-store"}})}',
@@ -373,8 +379,18 @@ function preflight() {
   if (leaks.length) throw new Error(`Internal files leaked into dist:\n${leaks.join('\n')}`);
 
   const deployedFunctionFiles = walk(FUNCTIONS_OUT).filter(f => /\.(mjs|js|cjs)$/i.test(f));
-  const oldRefs = deployedFunctionFiles.filter(f => fs.readFileSync(f, 'utf8').includes(OLD_SHEET_ID));
-  if (oldRefs.length) throw new Error(`Old admin Sheet ID remains in deployed functions:\n${oldRefs.join('\n')}`);
+  const wrongSheetRefs = deployedFunctionFiles.filter(file => {
+    const text = fs.readFileSync(file, 'utf8');
+    const ids = [
+      ...[...text.matchAll(/\bconst\s+(?:SID|SHEET_ID)\s*=\s*["']([A-Za-z0-9_-]+)["']/g)].map(m => m[1]),
+      ...[...text.matchAll(/docs\.google\.com\/spreadsheets\/d\/([A-Za-z0-9_-]+)/g)].map(m => m[1])
+    ];
+    return ids.some(id => id !== PUBLIC_SHEET_ID);
+  });
+  if (wrongSheetRefs.length) throw new Error(`A deployed function still points to a non-public control sheet:\n${wrongSheetRefs.join('\n')}`);
+  for (const internal of INTERNAL_FUNCTIONS) {
+    if (fs.existsSync(path.join(FUNCTIONS_OUT, internal))) throw new Error(`Internal diagnostic function leaked into production: ${internal}`);
+  }
 
   const home = fs.readFileSync(path.join(OUT, 'index.html'), 'utf8');
   const requiredHomeStrings = [
