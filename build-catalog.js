@@ -8,6 +8,7 @@ import fs from "node:fs";
 import https from "node:https";
 
 const SHEET_ID = "1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM";
+const PROGRAMS_BOOKING_URL = "https://docs.google.com/forms/d/e/1FAIpQLSc-BEWzz5ipuGMjwVwNHZm-YLGZfEwRqw-OmFK_vL9EEkE0hg/viewform?usp=preview";
 
 const TARGETS = [
   {
@@ -77,12 +78,7 @@ function cardHTML(item, tab) {
     buttons.push(`<a href="${escapeHtml(item.story_link)}" target="_blank" rel="noopener">Read the story</a>`);
   }
 
-  if (tab === "Programs") {
-    const sessionLink = item["Book A Session"] || item.book_a_session || item.try_link || "";
-    if (sessionLink) {
-      buttons.push(`<a href="${escapeHtml(sessionLink)}" target="_blank" rel="noopener">Book A Session</a>`);
-    }
-  } else if (item.try_link) {
+  if (tab !== "Programs" && item.try_link) {
     buttons.push(`<a href="${escapeHtml(item.try_link)}" target="_blank" rel="noopener">Try it</a>`);
   }
 
@@ -137,6 +133,14 @@ function fetchCSV(url) {
   });
 }
 
+function applyProgramsBookingButton(page) {
+  const button = `<button class="filter-tag active" data-filter="all" type="button" onclick="window.open('${PROGRAMS_BOOKING_URL}','_blank','noopener,noreferrer')">BOOK A SESSION</button>`;
+  return page.replace(
+    /<button class="filter-tag active"[^>]*>(?:All|Book A Session|BOOK A SESSION)<\/button>/i,
+    button
+  );
+}
+
 async function buildTarget({ tab, file, startMarker, endMarker }) {
   console.log(`Fetching "${tab}" tab...`);
   if (!fs.existsSync(file)) throw new Error(`Could not find ${file}`);
@@ -144,6 +148,10 @@ async function buildTarget({ tab, file, startMarker, endMarker }) {
   let page = fs.readFileSync(file, "utf8");
   if (!page.includes(startMarker)) throw new Error(`Could not find START marker for "${tab}" inside ${file}`);
   if (!page.includes(endMarker)) throw new Error(`Could not find END marker for "${tab}" inside ${file}`);
+
+  if (tab === "Programs") {
+    page = applyProgramsBookingButton(page);
+  }
 
   const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tab)}`;
   const rows = parseCSV(await fetchCSV(csvUrl));
