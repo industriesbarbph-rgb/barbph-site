@@ -6,7 +6,7 @@ on:
       - ".github/workflows/preflight-once.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   preflight:
@@ -19,6 +19,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+
+      - name: Repair robots.txt false-positive in privacy guard
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const file = 'build-site.js';
+          let text = fs.readFileSync(file, 'utf8');
+          const oldLine = "  const leaks = publicFiles.filter(f => /\\.(md|txt)$/i.test(f) || INTERNAL_HTML.test(path.basename(f)) || f.includes(`${path.sep}overnight-work-log${path.sep}`));";
+          const newLine = "  const leaks = publicFiles.filter(f => ((/\\.(md|txt)$/i.test(f)) && path.basename(f).toLowerCase() !== 'robots.txt') || INTERNAL_HTML.test(path.basename(f)) || f.includes(`${path.sep}overnight-work-log${path.sep}`));";
+          if (!text.includes(oldLine) && !text.includes(newLine)) throw new Error('Expected privacy-guard line was not found.');
+          text = text.replace(oldLine, newLine);
+          fs.writeFileSync(file, text);
+          NODE
 
       - name: Run production build and built-in preflight
         run: |
@@ -45,6 +58,18 @@ jobs:
           grep -F 'BarbPH | Digital Assets, Coaching Programs, Multidisciplinary Arts & Interactive Builds' dist/index.html
           grep -F 'https://barbph.com/sitemap.xml' dist/robots.txt
           grep -F 'https://barbph.com/products' dist/sitemap.xml
+
+      - name: Commit guard fix only after all checks pass
+        run: |
+          git config user.name "barbph-preflight"
+          git config user.email "actions@github.com"
+          git add build-site.js
+          if git diff --cached --quiet; then
+            echo "Guard fix already present."
+          else
+            git commit -m "Fix BarbPH production privacy preflight guard [skip netlify]"
+            git push
+          fi
 
       - name: Package passed build for audit
         run: zip -qr barbph-preflight-output.zip dist dist-functions netlify.toml
