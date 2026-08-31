@@ -23,8 +23,13 @@ jobs:
           NORMAL_URL="https://barbph.com/.netlify/functions/catalog-feed?type=products"
 
           curl -fsSL "$SHEET_URL" -o /tmp/products.csv
-          curl -fsSL "$LIVE_URL" -o /tmp/live-fresh.json
-          curl -fsSL "$NORMAL_URL" -o /tmp/live-normal.json
+          curl -fsSL -D /tmp/fresh.headers "$LIVE_URL" -o /tmp/live-fresh.json
+          curl -fsSL -D /tmp/normal.headers "$NORMAL_URL" -o /tmp/live-normal.json
+
+          echo "--- FRESH RESPONSE HEADERS ---"
+          cat /tmp/fresh.headers
+          echo "--- NORMAL RESPONSE HEADERS ---"
+          cat /tmp/normal.headers
 
           python - <<'PY'
           import csv, json
@@ -44,9 +49,7 @@ jobs:
           normal_names=[x.get('name','') for x in normal.get('items',[])]
 
           print('SHEET_COUNT=',len(items))
-          print('SHEET_NAMES=',items)
           print('FRESH_FUNCTION_COUNT=',len(fresh_names))
-          print('FRESH_FUNCTION_NAMES=',fresh_names)
           print('NORMAL_FUNCTION_COUNT=',len(normal_names))
           print('NORMAL_FUNCTION_NAMES=',normal_names)
 
