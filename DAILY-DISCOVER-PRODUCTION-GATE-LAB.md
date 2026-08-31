@@ -1,20 +1,25 @@
 # Daily Discover Production Gate Lab
 
-Status: implemented as `daily-discover-production-test.html`.
+Current reconciliation: **2026-08-31 (Manila)**
 
-This is a `noindex,nofollow` internal diagnostic page. It is not the future BarbPH homepage.
+Status: implemented as `daily-discover-production-test.html` and updated for the current continuous source engine.
 
-## What the page can do
-- Refresh the read-only production readiness status.
-- Show whether production is armed.
-- Show the Barb Originals reserve count.
-- Show shared-history day count.
-- Show current readiness blockers.
-- Dry-run each of the 9 confirmed source worlds through the production engine using `lab=1`.
-- Force a source tantrum using `force_primary_fail=1` to verify the Barb Originals takeover path once the reserve is populated.
+This is a `noindex,nofollow` internal diagnostic page.
+
+## What the page does
+
+- Reads `/.netlify/functions/daily-discover-readiness`.
+- Shows current configured / production-ready / enabled source counts.
+- Shows Barb Originals reserve readiness.
+- Shows current daily lock/history information when available.
+- Builds source dry-run buttons from the readiness response instead of a hard-coded nine-source list.
+- Calls `/.netlify/functions/daily-stream?lab=1&force_source=...` for isolated source tests.
+- Uses `force_fail=1` for an intentional failure/reserve test.
 
 ## Safety behavior
-Lab-mode runs do not lock the Manila day and do not write production history. A forced tantrum returning `SAFE_FALLBACK_REQUIRED` is expected while Barb Originals has fewer than 3 enabled images.
+
+Lab mode uses isolated deploy-store state. It does not replace the production Manila-day control or production stream history.
 
 ## Page
+
 `/daily-discover-production-test.html`

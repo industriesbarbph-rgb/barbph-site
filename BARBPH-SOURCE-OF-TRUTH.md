@@ -1,32 +1,80 @@
-# BarbPH — Source of Truth
+# BarbPH - Source of Truth
 
-Last reconciled: **2026-08-27 (Manila)**
+Last reconciled: **2026-08-31 (Manila)**
 
-This file is the master current-state record for the BarbPH site build. Older dated specs and verification notes remain historical evidence; when they conflict with this file on current state, use this file plus the relevant locked spec.
+This is the master current-state record for the BarbPH site. Older dated specs, commits, labs, and screenshots remain historical evidence. When an older document conflicts with this file on current production state, this file and the live implementation take priority.
 
 ## Status vocabulary
 
-- **PROVEN** — verified in deployed/prod-capable state or by a real production-state test.
-- **IMPLEMENTED** — present in current source.
-- **PENDING** — intentionally unfinished, not visually approved, or still requires an operational decision.
-- **HISTORICAL** — accurate for the date recorded but no longer the current state.
+- **PRODUCTION** - currently part of the public production architecture.
+- **READY** - technically eligible/validated but still governed by live Admin Sheet controls.
+- **HOLD / BUILDING / PARKED / PENDING** - intentionally excluded from automatic production duty.
+- **HISTORICAL** - accurate for an earlier stage but superseded in current production.
+- **PLANNED** - approved idea/specification that is not yet production.
 
-## Current production posture
+## Production posture
 
-- Netlify project: `barbphproducts`.
-- GitHub repo: `industriesbarbph-rgb/barbph-site`.
-- Main branch is connected to Netlify deployment.
-- A production `index.html` homepage now exists. Earlier notes stating that no official homepage existed are **HISTORICAL**.
-- Netlify project state was checked as **ready** during the Aug 27 reconciliation.
-- Internal diagnostic/lab pages remain separate from ordinary public navigation and must continue to respect their noindex/test-surface role where configured.
+- Public domain: `https://barbph.com/`
+- GitHub repository: `industriesbarbph-rgb/barbph-site`
+- Production branch: `main`
+- Repository history records `main` as connected to the Netlify production project `barbphproducts`; therefore treat a main-branch push as production-deploy-capable.
+- Production `index.html` exists.
+- Internal labs remain separate from normal visitor navigation and must keep `noindex,nofollow` behavior where applicable.
 
-## Daily Discover — source architecture
+## Public surfaces
 
-The source accounting is locked as:
+- `/` - homepage and Daily Discover world
+- `/products` - Products catalog
+- `/programs` - Programs catalog
+- `/publications` - Publications / Bulletin surface
+- `/partnership` - Partnership portal
+- `/systems` - redirects to the homepage Systems & Transmission Logs view
+- EE / Everything Else - external published Google Slides destination linked from the homepage
 
-**15 total entries = 9 confirmed lab-success public sources + 5 parked/waiting public worlds + 1 emergency reserve.**
+## Admin Sheet control plane
 
-### Nine confirmed public sources
+The `barbph-admin` Google Sheet is an active control/data plane, not merely a planning file.
+
+Current production integrations include:
+
+- Products and Programs catalog data
+- Publications and The Bulletin
+- Theme Sources
+- Sponsor Takeovers
+- Theme Override
+- Partnership Config
+- Barb Originals reserve
+- related source/reporting fields
+
+Products and Programs are available through the live `catalog-feed` function and are also baked into static fallback blocks by the hourly GitHub catalog rebuild.
+
+## Catalog engine - reconciled August 31
+
+The catalog rebuild workflow is scheduled hourly and runs `node build-catalog.js`.
+
+The failure found on August 31 was a module mismatch: `package.json` declares `type: module`, while `build-catalog.js` still used CommonJS `require(...)`. The repair changes the builder to Node ES-module imports and normalizes GitHub blob URLs to raw media URLs.
+
+Programs also had a separate live-rendering defect: its browser-side catalog renderer discarded `photo_url` and always emitted an empty photo frame. That renderer is repaired so live Program cards use the same image behavior as Products.
+
+## Homepage priority controller
+
+Locked priority:
+
+1. Sponsor Takeover
+2. Theme Override
+3. Daily Discover
+
+The controller uses Manila date boundaries. When neither a valid sponsor nor valid theme override wins, the homepage points to `/.netlify/functions/daily-stream-public`.
+
+## Daily Discover - current continuous architecture
+
+Daily Discover now uses the continuous engine (`daily-stream.mjs` plus the public cached wrapper) rather than relying only on the earlier fixed daily-set engine.
+
+### Live Theme Sources accounting
+
+Current configured Theme Source entries: **21**.
+
+**Enabled + production-ready (11):**
 
 - The Met Open Access
 - NASA
@@ -37,107 +85,96 @@ The source accounting is locked as:
 - Art Institute of Chicago
 - Cleveland Museum of Art
 - National Gallery of Art
+- NHCP National Memory Project
+- National Heritage Board Singapore
 
-The current schedule code explicitly whitelists these same nine sources in its `PASSED` set. Production eligibility additionally requires live `Theme Sources` controls to have `enabled=yes` and positive weight. Historical Aug 21 evidence proved NASA production duty and a real Manila-midnight rollover, but live spreadsheet controls remain the authority for current arming.
+**Disabled / non-production (10):**
 
-### Five parked/waiting public worlds
+- Europeana - HOLD
+- New York Public Library - HOLD
+- Biodiversity Heritage Library - HOLD
+- Getty Open Content - HOLD
+- Wildcard - HOLD
+- National Diet Library - BUILDING
+- National Folk Museum of Korea - PARKED
+- National Palace Museum - PENDING_API_KEY
+- Old Photos of Hong Kong - INGESTION_REQUIRED
+- Khastara / National Library of Indonesia - BUILDING
 
-- Europeana — adapter built; requires `EUROPEANA_API_KEY`.
-- New York Public Library — adapter built; requires `NYPL_API_TOKEN`.
-- Biodiversity Heritage Library — adapter built; requires `BHL_API_KEY`.
-- Getty Open Content — rights-safe retrieval has not yet yielded enough explicit CC0 image records.
-- Wildcard — intentionally parked until a pre-approved rights-safe pool is defined.
+Barb Originals is maintained separately as the emergency reserve and is not counted among the 21 Theme Source entries.
 
-Parked/unverified worlds must not enter automatic production rotation without later explicit validation.
+### Eligibility rule
 
-### Barb Originals emergency reserve
+A normal source is automatically eligible only when all are true:
 
-Barb Originals is the single emergency reserve, not a normal weighted public source.
+- `enabled=yes`
+- weight is above zero
+- `adapter_key` is present
+- `production_status` is `PRODUCTION_READY` or `PRODUCTION`
 
-- Minimum readiness threshold: 3 enabled unique valid images.
-- Reserve readiness was documented as proven/ready after the Aug 20 snapshot.
-- If the scheduled public source cannot safely serve the required set, production may switch the Manila day to Barb Originals.
-- If the reserve also cannot serve safely, the system must prefer a hard safe fallback rather than questionable third-party media.
+The readiness function reports unsafe enabled rows rather than silently permitting them.
 
-See `DAILY-DISCOVER-SOURCE-STATUS.md`, `DAILY-DISCOVER-PRODUCTION-ENGINE.md`, `DAILY-DISCOVER-PRODUCTION-READINESS.md`, and `DAILY-DISCOVER-EMERGENCY-RESERVE.md`.
+### Continuous behavior
 
-## Production verification retained from Aug 20→21
+For each Manila day the engine locks one scheduled source. It then serves continuous batches from that source using Admin Sheet batch/rotation/refresh settings.
 
-The Daily Discover production engine passed a real Manila-date rollover:
+The current resilience order is:
 
-- Aug 20 was retained in shared history.
-- The first Aug 21 production request created a new locked day set.
-- NASA was the scheduled and served source in primary mode for that verification.
-- A separate/incognito request returned the same persisted daily set with `cache_hit:true`.
-- Shared daily locking and cross-day history were therefore proven in the observed production path.
+1. use a still-fresh current batch;
+2. refresh from the same scheduled source;
+3. on degradation, use same-source last-known-good material during retry backoff when available;
+4. if safe same-source material is unavailable, use Barb Originals;
+5. if neither path is safe, return `SAFE_FALLBACK_REQUIRED` rather than questionable institutional media.
 
-These statements are retained as historical verification evidence; they do not by themselves claim the live Aug 27 source-control values.
+The engine can recover from degraded/cache/reserve mode back to the scheduled source after a later successful retrieval. This supersedes the older whole-day reserve-takeover rule.
 
-## Satellite Live Telecast / transmission schedule
+If an administrator disables or de-authorizes the scheduled source during its day, the engine treats that as an Admin hold and does not continue serving that institution's cached material as though approval still existed.
 
-Implemented in the current BarbPH source:
+## Watchtower interlude
 
-- `satellite-tab.css`
-- `satellite-tab.js`
-- `satellite-tab.png`
-- `netlify/functions/daily-discover-schedule.mjs`
+Watchtower is integrated as an hourly interlude around the top of the hour. The browser controller preloads the frame, uses a bounded readiness/fail-safe window, shows the interlude for the configured period, unloads it afterward, and requests a Daily Discover resynchronization when BarbPH resumes.
 
-The feature places a Satellite tab after EE and exposes a Yesterday / Today / Tomorrow transmission schedule derived from Daily Discover production/history state.
+## Systems & Transmission Logs
 
-The schedule function:
+Current BarbPH includes a public operational ledger backed by persistent state. Public events are sanitized and include source/transmission conditions such as selection, refresh, degradation, same-source cache use, Barb Originals use, recovery, Watchtower transitions, Admin hold, and unresolved conditions.
 
-- uses the same nine-source approved whitelist;
-- reports scheduled versus served source and fallback state;
-- forecasts Tomorrow from eligible enabled sources;
-- reads an optional publication URL from Theme Sources;
-- does not authorize parked sources or create a second source architecture.
+Permanent public Systems history begins **2026-08-30**.
 
-### Satellite tab image state
+## Publications and Partnership
 
-History preserved:
+Publications / The Bulletin are read dynamically from the Admin Sheet through `content-feed.mjs`.
 
-- Aug 24: satellite tab feature added.
-- Aug 24: a dedicated `satellite-tab.png` asset repair commit replaced the earlier bad asset state.
-- Aug 27: image loading was hardened so the built-in SVG remains as a fallback and the PNG only replaces it after successful preload; the PNG request is cache-busted.
+Partnership is now a real public page. The information/guide destination can be controlled through `Partnership Config` and `partnership-info.mjs`.
 
-Current source therefore has a nonblank fallback path even if the PNG itself fails. Visual acceptance of the final satellite artwork remains separate from loading reliability.
+## SEO / routing
 
-### Mechanical schedule visual state
+Canonical public content currently includes the homepage, Products, Programs, Publications, and Partnership.
 
-The Yesterday / Today / Tomorrow mechanism is **implemented but visually not approved**. The current direction under discussion is to replace the web-styled mechanical treatment with a more physically believable machine-like design. No such redesign is recorded as completed yet.
+Systems is a state/view of the homepage rather than an independent canonical document. `/systems` redirects into `/?systems=open`, so the redirect-only Systems URL should not be treated as a separate canonical sitemap page.
 
-### Publication link
+## Historical architecture retained
 
-The code supports a publication URL through `publication_url` / `live_telecast_publication_url` in Theme Sources. No specific publication URL was verified during this Aug 27 reconciliation, so link completion remains **PENDING**.
+The following are retained as implementation history and must not be deleted simply because production moved on:
 
-## Live-telecast page design principle
+- Satellite tab assets/scripts/styles
+- mechanical Transmission Register files
+- older fixed daily-set production/schedule functions and tests
+- dated launch-hardening and prototype audit records
 
-The current concept is a zero-word, zero-scroll live-transmission experience in which the live broadcast/telecast is treated as the primary page object rather than ordinary content placed below explanatory copy. The visual theme is derived from transmission itself: satellite, signal, receiving/broadcast equipment, machinery, and schedule/time.
+The Satellite live-telecast tab itself was removed from the current homepage on **2026-08-30**. Its files remain historical evidence.
 
-The final public wording for this concept is still being refined; do not treat earlier shorthand such as “baked in” as locked publication language.
+The real Aug 20 to Aug 21 Manila-midnight Daily Discover verification also remains valuable historical proof of persistent daily state and cross-session locking, even though the current engine later evolved into continuous streaming.
 
-## Ticker / Alive / other historical specs
+## Planned, not production
 
-Dated or component-specific specs remain authoritative for their locked implementation details unless later explicitly superseded. Earlier statements that tied all Patroller work to Daily Discover sequencing are historical; Patroller/NOEN remains a separate project track and must not be merged into BarbPH production history.
+- Global Sky / World Time / Seasons remains planned.
+- NOEN/Patroller remains a separate project track and must not be merged into BarbPH production history.
 
-## SEO state
+## Current guardrails
 
-Completed historical work includes Programs SEO repair and sitewide crawl plumbing. Search Console/domain/indexing work should be evaluated against the current production homepage rather than the earlier pre-homepage assumptions.
-
-## Current unfinished tasks — Aug 27
-
-1. Verify the Satellite tab image/fallback behavior visually on the deployed homepage.
-2. Redesign the Yesterday / Today / Tomorrow mechanism conceptually toward a realistic physical machine before touching production styling.
-3. Supply and verify the publication link used by the Satellite schedule feature.
-4. Keep the nine-source production whitelist and five parked public worlds accurately documented; do not silently promote parked sources.
-5. Preserve Barb Originals as reserve-only.
-
-## Do not accidentally do these
-
-- do not enable parked/unverified source worlds without explicit validation;
-- do not treat Barb Originals as a weighted public source;
-- do not infer current live source arming from the Aug 21 NASA verification alone;
-- do not treat the current mechanical Satellite schedule visual as approved;
-- do not claim the Satellite publication link is complete until a URL is verified;
-- do not merge NOEN/Patroller history into BarbPH history;
-- do not treat old pre-homepage statements as current production truth.
+- Do not enable a held/building/parked/pending source without completing its stated unlock condition.
+- Do not treat the existence of adapter code as permission to enable a source.
+- Do not treat Barb Originals as a weighted institutional source.
+- Do not serve institutional cache after an Admin hold disables that source.
+- Do not let diagnostic state mutate production state.
+- Do not erase historical architecture when current-state docs are reconciled.

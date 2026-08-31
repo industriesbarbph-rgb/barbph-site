@@ -5,12 +5,12 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Programs &amp; Career Sessions | BarbPH</title>
-<meta content="Explore BarbPH programs and one-on-one career sessions, including Career Navigation and Job Interview Practice." name="description"/>
+<meta content="Explore BarbPH programs, mentorship, career navigation, interview practice, and consultation." name="description"/>
 <link href="https://barbph.com/programs" rel="canonical"/>
 <meta content="website" property="og:type"/>
 <meta content="BarbPH" property="og:site_name"/>
 <meta content="Programs &amp; Career Sessions | BarbPH" property="og:title"/>
-<meta content="Explore BarbPH programs and one-on-one career sessions, including Career Navigation and Job Interview Practice." property="og:description"/>
+<meta content="Explore BarbPH programs, mentorship, career navigation, interview practice, and consultation." property="og:description"/>
 <meta content="https://barbph.com/programs" property="og:url"/>
 <meta content="https://barbph.com/3stars1sun%20%283%29.png" property="og:image"/>
 <meta content="1200" property="og:image:width"/>
@@ -19,7 +19,7 @@
 <meta content="en_PH" property="og:locale"/>
 <meta content="summary_large_image" name="twitter:card"/>
 <meta content="Programs &amp; Career Sessions | BarbPH" name="twitter:title"/>
-<meta content="Explore BarbPH programs and one-on-one career sessions, including Career Navigation and Job Interview Practice." name="twitter:description"/>
+<meta content="Explore BarbPH programs, mentorship, career navigation, interview practice, and consultation." name="twitter:description"/>
 <meta content="https://barbph.com/3stars1sun%20%283%29.png" name="twitter:image"/>
 <meta content="Programs by Barb the Builder" name="twitter:image:alt"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
@@ -371,7 +371,7 @@
 <a class="plaque" href="products.html"><span class="plaque-text">Products</span></a>
 <a class="plaque active" href="programs.html"><span class="plaque-text">Programs</span></a>
 </nav>
-<p class="visually-hidden">Digital products by Barb the Builder, including Jana (a private encrypted notepad app), Will Wheel (a KPI dashboard), and The Bible (a paper technology story).</p>
+<p class="visually-hidden">BarbPH programs include Career Navigation, Coach Doll Mentorship, Job Interview Practice Session, and Consultation.</p>
 </header>
 <main>
 <div class="filter-tags" id="filter-tags">
@@ -381,23 +381,72 @@
 </div>
 <section class="grid" id="programs-grid">
 <!-- BARBPH-AUTOGEN:PROGRAMS-START -->
-<article class="card">
-<div aria-hidden="true" class="card-photo card-photo--empty"></div>
-<div class="card-body">
-<div class="card-name">Career Navigation</div>
-<div class="card-desc">Personalized guidance to help you clarify your career direction, explore opportunities, and plan your next professional move.</div>
-<div class="card-actions"></div>
-</div>
-</article>
-<article class="card">
-<div aria-hidden="true" class="card-photo card-photo--empty"></div>
-<div class="card-body">
-<div class="card-name">Job Interview Practice Session</div>
-<div class="card-desc">One-on-one interview practice with feedback to help you answer confidently, communicate clearly, and prepare for real job interviews.</div>
-<div class="card-actions"></div>
-</div>
-</article>
-<!-- BARBPH-AUTOGEN:PROGRAMS-END -->
+    <article class="card">
+      
+      <div class="card-photo">
+        <img src="https://raw.githubusercontent.com/industriesbarbph-rgb/barbph-media/main/486363695_632371549428293_4964588722830912259_n.jpg" alt="Career Navigation" loading="lazy">
+      </div>
+
+      <div class="card-body">
+        <div class="card-name">Career Navigation</div>
+
+        <div class="card-desc">Personalized guidance to help you clarify your career direction, explore opportunities, and plan your next professional move.</div>
+
+        <div class="card-actions">
+          
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      
+      <div class="card-photo">
+        <img src="https://raw.githubusercontent.com/industriesbarbph-rgb/barbph-media/main/487130376_632271486104966_1212142215112589787_n.jpg" alt="Coach Doll Mentorship" loading="lazy">
+      </div>
+
+      <div class="card-body">
+        <div class="card-name">Coach Doll Mentorship</div>
+
+        <div class="card-desc">Personal mentorship sessions with Coach Doll</div>
+
+        <div class="card-actions">
+          
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      
+      <div class="card-photo">
+        <img src="https://raw.githubusercontent.com/industriesbarbph-rgb/barbph-media/main/476226739_598911932774255_7959659474457744268_n.jpg" alt="Job Interview Practice Session" loading="lazy">
+      </div>
+
+      <div class="card-body">
+        <div class="card-name">Job Interview Practice Session</div>
+
+        <div class="card-desc">One-on-one interview practice with feedback to help you answer confidently, communicate clearly, and prepare for real job interviews.</div>
+
+        <div class="card-actions">
+          
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      
+      <div class="card-photo card-photo--empty" aria-hidden="true"></div>
+
+      <div class="card-body">
+        <div class="card-name">Consultation</div>
+
+        <div class="card-desc">Advisory sessions that spot the friction in your business flow and give you a clear path to smoother, more efficient operations</div>
+
+        <div class="card-actions">
+          
+        </div>
+      </div>
+    </article>
+    <!-- BARBPH-AUTOGEN:PROGRAMS-END -->
 </section>
 </main>
 <script>
@@ -526,15 +575,26 @@
 (() => {
   const grid = document.getElementById('programs-grid');
   if (!grid || location.protocol === 'file:') return;
+
   const esc = s => String(s || '').replace(/[&<>"']/g, c => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[c]));
+  const normalizeImage = u => {
+    u = String(u || '').trim();
+    if (/^github\.com\//i.test(u)) u = `https://${u}`;
+    const m = u.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+?)(?:[?#].*)?$/i);
+    return m ? `https://raw.githubusercontent.com/${m[1]}/${m[2]}/${m[3]}/${m[4]}` : u;
+  };
   const card = x => {
+    const photo = normalizeImage(x.photo_url);
+    const media = photo
+      ? `<div class="card-photo"><img src="${esc(photo)}" alt="${esc(x.name)}" loading="lazy"></div>`
+      : `<div class="card-photo card-photo--empty" aria-hidden="true"></div>`;
     const links=[];
     if(x.story_link) links.push(`<a href="${esc(x.story_link)}" target="_blank" rel="noopener">Read the story</a>`);
     if(x.try_link) links.push(`<a href="${esc(x.try_link)}" target="_blank" rel="noopener">Try it</a>`);
     if(x.buy_link) links.push(`<a href="${esc(x.buy_link)}" target="_blank" rel="noopener" class="primary">Buy it</a>`);
-    return `<article class="card"><div class="card-photo card-photo--empty" aria-hidden="true"></div><div class="card-body"><div class="card-name">${esc(x.name)}</div><div class="card-desc">${esc(x.description)}</div><div class="card-actions">${links.join('')}</div></div></article>`;
+    return `<article class="card">${media}<div class="card-body"><div class="card-name">${esc(x.name)}</div><div class="card-desc">${esc(x.description)}</div><div class="card-actions">${links.join('')}</div></div></article>`;
   };
   fetch('/.netlify/functions/catalog-feed?type=programs', {cache:'no-store'})
     .then(r => r.ok ? r.json() : Promise.reject(new Error('catalog unavailable')))
