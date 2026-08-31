@@ -94,7 +94,7 @@ function rewriteFunctions() {
     if (name === 'catalog-feed.mjs' || name === 'content-feed.mjs') {
       text = text.replace(
         'function json(body,status=200){return Response.json(body,{status,headers:{"cache-control":"no-store"}})}',
-        'function json(body,status=200){const ok=status===200;return Response.json(body,{status,headers:{"cache-control":ok?"public, max-age=60":"no-store","Netlify-CDN-Cache-Control":ok?"public, durable, s-maxage=3600, stale-while-revalidate=3600":"no-store"}})}'
+        'function json(body,status=200){const ok=status===200;return Response.json(body,{status,headers:{"cache-control":ok?"public, max-age=0, must-revalidate":"no-store","Netlify-CDN-Cache-Control":ok?"public, durable, s-maxage=60":"no-store"}})}'
       );
     }
     fs.writeFileSync(file, text);
@@ -263,7 +263,7 @@ function postProcessProducts(html) {
     imageAlt: 'Digital assets from BarbPH'
   });
   html = html.replace(/<h1 class="page-title">Products<\/h1>/i, '<h1 class="page-title">Digital Assets</h1>');
-  html = html.replace("fetch('/.netlify/functions/catalog-feed?type=products', {cache:'no-store'})", "fetch('/.netlify/functions/catalog-feed?type=products')");
+  html = html.replace("fetch('/.netlify/functions/catalog-feed?type=products')", "fetch('/.netlify/functions/catalog-feed?type=products', {cache:'no-store'})");
   html = insertJsonLd(html, {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
@@ -309,7 +309,7 @@ function postProcessPublications(html) {
     ogDescription: description,
     imageAlt: 'BarbPH publications and bulletin'
   });
-  html = html.replace("fetch('/.netlify/functions/content-feed', {cache:'no-store'})", "fetch('/.netlify/functions/content-feed')");
+  html = html.replace("fetch('/.netlify/functions/content-feed')", "fetch('/.netlify/functions/content-feed', {cache:'no-store'})");
   html = html.replace(/20% off Jana this week\s+[—–-]\s+code BARB20/g, '20% off Jana this week, code BARB20');
   html = insertJsonLd(html, {
     '@context': 'https://schema.org',
