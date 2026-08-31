@@ -1,3 +1,4 @@
+# BarbPH production hardening deployment trigger 2026-08-31
 [build]
   command = "node build-site.js && node post-build-fix.js"
   publish = "dist"
