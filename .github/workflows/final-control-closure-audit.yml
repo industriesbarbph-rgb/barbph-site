@@ -1,0 +1,111 @@
+name: BarbPH Control Closure Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/final-control-closure-audit.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Audit private master, public mirror, live catalog and cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import csv, io, json, urllib.request, urllib.error, urllib.parse
+
+          MASTER='1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM'
+          MIRROR='1NA3jrA3gdctbpfhXtz2TAiRGRFWsyWRTT6EvoJNIfUw'
+          BASE='https://barbph.com'
+          TABS={
+            'Products':'name', 'Programs':'name', 'Publications':'title',
+            'The Bulletin':'', 'Sponsor Takeovers':'', 'Theme Override':'',
+            'Theme Sources':'', 'Barb Originals':'', 'Partnership Config':''
+          }
+          passes=[]
+          def ok(label, cond, detail=''):
+            if not cond: raise SystemExit(f'FAIL: {label}: {detail}')
+            passes.append(label)
+          def get(url, headers=None, no_redirect=False):
+            class NR(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self,*a,**k): return None
+            op=urllib.request.build_opener(NR) if no_redirect else urllib.request.build_opener()
+            req=urllib.request.Request(url, headers={'User-Agent':'BarbPH-Control-Closure/1.0', **(headers or {})})
+            try:
+              with op.open(req,timeout=40) as r: return r.status, dict(r.headers), r.read()
+            except urllib.error.HTTPError as e: return e.code, dict(e.headers), e.read()
+
+          # Master must NOT be anonymously readable.
+          master_url=f'https://docs.google.com/spreadsheets/d/{MASTER}/gviz/tq?tqx=out:csv&sheet=Products&headers=0'
+          st,h,b=get(master_url)
+          text=b.decode('utf-8','replace')
+          ok('Private master is not anonymously readable', st in (401,403) or '<html' in text.lower() or 'sign in' in text.lower(), f'HTTP {st}')
+
+          mirror_rows={}
+          for tab, expected_header in TABS.items():
+            u=f'https://docs.google.com/spreadsheets/d/{MIRROR}/gviz/tq?tqx=out:csv&sheet={urllib.parse.quote(tab)}&headers=0&cb=closure'
+            st,h,b=get(u); text=b.decode('utf-8','replace')
+            ok(f'Mirror {tab} HTTP 200', st==200, str(st))
+            ok(f'Mirror {tab} has no REF error', '#REF!' not in text, text[:120])
+            rows=list(csv.reader(io.StringIO(text)))
+            ok(f'Mirror {tab} has rows', len(rows)>0, str(len(rows)))
+            if expected_header:
+              hi=next((i for i,r in enumerate(rows) if r and r[0].strip().lower()==expected_header.lower()),-1)
+              ok(f'Mirror {tab} header present', hi>=0, expected_header)
+              mirror_rows[tab]=(rows,hi)
+
+          def published_names(tab):
+            rows,hi=mirror_rows[tab]
+            heads=[x.strip() for x in rows[hi]]
+            out=[]
+            for r in rows[hi+1:]:
+              d={h:(r[i].strip() if i<len(r) else '') for i,h in enumerate(heads)}
+              if d.get('published','').lower()=='yes' and d.get('name','').strip(): out.append(d['name'].strip())
+            return out
+
+          products=published_names('Products')
+          programs=published_names('Programs')
+          ok('Mirror has 19 published named products', len(products)==19, str(len(products)))
+          ok('Mirror has 5 published named programs', len(programs)==5, str(len(programs)))
+
+          def live_catalog(kind):
+            st,h,b=get(f'{BASE}/.netlify/functions/catalog-feed?type={kind}')
+            ok(f'Live {kind} catalog HTTP 200', st==200, str(st))
+            d=json.loads(b.decode())
+            return [x.get('name','') for x in d.get('items',[])], {k.lower():v for k,v in h.items()}
+
+          lp,ph=live_catalog('products')
+          lprog,pgh=live_catalog('programs')
+          ok('Live Products exactly match mirror', lp==products, f'live={len(lp)} mirror={len(products)}')
+          ok('Live Programs exactly match mirror', lprog==programs, f'live={len(lprog)} mirror={len(programs)}')
+          cc=ph.get('cache-control','').replace(' ','').lower()
+          ok('Products browser cache must revalidate', 'max-age=0' in cc and 'must-revalidate' in cc, cc)
+          cs=ph.get('cache-status','')
+          ok('Products response is healthy', len(lp)==19, str(len(lp)))
+
+          for p in ['/', '/products', '/programs', '/publications', '/partnership']:
+            st,h,b=get(BASE+p)
+            ok(f'Page {p} HTTP 200', st==200, str(st))
+
+          funcs=['content-feed','homepage-priority','daily-stream-public','systems-public']
+          for f in funcs:
+            st,h,b=get(f'{BASE}/.netlify/functions/{f}')
+            ok(f'Function {f} HTTP 200', st==200, str(st))
+            json.loads(b.decode())
+            ok(f'Function {f} JSON parses', True)
+
+          st,h,b=get(f'{BASE}/.netlify/functions/partnership-info', no_redirect=True)
+          loc=h.get('Location') or h.get('location') or ''
+          ok('Partnership info redirects', st in (301,302,307,308), f'{st} {loc}')
+          ok('Partnership info uses clean target', urllib.parse.urlsplit(loc).path=='/partnership-guide', loc)
+
+          print('FINAL_CONTROL_AUDIT_PASS_COUNT=',len(passes))
+          for x in passes: print('PASS:',x)
+          print('FINAL_CONTROL_AUDIT_FAILURES=0')
+          PY
