@@ -1,0 +1,58 @@
+name: BarbPH Production Preflight Once
+
+on:
+  push:
+    paths:
+      - ".github/workflows/preflight-once.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run production build and built-in preflight
+        run: |
+          node build-site.js
+          node post-build-fix.js
+
+      - name: Syntax-check deployed JavaScript
+        run: |
+          set -e
+          find dist-functions -type f \( -name '*.js' -o -name '*.mjs' -o -name '*.cjs' \) -print0 | while IFS= read -r -d '' f; do
+            node --check "$f"
+          done
+
+      - name: Verify production privacy and migration guards
+        run: |
+          set -e
+          test -f dist/index.html
+          test -f dist/products.html
+          test -f dist/programs.html
+          test -f dist/publications.html
+          test -f dist/partnership.html
+          ! grep -R -F '1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM' dist-functions
+          ! find dist -type f \( -name '*.md' -o -name 'partnerships.html' -o -name '*test*.html' -o -name '*prototype*.html' -o -name '*diagnostic*.html' \) | grep .
+          grep -F 'BarbPH | Digital Assets, Coaching Programs, Multidisciplinary Arts & Interactive Builds' dist/index.html
+          grep -F 'https://barbph.com/sitemap.xml' dist/robots.txt
+          grep -F 'https://barbph.com/products' dist/sitemap.xml
+
+      - name: Package passed build for audit
+        run: zip -qr barbph-preflight-output.zip dist dist-functions netlify.toml
+
+      - name: Upload passed build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: barbph-preflight-output
+          path: barbph-preflight-output.zip
+          if-no-files-found: error
+          retention-days: 1
