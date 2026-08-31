@@ -1,7 +1,7 @@
 import { getStore, getDeployStore } from "@netlify/blobs";
 import { collectSource } from "./_daily-source-adapters.mjs";
 
-const SID="1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM";
+const SID="1NA3jrA3gdctbpfhXtz2TAiRGRFWsyWRTT6EvoJNIfUw";
 const TZ="Asia/Manila";
 const STORE_NAME="barbph-daily-discover";
 const ENGINE_VERSION="2026-08-30-continuous-v1";
@@ -19,7 +19,7 @@ function json(body,status=200,lab=false){return Response.json(body,{status,heade
 async function getText(url,ms=10000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.text()}finally{clearTimeout(t)}}
 function parseCSV(text){const rows=[];let row=[],field="",quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(quoted){if(c==='"'&&text[i+1]==='"'){field+='"';i++}else if(c==='"')quoted=false;else field+=c}else if(c==='"')quoted=true;else if(c===','){row.push(field);field=""}else if(c==='\n'){row.push(field);rows.push(row);row=[];field=""}else if(c!=='\r')field+=c}if(field||row.length){row.push(field);rows.push(row)}return rows}
 function table(raw,header){const rows=parseCSV(raw),i=rows.findIndex(r=>clean(r[0]).toLowerCase()===header.toLowerCase());if(i<0)throw new Error(`${header} header not found`);const heads=rows[i].map(clean);return rows.slice(i+1).filter(r=>r.some(Boolean)).map(r=>Object.fromEntries(heads.map((h,j)=>[h,clean(r[j])]))) }
-async function themeRows(){const urls=[`https://docs.google.com/spreadsheets/d/${SID}/export?format=csv&gid=342757810`,`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("Theme Sources")}&headers=0`];let last="";for(const u of urls){try{const raw=await getText(u);if(/<html|accounts\.google\.com|sign in/i.test(raw)){last="Theme Sources is not anonymously readable";continue}return table(raw,"source_name")}catch(e){last=e.message}}throw new Error(last||"Theme Sources unavailable")}
+async function themeRows(){const urls=[`https://docs.google.com/spreadsheets/d/${SID}/export?format=csv&gid=2000682467`,`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("Theme Sources")}&headers=0`];let last="";for(const u of urls){try{const raw=await getText(u);if(/<html|accounts\.google\.com|sign in/i.test(raw)){last="Theme Sources is not anonymously readable";continue}return table(raw,"source_name")}catch(e){last=e.message}}throw new Error(last||"Theme Sources unavailable")}
 function rowConfig(r){return{source_name:clean(r.source_name),enabled:clean(r.enabled).toLowerCase()==="yes",weight:Number(r.weight)||0,adapter_key:clean(r.adapter_key),status:clean(r.production_status).toUpperCase(),mode:clean(r.operating_mode).toUpperCase()||"CONTINUOUS_DISCOVERY",batch_size:Math.max(12,Math.min(60,Number(r.stream_batch_size)||30)),rotation_seconds:Math.max(8,Math.min(120,Number(r.rotation_seconds)||18)),refresh_seconds:Math.max(60,Math.min(3600,Number(r.refresh_seconds)||600)),rights_rule:clean(r.rights_rule),country_region:clean(r.country_region)}}
 function eligible(rows){return rows.map(rowConfig).filter(r=>r.enabled&&r.weight>0&&r.adapter_key&&READY_STATES.has(r.status))}
 function weightedChoice(rows,date,last=""){const reduced=last&&rows.length>1?rows.filter(r=>r.source_name!==last):rows,total=reduced.reduce((n,r)=>n+r.weight,0);let p=(hash(`${ENGINE_VERSION}|${date}|${last}`)/4294967296)*total;for(const r of reduced){p-=r.weight;if(p<0)return r}return reduced.at(-1)}

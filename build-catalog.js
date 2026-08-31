@@ -7,7 +7,7 @@
 import fs from "node:fs";
 import https from "node:https";
 
-const SHEET_ID = "1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM";
+const SHEET_ID = "1NA3jrA3gdctbpfhXtz2TAiRGRFWsyWRTT6EvoJNIfUw";
 const PROGRAMS_BOOKING_URL = "https://docs.google.com/forms/d/e/1FAIpQLSc-BEWzz5ipuGMjwVwNHZm-YLGZfEwRqw-OmFK_vL9EEkE0hg/viewform?usp=preview";
 
 const TARGETS = [

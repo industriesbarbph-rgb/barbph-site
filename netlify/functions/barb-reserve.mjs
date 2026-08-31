@@ -6,7 +6,7 @@ function normalizeImageURL(value){const v=String(value||"").trim();if(!v)return"
 export default async request=>{
   if(request.method!=="GET")return json({error:"Method not allowed"},405);
   const url=new URL(request.url),requestedCount=Math.max(3,Math.min(12,Number(url.searchParams.get("count"))||3)),minimumReady=3,seed=Math.abs(Number(url.searchParams.get("seed"))||1);
-  const sheet="https://docs.google.com/spreadsheets/d/1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM/gviz/tq?tqx=out:csv&sheet=Barb%20Originals&headers=0";
+  const sheet="https://docs.google.com/spreadsheets/d/1NA3jrA3gdctbpfhXtz2TAiRGRFWsyWRTT6EvoJNIfUw/gviz/tq?tqx=out:csv&sheet=Barb%20Originals&headers=0";
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
   let raw;
   try{const r=await fetch(sheet,{signal:controller.signal,cache:"no-store"});if(!r.ok)return json({error:`Barb Originals sheet unavailable (HTTP ${r.status}).`},502);raw=await r.text()}catch(e){return json({error:`Barb Originals sheet unavailable (${e?.message||"request failed"}).`},502)}finally{clearTimeout(timer)}

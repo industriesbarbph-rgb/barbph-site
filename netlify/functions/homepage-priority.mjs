@@ -1,4 +1,4 @@
-const SID="1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM",TZ="Asia/Manila";
+const SID="1NA3jrA3gdctbpfhXtz2TAiRGRFWsyWRTT6EvoJNIfUw",TZ="Asia/Manila";
 function clean(v){return String(v??"").trim()}
 function dateManila(){const p=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),g=t=>p.find(x=>x.type===t)?.value;return`${g("year")}-${g("month")}-${g("day")}`}
 function validDate(v){return /^\d{4}-\d{2}-\d{2}$/.test(String(v||""))&&!Number.isNaN(Date.parse(`${v}T00:00:00Z`))}

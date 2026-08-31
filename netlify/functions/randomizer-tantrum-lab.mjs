@@ -1,4 +1,4 @@
-const SID = "1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM";
+const SID = "1NA3jrA3gdctbpfhXtz2TAiRGRFWsyWRTT6EvoJNIfUw";
 const PASSED = [
   "The Met Open Access",
   "NASA",
@@ -26,7 +26,7 @@ function parseCSV(s){const out=[];let r=[],f="",q=false;for(let i=0;i<s.length;i
 function table(raw,header){const rr=parseCSV(raw),h=rr.findIndex(r=>clean(r[0]).toLowerCase()===header.toLowerCase());if(h<0)throw new Error(`${header} header not found`);const heads=rr[h].map(clean);return rr.slice(h+1).filter(r=>r.some(Boolean)).map(r=>Object.fromEntries(heads.map((k,i)=>[k,clean(r[i])]))) }
 async function getText(url,ms=9000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});if(!r.ok)throw new Error(`HTTP ${r.status}`);const raw=await r.text();if(/<html|accounts\.google\.com|sign in/i.test(raw))throw new Error("Theme Sources is not anonymously readable");return raw}finally{clearTimeout(t)}}
 async function getJSON(url,ms=25000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});let data=null;try{data=await r.json()}catch{data={error:`Non-JSON response · HTTP ${r.status}`}}return{ok:r.ok,status:r.status,data}}finally{clearTimeout(t)}}
-async function themeRows(){const urls=[`https://docs.google.com/spreadsheets/d/${SID}/export?format=csv&gid=342757810`,`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("Theme Sources")}&headers=0`];let last="";for(const u of urls){try{return table(await getText(u),"source_name")}catch(e){last=e.message}}throw new Error(last||"Theme Sources unavailable")}
+async function themeRows(){const urls=[`https://docs.google.com/spreadsheets/d/${SID}/export?format=csv&gid=2000682467`,`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("Theme Sources")}&headers=0`];let last="";for(const u of urls){try{return table(await getText(u),"source_name")}catch(e){last=e.message}}throw new Error(last||"Theme Sources unavailable")}
 function poolFromRows(rows){const byName=new Map(rows.map(r=>[r.source_name,r]));return PASSED.map(name=>({source_name:name,weight:Math.max(0,Number(byName.get(name)?.weight)||1),sheet_enabled:clean(byName.get(name)?.enabled).toLowerCase()==="yes"})).filter(x=>x.weight>0)}
 function weightedPick(pool,seed,salt){const total=pool.reduce((n,x)=>n+x.weight,0);let p=(hash(`${seed}|${salt}`)/4294967296)*total;for(const item of pool){p-=item.weight;if(p<0)return item}return pool.at(-1)}
 
