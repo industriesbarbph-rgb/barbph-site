@@ -1,6 +1,7 @@
 [build]
-  publish = "."
-  functions = "netlify/functions"
+  command = "node build-site.js"
+  publish = "dist"
+  functions = "dist-functions"
 
 [[headers]]
   for = "/*"
@@ -8,6 +9,7 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000"
 
 [[headers]]
   for = "/*.html"
@@ -15,6 +17,16 @@
     Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
-  for = "/.netlify/functions/*"
+  for = "/assets/*"
   [headers.values]
-    Cache-Control = "no-store"
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+[[headers]]
+  for = "/web/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
