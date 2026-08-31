@@ -1,54 +1,41 @@
 # BarbPH Homepage Priority Controller
 
-Status: implemented as a standalone controller. It does **not** create or replace `index.html`.
+Current reconciliation: **2026-08-31 (Manila)**
+
+Status: integrated into the current homepage architecture through `netlify/functions/homepage-priority.mjs`.
 
 ## Locked priority
+
 1. Sponsor Takeover
 2. Theme Override
 3. Daily Discover
 
-The controller uses the Manila date (`Asia/Manila`) for all scheduling decisions.
+The controller uses `Asia/Manila` for scheduling decisions.
 
 ## Sponsor Takeovers
-The controller reads the existing `Sponsor Takeovers` sheet columns:
-`brand_name, media_type, media_url, overlay_text, overlay_link, start_date, end_date, status`.
 
-A sponsor can take over only when:
-- `status = approved`
-- the Manila date is inside the inclusive `start_date` to `end_date` window
-- `brand_name` is present
-- `media_type` is `image` or `video`
-- `media_url` is a valid HTTPS URL
-- if `overlay_link` is supplied, it must also be a valid HTTPS URL
+A sponsor can win only when its Admin Sheet row is approved, inside the active date window, has a brand name, uses an allowed image/video media type, has a valid HTTPS media URL, and has a valid HTTPS overlay link when one is supplied.
 
-Draft, incomplete, malformed, expired, and future sponsor rows do not win the homepage.
-
-If more than one valid approved sponsor overlaps the same date, the first valid row in spreadsheet order wins and the controller reports a conflict count for diagnostics.
+If multiple valid approved sponsors overlap, the first valid row in Sheet order wins and conflict count is reported diagnostically.
 
 ## Theme Override
-The controller reads the existing `Theme Override` sheet columns:
-`override_active, theme_name, start_date, end_date`.
 
-A theme override can win only when:
-- no valid sponsor takeover currently wins
-- `override_active = yes`
-- `theme_name` is present
-- the Manila date is inside the inclusive date range
+A Theme Override can win only when no valid sponsor wins, `override_active=yes`, a theme name exists, and the Manila date is inside the configured window.
 
-If multiple valid overrides overlap, the first valid row in spreadsheet order wins and the conflict is surfaced diagnostically.
+If multiple valid overrides overlap, the first valid row in Sheet order wins and the conflict is reported diagnostically.
 
 ## Daily Discover handoff
-When neither a sponsor nor a theme override is valid for the date, the controller returns `selected_mode: daily_discover` and points the future homepage to `/.netlify/functions/daily-discover-production`.
 
-The priority controller does not arm Daily Discover. The production engine remains governed by its own readiness state and spreadsheet controls.
+When neither higher-priority mode wins, the controller returns `selected_mode: daily_discover` and points to:
+
+`/.netlify/functions/daily-stream-public`
+
+That endpoint is the current public wrapper for the continuous source-of-the-day engine.
 
 ## Failure behavior
-If either control sheet cannot be read or its expected header is missing, the controller returns `CONTROL_UNAVAILABLE` instead of silently dropping to a lower-priority experience. This protects sponsor obligations and manual overrides from being accidentally ignored.
+
+If the Sponsor Takeovers or Theme Override control sheet cannot be read, the controller returns `CONTROL_UNAVAILABLE` rather than silently ignoring a higher-priority obligation.
 
 ## Diagnostic mode
-`homepage-priority-test.html` is a noindex lab page. It can:
-- read the real spreadsheet controls for a chosen Manila date
-- verify that the existing example sponsor remains rejected while its status is `draft`
-- run synthetic sponsor, theme, and Daily Discover priority tests without writing anything
 
-Lab query parameters are accepted only with `lab=1`. Synthetic mock modes never write to the spreadsheet and never modify production controls.
+`homepage-priority-test.html` remains an internal `noindex,nofollow` test surface. Synthetic sponsor/theme/daily modes do not write spreadsheet controls or production source state.

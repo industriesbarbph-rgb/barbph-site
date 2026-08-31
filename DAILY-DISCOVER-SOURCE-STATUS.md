@@ -1,56 +1,69 @@
-# Daily Discover Source Status — 2026-08-20
+# Daily Discover Source Status
 
-Operational shorthand: **15/15 entries accounted for — 9 confirmed lab-success sources, 6 parked/waiting entries.**
+Current reconciliation: **2026-08-31 (Manila)**
 
-Important nuance: Barb Originals is included in the waiting/accounting total, but it is an **emergency reserve**, not a normal public rotation world.
+This file is the current source-accounting record. Earlier 15-entry snapshots are preserved below as historical context rather than deleted.
 
-## Confirmed lab success
-- The Met Open Access — ✅ rotating 3 assets
-- NASA — ✅ rotating 3 assets
-- Smithsonian Open Access — ✅ rotating 3 assets
-- Library of Congress — ✅ rotating 3 assets
-- NOAA — ✅ rotating 3 assets
-- USGS — ✅ rotating 3 assets
-- Art Institute of Chicago — ✅ rotating 3 assets
-- Cleveland Museum of Art — ✅ rotating 3 assets
-- National Gallery of Art — ✅ rotating 3 assets
+## Current accounting
 
-## Public worlds built but parked / waiting
-- Europeana — 🅿️ adapter built; requires `EUROPEANA_API_KEY`
-- New York Public Library — 🅿️ adapter built; requires `NYPL_API_TOKEN`
-- Biodiversity Heritage Library — 🅿️ adapter built; requires `BHL_API_KEY`
-- Getty Open Content — 🅿️ current rights-safe retrieval is not yet yielding enough explicit CC0 image records
-- Wildcard — 🅿️ intentionally parked until a pre-approved rights-safe pool is defined
+The live `Theme Sources` configuration currently contains **21 configured source entries**.
 
-## Emergency reserve waiting
-- Barb Originals — 🅿️ emergency reserve; readiness requires at least 3 enabled unique valid images
-- 3 is only the minimum. The reserve may and preferably will contain more images.
+- **11 enabled + production-ready**
+- **10 disabled / held / building / parked / pending / ingestion-required**
+- **Barb Originals is separate** and remains the emergency reserve
 
-## Locked operational decision
-Barb Originals is not a normal weighted source world. It is the emergency reserve for a scheduled public world that cannot serve a safe Daily Discover set. Manual lab tests still expose failures rather than hiding them behind reserve content.
+## Enabled + production-ready
 
-## Production state — historical 2026-08-20
-All confirmed Theme Sources remained disabled until explicit production approval. Parked/unverified worlds were required to remain disabled.
+| Source | Region | Status |
+| --- | --- | --- |
+| The Met Open Access | Global / USA | PRODUCTION_READY |
+| NASA | Global / USA | PRODUCTION_READY |
+| Smithsonian Open Access | Global / USA | PRODUCTION_READY |
+| Library of Congress | USA | PRODUCTION_READY |
+| NOAA | USA | PRODUCTION_READY |
+| USGS | USA | PRODUCTION_READY |
+| Art Institute of Chicago | USA | PRODUCTION_READY |
+| Cleveland Museum of Art | USA | PRODUCTION_READY |
+| National Gallery of Art | USA | PRODUCTION_READY |
+| NHCP National Memory Project | Philippines | PRODUCTION_READY |
+| National Heritage Board Singapore | Singapore | PRODUCTION_READY |
 
-## Patroller gate — historical sequencing note
-The original source-world phase used a temporary Patroller gate. Later project reconciliation separated the Patroller track from BarbPH production, so this gate is historical rather than a current dependency.
+## Disabled / not in automatic production
 
-## Reconciliation — 2026-08-27 Manila
+| Source | Status | Current reason / unlock condition |
+| --- | --- | --- |
+| Europeana | HOLD | Complete rights/API verification and live adapter proof. |
+| New York Public Library | HOLD | Complete API access and live retrieval proof. |
+| Biodiversity Heritage Library | HOLD | Complete API access and public-domain-only retrieval proof. |
+| Getty Open Content | HOLD | Finish rights filtering and live retrieval validation. |
+| Wildcard | HOLD | Create a pre-approved rights-safe catalogue. |
+| National Diet Library | BUILDING | Finish NDL Image Bank adapter and pass live/rights tests. |
+| National Folk Museum of Korea | PARKED | Revisit later and obtain approved API access if activation is desired. |
+| National Palace Museum | PENDING_API_KEY | Finish the open-data/CC0 retrieval path and pass live proof; API key only if still needed. |
+| Old Photos of Hong Kong | INGESTION_REQUIRED | Build/import the rights-cleared photo catalogue and pass continuous-stream testing. |
+| Khastara / National Library of Indonesia | BUILDING | Build a verified rights-cleared catalogue subset and pass retrieval testing. |
 
-The 15-entry accounting remains valid and is now expressed more precisely as:
+## Eligibility rule
 
-- **9 confirmed lab-success public sources** eligible for the production pool;
-- **5 parked/waiting public source worlds**: Europeana, New York Public Library, Biodiversity Heritage Library, Getty Open Content, and Wildcard;
-- **1 emergency reserve**: Barb Originals, which is not a weighted public source.
+The continuous engine does not use a fixed hard-coded list of nine sources anymore. Runtime eligibility is status-driven.
 
-The current production scheduler in `netlify/functions/daily-discover-schedule.mjs` explicitly whitelists the same nine confirmed public sources in its `PASSED` set. Eligibility still additionally depends on the live `Theme Sources` controls (`enabled=yes` and positive weight), so this document does not claim that all nine are simultaneously armed.
+A source enters the automatic pool only when:
 
-The parked reasons remain unchanged unless a later validation explicitly supersedes them:
+- `enabled=yes`
+- weight is above zero
+- `adapter_key` exists
+- `production_status` is `PRODUCTION_READY` or `PRODUCTION`
 
-- Europeana — requires `EUROPEANA_API_KEY`.
-- New York Public Library — requires `NYPL_API_TOKEN`.
-- Biodiversity Heritage Library — requires `BHL_API_KEY`.
-- Getty Open Content — rights-safe retrieval has not yet yielded enough explicit CC0 image records.
-- Wildcard — still requires a pre-approved rights-safe pool.
+The readiness endpoint flags a source that is enabled while not production-ready or missing an adapter.
 
-Barb Originals has since been documented as ready for the automatic emergency fallback path, while retaining its reserve-only role. No parked public source is reclassified as passed by this reconciliation.
+## Barb Originals reserve
+
+Barb Originals is not one of the 21 Theme Sources entries and does not compete by weight. It is the safety reserve used after same-source continuity options are exhausted or when an Admin hold prevents continued institutional serving.
+
+## Historical source accounting
+
+### 2026-08-20 snapshot
+
+At that stage the architecture was documented as 15 accounted entries: nine lab-success public sources, five parked/waiting public worlds, and Barb Originals as reserve.
+
+That snapshot remains useful history but is no longer the current inventory. New Asian/public-data source work and the continuous engine expanded the configured source catalogue after that date.

@@ -10,8 +10,8 @@
  * Only content between the BARBPH-AUTOGEN markers is replaced.
  */
 
-const fs = require("fs");
-const https = require("https");
+import fs from "node:fs";
+import https from "node:https";
 
 // ---- CONFIG ----
 const SHEET_ID = "1TSpt_DxEDhpsXE09lNx8S63b7cDomEXhVua--p99DGM";
@@ -31,20 +31,30 @@ const TARGETS = [
   }
 ];
 
-// ---- Handles Cloudinary / GitHub raw / Google Drive links interchangeably ----
+// ---- Handles Google Drive / GitHub / direct media links interchangeably ----
 function normalizeMediaUrl(url) {
   if (!url) return "";
 
-  url = url.trim();
+  url = String(url).trim();
+
+  if (/^github\.com\//i.test(url)) url = `https://${url}`;
+  if (/^www\./i.test(url)) url = `https://${url}`;
+  if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
 
   // Google Drive share links -> direct-view format
-  const driveMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
-
+  const driveMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/i);
   if (driveMatch) {
     return `https://drive.google.com/uc?export=view&id=${driveMatch[1]}`;
   }
 
-  // Cloudinary, GitHub raw, Imgur, etc. are already direct links
+  // GitHub blob links -> raw file URLs. Query strings such as ?raw=true are removed.
+  const githubMatch = url.match(
+    /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+?)(?:[?#].*)?$/i
+  );
+  if (githubMatch) {
+    return `https://raw.githubusercontent.com/${githubMatch[1]}/${githubMatch[2]}/${githubMatch[3]}/${githubMatch[4]}`;
+  }
+
   return url;
 }
 
@@ -151,13 +161,15 @@ function cardHTML(item) {
       </audio>`
     : "";
 
+  const mediaMarkup = photo
+    ? `<div class="card-photo">
+        <img src="${escapeHtml(photo)}" alt="${escapeHtml(item.name)}" loading="lazy">
+      </div>`
+    : `<div class="card-photo card-photo--empty" aria-hidden="true"></div>`;
+
   return `    <article class="card"${voice ? " data-voice-card" : ""}>
       ${voiceMarkup}
-      <div class="card-photo">
-        <img src="${escapeHtml(photo)}" alt="${escapeHtml(
-    item.name
-  )}" loading="lazy">
-      </div>
+      ${mediaMarkup}
 
       <div class="card-body">
         <div class="card-name">${escapeHtml(item.name)}</div>
