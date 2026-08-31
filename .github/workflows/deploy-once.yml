@@ -1,0 +1,46 @@
+name: One-time BarbPH Production Deploy
+
+on:
+  push:
+    paths:
+      - ".github/workflows/deploy-once.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: barbph-one-time-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out production source
+        uses: actions/checkout@v4
+
+      - name: Verify Netlify credential exists
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ]; then
+            echo "NETLIFY_AUTH_TOKEN is not configured in this repository."
+            exit 2
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Deploy BarbPH production once
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: |
+          npx -y netlify-cli@latest deploy \
+            --build \
+            --prod \
+            --site 38e8ac3c-30c4-402e-b2f8-1bb5e5b3d4e4 \
+            --auth "$NETLIFY_AUTH_TOKEN" \
+            --message "BarbPH 90-fix repair package"
