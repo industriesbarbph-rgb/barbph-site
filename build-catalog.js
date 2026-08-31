@@ -68,6 +68,16 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;");
 }
 
+function slugify(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function cardHTML(item, tab) {
   const photo = normalizeMediaUrl(item.photo_url);
   const voiceOn = String(item.voice_enabled || "").toLowerCase() === "yes";
@@ -103,7 +113,10 @@ function cardHTML(item, tab) {
       </div>`
     : `<div class="card-photo card-photo--empty" aria-hidden="true"></div>`;
 
-  return `    <article class="card"${voice ? " data-voice-card" : ""}>
+  const category = tab === "Products" ? slugify(item.category) : "";
+  const categoryAttr = category ? ` data-category="${escapeHtml(category)}"` : "";
+
+  return `    <article class="card"${categoryAttr}${voice ? " data-voice-card" : ""}>
       ${voiceMarkup}
       ${mediaMarkup}
 
@@ -141,6 +154,89 @@ function applyProgramsBookingButton(page) {
   );
 }
 
+function productCategories(items) {
+  const seen = new Set();
+  const categories = [];
+  for (const item of items) {
+    const label = String(item.category || "").trim();
+    const key = slugify(label);
+    if (!label || !key || seen.has(key)) continue;
+    seen.add(key);
+    categories.push({ key, label });
+  }
+  return categories;
+}
+
+function applyProductFilters(page, items) {
+  const categories = productCategories(items);
+  const buttons = [
+    `<button class="filter-tag active" data-filter="all">All</button>`,
+    ...categories.map(({ key, label }) => `<button class="filter-tag" data-filter="${escapeHtml(key)}">${escapeHtml(label)}</button>`)
+  ].join("\n");
+
+  const startMarker = "<!-- BARBPH-AUTOGEN:PRODUCTS-FILTERS-START -->";
+  const endMarker = "<!-- BARBPH-AUTOGEN:PRODUCTS-FILTERS-END -->";
+  const start = page.indexOf(startMarker);
+  const end = page.indexOf(endMarker);
+  if (start < 0 || end < start) throw new Error("Could not find Products filter markers.");
+  return page.slice(0, start) + startMarker + "\n" + buttons + "\n" + endMarker + page.slice(end + endMarker.length);
+}
+
+function applyProductsLiveCatalog(page) {
+  const liveScript = `<script id="barbph-live-catalog">
+(() => {
+  const grid = document.getElementById('products-grid');
+  const filters = document.getElementById('filter-tags');
+  if (!grid || !filters || location.protocol === 'file:') return;
+
+  const esc = s => String(s || '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+  const slug = s => String(s || '').trim().toLowerCase().normalize('NFKD')
+    .replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  const normalizeImage = u => {
+    u = String(u || '').trim();
+    const m = u.match(/^https:\\/\\/github\\.com\\/([^/]+)\\/([^/]+)\\/blob\\/([^/]+)\\/(.+)$/);
+    return m ? \`https://raw.githubusercontent.com/\${m[1]}/\${m[2]}/\${m[3]}/\${m[4]}\` : u;
+  };
+  const renderFilters = items => {
+    const seen = new Map();
+    items.forEach(x => {
+      const label = String(x.category || '').trim();
+      const key = slug(label);
+      if (label && key && !seen.has(key)) seen.set(key, label);
+    });
+    filters.innerHTML = '<button class="filter-tag active" data-filter="all">All</button>' +
+      [...seen].map(([key,label]) => \`<button class="filter-tag" data-filter="\${esc(key)}">\${esc(label)}</button>\`).join('');
+  };
+  const card = x => {
+    const photo = normalizeImage(x.photo_url);
+    const category = slug(x.category);
+    const media = photo
+      ? \`<div class="card-photo"><img src="\${esc(photo)}" alt="\${esc(x.name)}" loading="lazy"></div>\`
+      : \`<div class="card-photo card-photo--empty" aria-hidden="true"></div>\`;
+    const links = [];
+    if (x.story_link) links.push(\`<a href="\${esc(x.story_link)}" target="_blank" rel="noopener">Read the story</a>\`);
+    if (x.try_link) links.push(\`<a href="\${esc(x.try_link)}" target="_blank" rel="noopener">Try it</a>\`);
+    if (x.buy_link) links.push(\`<a href="\${esc(x.buy_link)}" target="_blank" rel="noopener" class="primary">Buy it</a>\`);
+    return \`<article class="card"\${category ? \` data-category="\${esc(category)}"\` : ''}>\${media}<div class="card-body"><div class="card-name">\${esc(x.name)}</div><div class="card-desc">\${esc(x.description)}</div><div class="card-actions">\${links.join('')}</div></div></article>\`;
+  };
+
+  fetch('/.netlify/functions/catalog-feed?type=products', {cache:'no-store'})
+    .then(r => r.ok ? r.json() : Promise.reject(new Error('catalog unavailable')))
+    .then(data => {
+      if (Array.isArray(data.items) && data.items.length) {
+        grid.innerHTML = data.items.map(card).join('');
+        renderFilters(data.items);
+      }
+    })
+    .catch(() => {});
+})();
+</script>`;
+
+  return page.replace(/<script id="barbph-live-catalog">[\s\S]*?<\/script>/, liveScript);
+}
+
 async function buildTarget({ tab, file, startMarker, endMarker }) {
   console.log(`Fetching "${tab}" tab...`);
   if (!fs.existsSync(file)) throw new Error(`Could not find ${file}`);
@@ -165,6 +261,11 @@ async function buildTarget({ tab, file, startMarker, endMarker }) {
 
   const published = items.filter(i => String(i.published || "").toLowerCase() === "yes" && i.name);
   console.log(`  ${tab}: ${items.length} rows, ${published.length} published.`);
+
+  if (tab === "Products") {
+    page = applyProductFilters(page, published);
+    page = applyProductsLiveCatalog(page);
+  }
 
   const html = published.length
     ? published.map(item => cardHTML(item, tab)).join("\n\n")
