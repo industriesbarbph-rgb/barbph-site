@@ -20,17 +20,30 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Repair robots.txt false-positive in privacy guard
+      - name: Repair robots.txt false-positives in both privacy guards
         run: |
           node - <<'NODE'
           const fs = require('fs');
-          const file = 'build-site.js';
-          let text = fs.readFileSync(file, 'utf8');
-          const oldLine = "  const leaks = publicFiles.filter(f => /\\.(md|txt)$/i.test(f) || INTERNAL_HTML.test(path.basename(f)) || f.includes(`${path.sep}overnight-work-log${path.sep}`));";
-          const newLine = "  const leaks = publicFiles.filter(f => ((/\\.(md|txt)$/i.test(f)) && path.basename(f).toLowerCase() !== 'robots.txt') || INTERNAL_HTML.test(path.basename(f)) || f.includes(`${path.sep}overnight-work-log${path.sep}`));";
-          if (!text.includes(oldLine) && !text.includes(newLine)) throw new Error('Expected privacy-guard line was not found.');
-          text = text.replace(oldLine, newLine);
-          fs.writeFileSync(file, text);
+
+          {
+            const file = 'build-site.js';
+            let text = fs.readFileSync(file, 'utf8');
+            const oldLine = "  const leaks = publicFiles.filter(f => /\\.(md|txt)$/i.test(f) || INTERNAL_HTML.test(path.basename(f)) || f.includes(`${path.sep}overnight-work-log${path.sep}`));";
+            const newLine = "  const leaks = publicFiles.filter(f => ((/\\.(md|txt)$/i.test(f)) && path.basename(f).toLowerCase() !== 'robots.txt') || INTERNAL_HTML.test(path.basename(f)) || f.includes(`${path.sep}overnight-work-log${path.sep}`));";
+            if (!text.includes(oldLine) && !text.includes(newLine)) throw new Error('Expected build-site privacy-guard line was not found.');
+            text = text.replace(oldLine, newLine);
+            fs.writeFileSync(file, text);
+          }
+
+          {
+            const file = 'post-build-fix.js';
+            let text = fs.readFileSync(file, 'utf8');
+            const oldLine = "    || /\\.(?:md|txt|ya?ml)$/i.test(rel)";
+            const newLine = "    || (/\\.(?:md|txt|ya?ml)$/i.test(rel) && rel.toLowerCase() !== 'robots.txt')";
+            if (!text.includes(oldLine) && !text.includes(newLine)) throw new Error('Expected post-build privacy-guard line was not found.');
+            text = text.replace(oldLine, newLine);
+            fs.writeFileSync(file, text);
+          }
           NODE
 
       - name: Run production build and built-in preflight
@@ -59,15 +72,15 @@ jobs:
           grep -F 'https://barbph.com/sitemap.xml' dist/robots.txt
           grep -F 'https://barbph.com/products' dist/sitemap.xml
 
-      - name: Commit guard fix only after all checks pass
+      - name: Commit guard fixes only after all checks pass
         run: |
           git config user.name "barbph-preflight"
           git config user.email "actions@github.com"
-          git add build-site.js
+          git add build-site.js post-build-fix.js
           if git diff --cached --quiet; then
-            echo "Guard fix already present."
+            echo "Guard fixes already present."
           else
-            git commit -m "Fix BarbPH production privacy preflight guard [skip netlify]"
+            git commit -m "Fix BarbPH production privacy guards [skip netlify]"
             git push
           fi
 
