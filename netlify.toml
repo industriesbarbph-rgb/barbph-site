@@ -1,4 +1,4 @@
-# BarbPH production hardening deployment trigger 2026-08-31
+# BarbPH catalog freshness production trigger 2026-09-01
 [build]
   command = "node build-site.js && node post-build-fix.js"
   publish = "dist"
