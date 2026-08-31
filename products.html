@@ -612,7 +612,7 @@
     <article class="card">
       
       <div class="card-photo">
-        <img src="https://raw.githubusercontent.com/industriesbarbph-rgb/barbph-media/main/httpstheorb.barbph.com.png" alt="The ORB" loading="lazy">
+        <img src="https://raw.githubusercontent.com/industriesbarbph-rgb/barbph-media/main/httpstheorb.barbph.com.png?v=20260831-1" alt="The ORB" loading="lazy">
       </div>
 
       <div class="card-body">
@@ -753,18 +753,32 @@
 <script id="barbph-live-catalog">
 (() => {
   const grid = document.getElementById('products-grid');
-  if (!grid || location.protocol === 'file:') return;
+  const filters = document.getElementById('filter-tags');
+  if (!grid || !filters || location.protocol === 'file:') return;
 
   const esc = s => String(s || '').replace(/[&<>"']/g, c => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[c]));
+  const slug = s => String(s || '').trim().toLowerCase().normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
   const normalizeImage = u => {
     u = String(u || '').trim();
     const m = u.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+)$/);
     return m ? `https://raw.githubusercontent.com/${m[1]}/${m[2]}/${m[3]}/${m[4]}` : u;
   };
+  const renderFilters = items => {
+    const seen = new Map();
+    items.forEach(x => {
+      const label = String(x.category || '').trim();
+      const key = slug(label);
+      if (label && key && !seen.has(key)) seen.set(key, label);
+    });
+    filters.innerHTML = '<button class="filter-tag active" data-filter="all">All</button>' +
+      [...seen].map(([key,label]) => `<button class="filter-tag" data-filter="${esc(key)}">${esc(label)}</button>`).join('');
+  };
   const card = x => {
     const photo = normalizeImage(x.photo_url);
+    const category = slug(x.category);
     const media = photo
       ? `<div class="card-photo"><img src="${esc(photo)}" alt="${esc(x.name)}" loading="lazy"></div>`
       : `<div class="card-photo card-photo--empty" aria-hidden="true"></div>`;
@@ -772,13 +786,16 @@
     if (x.story_link) links.push(`<a href="${esc(x.story_link)}" target="_blank" rel="noopener">Read the story</a>`);
     if (x.try_link) links.push(`<a href="${esc(x.try_link)}" target="_blank" rel="noopener">Try it</a>`);
     if (x.buy_link) links.push(`<a href="${esc(x.buy_link)}" target="_blank" rel="noopener" class="primary">Buy it</a>`);
-    return `<article class="card">${media}<div class="card-body"><div class="card-name">${esc(x.name)}</div><div class="card-desc">${esc(x.description)}</div><div class="card-actions">${links.join('')}</div></div></article>`;
+    return `<article class="card"${category ? ` data-category="${esc(category)}"` : ''}>${media}<div class="card-body"><div class="card-name">${esc(x.name)}</div><div class="card-desc">${esc(x.description)}</div><div class="card-actions">${links.join('')}</div></div></article>`;
   };
 
   fetch('/.netlify/functions/catalog-feed?type=products', {cache:'no-store'})
     .then(r => r.ok ? r.json() : Promise.reject(new Error('catalog unavailable')))
     .then(data => {
-      if (Array.isArray(data.items) && data.items.length) grid.innerHTML = data.items.map(card).join('');
+      if (Array.isArray(data.items) && data.items.length) {
+        grid.innerHTML = data.items.map(card).join('');
+        renderFilters(data.items);
+      }
     })
     .catch(() => {});
 })();
