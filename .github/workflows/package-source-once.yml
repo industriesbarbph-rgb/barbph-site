@@ -26,3 +26,5 @@ jobs:
           path: barbph-source.zip
           if-no-files-found: error
           retention-days: 1
+
+# one-time production packaging refresh 2026-08-31
