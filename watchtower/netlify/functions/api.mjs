@@ -2,38 +2,23 @@ import {
   appendEvent,
   currentSession,
   getEvents,
-  getStoredSession,
-  loadRegistry,
-  runScoutOnce,
-  scoutStatus
+  getStoredSession
 } from './_lib/global-sky.mjs';
 
 const json = (value, status = 200) => new Response(JSON.stringify(value, null, 2), {
   status,
   headers: {
     'content-type': 'application/json; charset=utf-8',
-    'cache-control': 'no-store',
-    'access-control-allow-origin': '*',
-    'access-control-allow-headers': 'authorization, content-type',
-    'access-control-allow-methods': 'GET, POST, OPTIONS'
+    'cache-control': 'no-store'
   }
 });
-
-const unauthorized = () => json({ error: 'unauthorized' }, 401);
 
 function pathFor(request) {
   const url = new URL(request.url);
   let path = url.pathname;
   if (path.startsWith('/.netlify/functions/api')) path = path.slice('/.netlify/functions/api'.length) || '/';
   if (path.startsWith('/api')) path = path.slice(4) || '/';
-  return { path, url };
-}
-
-function scoutAuthorized(request) {
-  const expected = process.env.SCOUT_DASHBOARD_TOKEN;
-  if (!expected) return false;
-  const auth = request.headers.get('authorization') || '';
-  return auth === `Bearer ${expected}`;
+  return path;
 }
 
 function publicSession(session) {
@@ -58,9 +43,7 @@ function publicSession(session) {
 }
 
 export default async (request) => {
-  if (request.method === 'OPTIONS') return json({ ok: true });
-
-  const { path } = pathFor(request);
+  const path = pathFor(request);
 
   try {
     if (request.method === 'GET' && path === '/stage/current') {
@@ -95,20 +78,6 @@ export default async (request) => {
       const id = decodeURIComponent(publicSessionMatch[1]);
       const session = await getStoredSession(id);
       return session ? json({ session: publicSession(session) }) : json({ error: 'not found' }, 404);
-    }
-
-    if (path.startsWith('/scout/')) {
-      if (!scoutAuthorized(request)) return unauthorized();
-      if (request.method === 'GET' && path === '/scout/status') return json(await scoutStatus());
-      if (request.method === 'POST' && path === '/scout/run') {
-        const result = await runScoutOnce();
-        return json({ ok: true, discovered: result.discovered, state: result.state });
-      }
-    }
-
-    if (request.method === 'GET' && path === '/registry') {
-      if (!scoutAuthorized(request)) return unauthorized();
-      return json({ cameras: await loadRegistry() });
     }
 
     return json({ error: 'not found', path }, 404);
