@@ -31,8 +31,13 @@ jobs:
           const crypto = require('crypto');
           const manifest = JSON.parse(fs.readFileSync('public/build-manifest.json', 'utf8'));
           const html = fs.readFileSync('public/global-sky.html', 'utf8');
+          const sitemap = fs.readFileSync('public/sitemap.xml', 'utf8');
           const ids = [...html.matchAll(/camera_id:'([^']+)'/g)].map(m => m[1]);
           const unique = new Set(ids);
+          const exactTokyoAttribution = '著作権者: (一社)大手町・丸の内・有楽町地区まちづくり協議会';
+          const canonical = 'https://watchtower.barbph.com/';
+          const previewUrl = 'https://watchtower.barbph.com/global-sky-social-preview.png';
+
           if (manifest.total_camera_count !== 28 || manifest.added_camera_count !== 7) throw new Error('28-camera contract failed');
           if (JSON.stringify(manifest.accepted_source_camera_counts) !== JSON.stringify([21,28])) throw new Error('future 21/28 rebuild guard missing');
           if (manifest.camera_sets !== 4 || manifest.rotation_minutes !== 2) throw new Error('rotation/set contract failed');
@@ -44,9 +49,25 @@ jobs:
           if (!html.includes('const SET_INTERVAL_MS = 2 * 60 * 1000;')) throw new Error('2-minute rotation constant missing');
           if (!html.includes('CAM-FI-ROVANIEMI-CS-6452')) throw new Error('Rovaniemi was lost');
           if (!html.includes('GLOBAL SKY DESK')) throw new Error('Broadcast ID desk missing');
-          if (!html.includes('© Otemachi–Marunouchi–Yurakucho District Council') || !html.includes('feed-focus-attribution')) throw new Error('visible Tokyo Station attribution missing');
+
+          if (!html.includes(exactTokyoAttribution)) throw new Error('exact Tokyo Station copyright-holder wording missing');
+          if (!html.includes('feed-attribution') || !html.includes('feed-focus-attribution')) throw new Error('Tokyo attribution is not visible in both panel and focus views');
+          if ((html.match(/panel\.appendChild\(feedAttribution\);/g) || []).length !== 2) throw new Error('feed attribution is not attached to both image and iframe panel paths');
+          if (html.includes('© Otemachi–Marunouchi–Yurakucho District Council')) throw new Error('translated Tokyo attribution still remains');
+
+          if (!html.includes(`<link rel="canonical" href="${canonical}">`)) throw new Error('static canonical missing');
+          if (!html.includes(`<meta property="og:url" content="${canonical}">`)) throw new Error('static og:url missing');
+          if (!html.includes(`<meta property="og:image" content="${previewUrl}">`)) throw new Error('absolute og:image missing');
+          if (!html.includes(`<meta name="twitter:image" content="${previewUrl}">`)) throw new Error('absolute twitter:image missing');
           if (!html.includes('<meta property="og:image:width" content="1447">') || !html.includes('<meta property="og:image:height" content="702">')) throw new Error('OG dimensions wrong');
+          if (html.includes('location.origin + location.pathname') || html.includes('absolutePreview = location.origin')) throw new Error('dynamic social/canonical metadata code remains');
+          if ((html.match(/rel="canonical"/g) || []).length !== 1) throw new Error('canonical tag is duplicated');
+          if ((html.match(/property="og:url"/g) || []).length !== 1) throw new Error('og:url is duplicated');
+
           if (!fs.existsSync('public/robots.txt') || !fs.existsSync('public/sitemap.xml')) throw new Error('SEO support files missing');
+          if (!sitemap.includes('<loc>https://watchtower.barbph.com/</loc>')) throw new Error('canonical sitemap URL missing');
+          if (sitemap.includes('/global-sky.html')) throw new Error('duplicate non-canonical sitemap URL remains');
+          if ((sitemap.match(/<url>/g) || []).length !== 1) throw new Error('sitemap must contain exactly one canonical URL');
           if (!fs.existsSync('public/global-sky-social-preview.png')) throw new Error('social preview PNG missing');
 
           const png = fs.readFileSync('public/global-sky-social-preview.png');
@@ -85,7 +106,7 @@ jobs:
             'VERIFIED_CAMERA_ADDITIONS_20260905[2],\n            VERIFIED_CAMERA_ADDITIONS_20260905[4]',
             'VERIFIED_CAMERA_ADDITIONS_20260905[5],\n            EMBEDDED_CAMERA_SET[4]'
           ]) if (!html.includes(expected)) throw new Error('distributed camera-set contract failed');
-          console.log(`Verified release contract: static 28, four distributed sets, exact user-preview pixels ${pixelHash}, attribution, SEO metadata, no Scout/ledger/API/functions.`);
+          console.log(`Verified release contract: static 28, four distributed sets, exact owner attribution on-panel/focus, hard-coded canonical/social metadata, canonical-only sitemap, exact user-preview pixels ${pixelHash}, no Scout/ledger/API/functions.`);
           NODE
       - name: Verify next deployment can rebuild from the 28-camera page
         run: |
@@ -95,11 +116,18 @@ jobs:
           node - <<'NODE'
           const fs = require('fs');
           const html = fs.readFileSync('public/global-sky.html', 'utf8');
+          const sitemap = fs.readFileSync('public/sitemap.xml', 'utf8');
           const ids = new Set([...html.matchAll(/camera_id:'([^']+)'/g)].map(m => m[1]));
+          const exactTokyoAttribution = '著作権者: (一社)大手町・丸の内・有楽町地区まちづくり協議会';
           if (ids.size !== 28) throw new Error(`future rebuild produced ${ids.size} cameras`);
           if ((html.match(/const VERIFIED_CAMERA_ADDITIONS_20260905/g) || []).length !== 1) throw new Error('future rebuild duplicated additions');
           if ((html.match(/const VERIFIED_CAMERA_INVENTORY/g) || []).length !== 1) throw new Error('future rebuild duplicated inventory');
           if (html.includes('/api/') || html.includes('receipt-view')) throw new Error('future rebuild restored backend/ledger residue');
           if (!fs.existsSync('public/global-sky-social-preview.png')) throw new Error('future rebuild lost social preview');
-          console.log('Verified: a later deployment can safely rebuild from the live 28-camera page.');
+          if (!html.includes(exactTokyoAttribution) || !html.includes('feed-attribution') || !html.includes('feed-focus-attribution')) throw new Error('future rebuild lost exact visible attribution');
+          if (!html.includes('<link rel="canonical" href="https://watchtower.barbph.com/">')) throw new Error('future rebuild lost canonical');
+          if (!html.includes('<meta property="og:url" content="https://watchtower.barbph.com/">')) throw new Error('future rebuild lost og:url');
+          if (!html.includes('<meta property="og:image" content="https://watchtower.barbph.com/global-sky-social-preview.png">')) throw new Error('future rebuild lost absolute og:image');
+          if (sitemap.includes('/global-sky.html') || (sitemap.match(/<url>/g) || []).length !== 1) throw new Error('future rebuild restored duplicate sitemap URL');
+          console.log('Verified: a later deployment can safely rebuild from the live 28-camera page without losing final release hardening.');
           NODE
