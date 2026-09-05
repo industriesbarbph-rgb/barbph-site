@@ -27,6 +27,8 @@ jobs:
         run: |
           node - <<'NODE'
           const fs = require('fs');
+          const zlib = require('zlib');
+          const crypto = require('crypto');
           const manifest = JSON.parse(fs.readFileSync('public/build-manifest.json', 'utf8'));
           const html = fs.readFileSync('public/global-sky.html', 'utf8');
           const ids = [...html.matchAll(/camera_id:'([^']+)'/g)].map(m => m[1]);
@@ -45,6 +47,34 @@ jobs:
           if (!html.includes('© Otemachi–Marunouchi–Yurakucho District Council') || !html.includes('feed-focus-attribution')) throw new Error('visible Tokyo Station attribution missing');
           if (!html.includes('<meta property="og:image:width" content="1447">') || !html.includes('<meta property="og:image:height" content="702">')) throw new Error('OG dimensions wrong');
           if (!fs.existsSync('public/robots.txt') || !fs.existsSync('public/sitemap.xml')) throw new Error('SEO support files missing');
+          if (!fs.existsSync('public/global-sky-social-preview.png')) throw new Error('social preview PNG missing');
+
+          const png = fs.readFileSync('public/global-sky-social-preview.png');
+          if (png.subarray(0,8).toString('hex') !== '89504e470d0a1a0a') throw new Error('social preview is not PNG');
+          if (png.readUInt32BE(16) !== 1447 || png.readUInt32BE(20) !== 702) throw new Error('social preview PNG dimensions wrong');
+          let off = 8, width, height, bitDepth, colorType, interlace, idats = [];
+          while (off < png.length) {
+            const len = png.readUInt32BE(off), type = png.toString('ascii', off + 4, off + 8), data = png.subarray(off + 8, off + 8 + len);
+            off += 12 + len;
+            if (type === 'IHDR') { width=data.readUInt32BE(0); height=data.readUInt32BE(4); bitDepth=data[8]; colorType=data[9]; interlace=data[12]; }
+            if (type === 'IDAT') idats.push(data);
+            if (type === 'IEND') break;
+          }
+          if (bitDepth !== 8 || colorType !== 6 || interlace !== 0) throw new Error(`unexpected preview PNG format ${bitDepth}/${colorType}/${interlace}`);
+          const raw = zlib.inflateSync(Buffer.concat(idats)), bpp = 4, stride = width * bpp, pixels = Buffer.alloc(stride * height); let ri = 0;
+          const paeth = (a,b,c) => { const p=a+b-c, pa=Math.abs(p-a), pb=Math.abs(p-b), pc=Math.abs(p-c); return pa<=pb&&pa<=pc?a:pb<=pc?b:c; };
+          for (let y=0; y<height; y++) {
+            const filter = raw[ri++], row = pixels.subarray(y*stride,(y+1)*stride), prev = y ? pixels.subarray((y-1)*stride,y*stride) : null;
+            for (let x=0; x<stride; x++) {
+              const val=raw[ri++], a=x>=bpp?row[x-bpp]:0, up=prev?prev[x]:0, c=prev&&x>=bpp?prev[x-bpp]:0;
+              const predictor = filter===0?0:filter===1?a:filter===2?up:filter===3?Math.floor((a+up)/2):filter===4?paeth(a,up,c):null;
+              if (predictor === null) throw new Error(`unsupported PNG filter ${filter}`);
+              row[x]=(val+predictor)&255;
+            }
+          }
+          const pixelHash = crypto.createHash('sha256').update(pixels).digest('hex');
+          if (pixelHash !== 'ea99d008cffcdee150a67836d2aea246aaca72835b6d096d94fdc7f1d23793f8') throw new Error(`social preview pixels differ from user-supplied PNG: ${pixelHash}`);
+
           for (const forbidden of ['/api/','ledgerOnline','receipt-view','receipt-mode','renderReceipt','initReceiptView','open-broadcast-receipt','openCurrentReceipt']) {
             if (html.includes(forbidden)) throw new Error(`ledger/backend residue remains: ${forbidden}`);
           }
@@ -55,7 +85,7 @@ jobs:
             'VERIFIED_CAMERA_ADDITIONS_20260905[2],\n            VERIFIED_CAMERA_ADDITIONS_20260905[4]',
             'VERIFIED_CAMERA_ADDITIONS_20260905[5],\n            EMBEDDED_CAMERA_SET[4]'
           ]) if (!html.includes(expected)) throw new Error('distributed camera-set contract failed');
-          console.log('Verified release contract: static 28, four distributed sets, attribution, SEO metadata, no Scout/ledger/API/functions.');
+          console.log(`Verified release contract: static 28, four distributed sets, exact user-preview pixels ${pixelHash}, attribution, SEO metadata, no Scout/ledger/API/functions.`);
           NODE
       - name: Verify next deployment can rebuild from the 28-camera page
         run: |
@@ -70,5 +100,6 @@ jobs:
           if ((html.match(/const VERIFIED_CAMERA_ADDITIONS_20260905/g) || []).length !== 1) throw new Error('future rebuild duplicated additions');
           if ((html.match(/const VERIFIED_CAMERA_INVENTORY/g) || []).length !== 1) throw new Error('future rebuild duplicated inventory');
           if (html.includes('/api/') || html.includes('receipt-view')) throw new Error('future rebuild restored backend/ledger residue');
+          if (!fs.existsSync('public/global-sky-social-preview.png')) throw new Error('future rebuild lost social preview');
           console.log('Verified: a later deployment can safely rebuild from the live 28-camera page.');
           NODE
