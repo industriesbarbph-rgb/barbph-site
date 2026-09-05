@@ -1,0 +1,28 @@
+[build]
+  publish = "public"
+  command = "npm run check"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+# Preserve the exact existing Global Sky visual while the Camera Scout backend
+# is introduced on the same Watch Tower domain. The current manual deploy URL
+# is immutable and is used only as the visual origin during migration.
+[[redirects]]
+  from = "/*"
+  to = "https://6a92f93b90ee21cdc0f68168--thriving-pie-e168bd.netlify.app/:splat"
+  status = 200
+  force = false
+
+[[headers]]
+  for = "/camera-scout.html"
+  [headers.values]
+    Cache-Control = "no-store"
+    X-Robots-Tag = "noindex, nofollow"
