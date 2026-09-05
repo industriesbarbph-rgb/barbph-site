@@ -12,6 +12,11 @@ function requireReplace(text, pattern, replacement, label) {
   return next;
 }
 
+function matchReplace(text, pattern, replacement, label) {
+  if (!pattern.test(text)) throw new Error(`Finalizer guard failed: ${label} was not found.`);
+  return text.replace(pattern, replacement);
+}
+
 let html = await readFile(HTML_FILE, 'utf8');
 
 // Use the camera owner's exact copyright-holder wording, rather than a translation.
@@ -54,10 +59,10 @@ html = requireReplace(
   'application-name metadata anchor'
 );
 
-html = requireReplace(html, /<meta property="og:image" content="[^"]*">/, `<meta property="og:image" content="${PREVIEW_URL}">`, 'og:image');
-html = requireReplace(html, /<meta name="twitter:image" content="[^"]*">/, `<meta name="twitter:image" content="${PREVIEW_URL}">`, 'twitter:image');
-html = requireReplace(html, /<meta property="og:image:width" content="[^"]*">/, '<meta property="og:image:width" content="1447">', 'og:image width');
-html = requireReplace(html, /<meta property="og:image:height" content="[^"]*">/, '<meta property="og:image:height" content="702">', 'og:image height');
+html = matchReplace(html, /<meta property="og:image" content="[^"]*">/, `<meta property="og:image" content="${PREVIEW_URL}">`, 'og:image');
+html = matchReplace(html, /<meta name="twitter:image" content="[^"]*">/, `<meta name="twitter:image" content="${PREVIEW_URL}">`, 'twitter:image');
+html = matchReplace(html, /<meta property="og:image:width" content="[^"]*">/, '<meta property="og:image:width" content="1447">', 'og:image width');
+html = matchReplace(html, /<meta property="og:image:height" content="[^"]*">/, '<meta property="og:image:height" content="702">', 'og:image height');
 
 for (const required of [
   `<link rel="canonical" href="${CANONICAL_URL}">`,
