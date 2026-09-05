@@ -4,7 +4,7 @@
   "type": "module",
   "version": "1.0.0",
   "scripts": {
-    "check": "node --check build-static.mjs",
-    "build": "node build-static.mjs"
+    "check": "node --check build-static.mjs && node --check finalize-static.mjs",
+    "build": "node build-static.mjs && node finalize-static.mjs"
   }
 }
