@@ -34,9 +34,15 @@ jobs:
           if (manifest.total_camera_count !== 28) throw new Error('manifest camera count is not 28');
           if (manifest.baseline_camera_count !== 21 || manifest.added_camera_count !== 7) throw new Error('21+7 contract failed');
           if (manifest.scout !== false) throw new Error('Scout must be disabled');
+          if (manifest.ledger !== false || manifest.backend_api !== false) throw new Error('ledger/backend must be disabled');
+          if (manifest.broadcast_id_desk !== true) throw new Error('Broadcast ID desk must remain');
           if (unique.size !== 28) throw new Error(`expected 28 unique cameras, got ${unique.size}`);
           if (!html.includes('const SET_INTERVAL_MS = 2 * 60 * 1000;')) throw new Error('2-minute rotation constant missing');
           if (!html.includes('CAM-FI-ROVANIEMI-CS-6452')) throw new Error('Rovaniemi was lost');
+          if (!html.includes('GLOBAL SKY DESK')) throw new Error('Broadcast ID desk missing');
+          for (const forbidden of ['/api/','ledgerOnline','receipt-view','receipt-mode','renderReceipt','initReceiptView','open-broadcast-receipt','openCurrentReceipt']) {
+            if (html.includes(forbidden)) throw new Error(`ledger/backend residue remains: ${forbidden}`);
+          }
           if (fs.existsSync('netlify/functions')) throw new Error('Netlify Functions directory still exists');
-          console.log('Verified: static only, 21 + 7 = 28, 2-minute rotation, Rovaniemi preserved, no functions.');
+          console.log('Verified: static only, 21 + 7 = 28, 2-minute rotation, Broadcast ID desk preserved, no Scout, no ledger, no API, no functions.');
           NODE
