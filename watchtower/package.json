@@ -1,0 +1,13 @@
+{
+  "name": "coach-doll-patrols-global-sky",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "check": "node --check netlify/functions/api.mjs && node --check netlify/functions/camera-scout-scheduled.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^10.0.0",
+    "@netlify/functions": "^5.0.0"
+  }
+}
