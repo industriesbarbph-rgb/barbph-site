@@ -1,8 +1,8 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
-// During the one-time migration build, the public production URL still serves
-// the preserved 21-camera Global Sky. The guards below refuse to build from
-// anything other than that exact 21-camera shape.
+// During this migration build, the public production URL still serves the
+// preserved 21-camera Global Sky. The source guards below deliberately refuse
+// to mutate an unexpected page shape.
 const SOURCE_URL = 'https://watchtower.barbph.com/global-sky.html';
 const OUT_DIR = new URL('./public/', import.meta.url);
 
@@ -80,6 +80,100 @@ function idsFrom(html) {
   return [...html.matchAll(/camera_id:'([^']+)'/g)].map(m => m[1]);
 }
 
+function removeRange(html, startMarker, endMarker, label) {
+  const start = html.indexOf(startMarker);
+  const end = html.indexOf(endMarker, start + startMarker.length);
+  if (start < 0 || end < 0) throw new Error(`Static cleanup guard failed: ${label} markers not found.`);
+  return html.slice(0, start) + html.slice(end);
+}
+
+function stripLedgerAndBackend(html) {
+  let out = html;
+
+  // Remove the hidden receipt page and its CSS, but keep the visible Broadcast
+  // ID icon and Global Sky Desk exactly as they are.
+  out = removeRange(
+    out,
+    '        /* Built-in receipt view.',
+    '        @media (prefers-reduced-motion: reduce)',
+    'receipt CSS'
+  );
+  out = removeRange(
+    out,
+    '    <section id="receipt-view"',
+    '    <div id="feed-focus-overlay"',
+    'receipt HTML'
+  );
+
+  // Remove the dead receipt-button hook. The Global Sky Desk itself remains.
+  const receiptHook = `                const receiptButton = document.getElementById('open-broadcast-receipt');\n                if (receiptButton) receiptButton.addEventListener('click', openCurrentReceipt);\n`;
+  if (!out.includes(receiptHook)) throw new Error('Static cleanup guard failed: receipt hook missing.');
+  out = out.replace(receiptHook, '');
+
+  // Event logging becomes an intentional local no-op. Camera health/failover
+  // code may still call postEvent(), but it no longer performs a network call.
+  out = removeRange(
+    out,
+    '        async function postEvent(event) {',
+    '        function startPanelModeHealthProbe',
+    'event API function'
+  );
+  out = out.replace(
+    '        function startPanelModeHealthProbe',
+    '        function postEvent() {}\n\n        function startPanelModeHealthProbe'
+  );
+
+  // Remove receipt rendering/fetching and replace startup with the existing
+  // detached browser-side stage only. No /api/stage/current request remains.
+  out = removeRange(
+    out,
+    '        function renderReceipt(',
+    '        async function init() {',
+    'receipt functions'
+  );
+  out = removeRange(
+    out,
+    '        async function init() {',
+    '        function handleViewportChange()',
+    'remote startup function'
+  );
+  out = out.replace(
+    '        function handleViewportChange()',
+    `        async function init() {\n            makeStatusPanels();\n            makeFeedPanels();\n            stageData = detachedStageData();\n            mountStageData();\n            scheduleGeometry();\n        }\n\n        function handleViewportChange()`
+  );
+
+  // Remove the backend-state switch so the two-minute local rotation always
+  // remains active.
+  out = out.replace('        let ledgerOnline = false;\n', '');
+  const rotationGate = '            if (ledgerOnline || !stageData?.session) return false;';
+  if (!out.includes(rotationGate)) throw new Error('Static cleanup guard failed: rotation gate missing.');
+  out = out.replace(rotationGate, '            if (!stageData?.session) return false;');
+
+  // Remove the heartbeat logging branch; the visible signal indicator stays.
+  const heartbeatStart = "                    if (ledgerOnline && stageData?.session?.broadcast_id) {";
+  const heartbeatEnd = '                        });\n                    }';
+  const hs = out.indexOf(heartbeatStart);
+  const he = out.indexOf(heartbeatEnd, hs);
+  if (hs < 0 || he < 0) throw new Error('Static cleanup guard failed: heartbeat ledger block missing.');
+  out = out.slice(0, hs) + out.slice(he + heartbeatEnd.length);
+
+  const forbidden = [
+    '/api/',
+    'ledgerOnline',
+    'receipt-view',
+    'receipt-mode',
+    'renderReceipt',
+    'initReceiptView',
+    'open-broadcast-receipt',
+    'openCurrentReceipt'
+  ];
+  for (const token of forbidden) {
+    if (out.includes(token)) throw new Error(`Static cleanup failed: forbidden ledger/backend token remains: ${token}`);
+  }
+
+  return out;
+}
+
 const html = await sourceHtml();
 if (!html.includes('<title>Global Sky Live Cameras | Coach Doll Patrols</title>')) throw new Error('Source guard failed: Global Sky title marker missing.');
 if (!html.includes(oldInventory)) throw new Error('Source guard failed: expected 21-camera inventory block was not found.');
@@ -87,7 +181,9 @@ if (!html.includes(oldInventory)) throw new Error('Source guard failed: expected
 const uniqueBaseline = new Set(idsFrom(html).filter(id => id.startsWith('CAM-')));
 if (uniqueBaseline.size !== 21) throw new Error(`Source guard failed: expected 21 unique baseline cameras, found ${uniqueBaseline.size}.`);
 
-const patched = html.replace(oldInventory, newInventory);
+let patched = html.replace(oldInventory, newInventory);
+patched = stripLedgerAndBackend(patched);
+
 const uniqueAfter = new Set(idsFrom(patched));
 const requiredIds = [
   'CAM-JP-TOKYO-STATION-20260905',
@@ -102,6 +198,7 @@ for (const required of requiredIds) if (!uniqueAfter.has(required)) throw new Er
 if (uniqueAfter.size !== 28) throw new Error(`Camera count guard failed: expected 28 unique cameras, found ${uniqueAfter.size}.`);
 if (!patched.includes('const SET_INTERVAL_MS = 2 * 60 * 1000;')) throw new Error('Rotation guard failed: 2-minute set interval missing.');
 if (!patched.includes("camera_id:'CAM-FI-ROVANIEMI-CS-6452'")) throw new Error('Inventory guard failed: Rovaniemi missing.');
+if (!patched.includes('GLOBAL SKY DESK')) throw new Error('Broadcast ID desk guard failed.');
 
 await mkdir(OUT_DIR, { recursive: true });
 await writeFile(new URL('global-sky.html', OUT_DIR), patched, 'utf8');
@@ -113,8 +210,11 @@ await writeFile(new URL('build-manifest.json', OUT_DIR), JSON.stringify({
   total_camera_count: 28,
   scout: false,
   functions: false,
+  ledger: false,
+  backend_api: false,
+  broadcast_id_desk: true,
   rotation_minutes: 2,
   required_camera_ids: requiredIds
 }, null, 2) + '\n', 'utf8');
 
-console.log('Global Sky static build OK: 21 existing + 7 approved = 28 cameras; Scout disabled; 2-minute rotation preserved.');
+console.log('Global Sky static build OK: 28 cameras; Scout and ledger/backend removed; Broadcast ID desk and 2-minute rotation preserved.');
