@@ -1,6 +1,9 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
-const SOURCE_URL = 'https://6a92f93b90ee21cdc0f68168--thriving-pie-e168bd.netlify.app/global-sky.html';
+// During the one-time migration build, the public production URL still serves
+// the preserved 21-camera Global Sky. The guards below refuse to build from
+// anything other than that exact 21-camera shape.
+const SOURCE_URL = 'https://watchtower.barbph.com/global-sky.html';
 const OUT_DIR = new URL('./public/', import.meta.url);
 
 const additions = `
@@ -51,11 +54,11 @@ const oldInventory = `        const VERIFIED_CAMERA_INVENTORY = [
         ];`;
 
 const newInventory = `${additions}        const VERIFIED_CAMERA_INVENTORY = [
-            ...EMEDDED_CAMERA_SET,
+            ...EMBEDDED_CAMERA_SET,
             ...VERIFIED_CAMERA_SET_B,
             ...VERIFIED_CAMERA_EXPANSION,
             ...VERIFIED_CAMERA_ADDITIONS_20260905
-        ];`.replace('...EMEDDED_CAMERA_SET', '...EMBEDDED_CAMERA_SET');
+        ];`;
 
 async function sourceHtml() {
   if (process.env.GLOBAL_SKY_SOURCE_FILE) return readFile(process.env.GLOBAL_SKY_SOURCE_FILE, 'utf8');
@@ -70,7 +73,7 @@ async function sourceHtml() {
       if (attempt < 3) await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
     }
   }
-  throw new Error(`Unable to fetch immutable Global Sky source: ${lastError}`);
+  throw new Error(`Unable to fetch preserved Global Sky source: ${lastError}`);
 }
 
 function idsFrom(html) {
@@ -97,6 +100,8 @@ const requiredIds = [
 ];
 for (const required of requiredIds) if (!uniqueAfter.has(required)) throw new Error(`Camera injection failed: ${required} missing.`);
 if (uniqueAfter.size !== 28) throw new Error(`Camera count guard failed: expected 28 unique cameras, found ${uniqueAfter.size}.`);
+if (!patched.includes('const SET_INTERVAL_MS = 2 * 60 * 1000;')) throw new Error('Rotation guard failed: 2-minute set interval missing.');
+if (!patched.includes("camera_id:'CAM-FI-ROVANIEMI-CS-6452'")) throw new Error('Inventory guard failed: Rovaniemi missing.');
 
 await mkdir(OUT_DIR, { recursive: true });
 await writeFile(new URL('global-sky.html', OUT_DIR), patched, 'utf8');
@@ -107,7 +112,9 @@ await writeFile(new URL('build-manifest.json', OUT_DIR), JSON.stringify({
   added_camera_count: 7,
   total_camera_count: 28,
   scout: false,
+  functions: false,
+  rotation_minutes: 2,
   required_camera_ids: requiredIds
 }, null, 2) + '\n', 'utf8');
 
-console.log('Global Sky static build OK: 21 existing + 7 approved = 28 cameras; Scout disabled.');
+console.log('Global Sky static build OK: 21 existing + 7 approved = 28 cameras; Scout disabled; 2-minute rotation preserved.');
