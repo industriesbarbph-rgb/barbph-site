@@ -1,7 +1,11 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 
 const SOURCE_URL = 'https://watchtower.barbph.com/global-sky.html';
 const OUT_DIR = new URL('./public/', import.meta.url);
+const PREVIEW_URL = 'https://raw.githubusercontent.com/industriesbarbph-rgb/barbph-media/3b185df50726e8b8ace56dbc3a3a0ecffebab9d6/watchtower.barbph.com.png';
+const PREVIEW_WIDTH = 1447;
+const PREVIEW_HEIGHT = 702;
 
 const requiredIds = [
   'CAM-JP-TOKYO-STATION-20260905',
@@ -117,6 +121,32 @@ async function sourceHtml() {
 
 function idsFrom(html) {
   return [...html.matchAll(/camera_id:'([^']+)'/g)].map(m => m[1]);
+}
+
+async function socialPreviewBytes() {
+  let bytes;
+  if (process.env.GLOBAL_SKY_PREVIEW_FILE) {
+    bytes = await readFile(process.env.GLOBAL_SKY_PREVIEW_FILE);
+  } else {
+    const response = await fetch(PREVIEW_URL, { redirect: 'follow' });
+    if (!response.ok) throw new Error(`Unable to fetch social preview: HTTP ${response.status}`);
+    bytes = Buffer.from(await response.arrayBuffer());
+  }
+
+  if (bytes.length < 24 || bytes.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a') {
+    throw new Error('Social preview guard failed: expected a PNG file.');
+  }
+  const width = bytes.readUInt32BE(16);
+  const height = bytes.readUInt32BE(20);
+  if (width !== PREVIEW_WIDTH || height !== PREVIEW_HEIGHT) {
+    throw new Error(`Social preview guard failed: expected ${PREVIEW_WIDTH}x${PREVIEW_HEIGHT}, found ${width}x${height}.`);
+  }
+  return {
+    bytes,
+    width,
+    height,
+    sha256: createHash('sha256').update(bytes).digest('hex')
+  };
 }
 
 function removeRange(html, startMarker, endMarker, label) {
@@ -245,7 +275,10 @@ if (!patched.includes('© Otemachi–Marunouchi–Yurakucho District Council')) 
 if (!patched.includes('feed-focus-attribution')) throw new Error('Attribution guard failed: visible attribution UI missing.');
 if (!patched.includes('<meta property="og:image:width" content="1447">') || !patched.includes('<meta property="og:image:height" content="702">')) throw new Error('Social preview metadata guard failed.');
 
+const preview = await socialPreviewBytes();
+
 await mkdir(OUT_DIR, { recursive: true });
+await writeFile(new URL('global-sky-social-preview.png', OUT_DIR), preview.bytes);
 await writeFile(new URL('global-sky.html', OUT_DIR), patched, 'utf8');
 await writeFile(new URL('_redirects', OUT_DIR), '/  /global-sky.html  200\n', 'utf8');
 await writeFile(new URL('robots.txt', OUT_DIR), 'User-agent: *\nAllow: /\nSitemap: https://watchtower.barbph.com/sitemap.xml\n', 'utf8');
@@ -262,9 +295,15 @@ await writeFile(new URL('build-manifest.json', OUT_DIR), JSON.stringify({
   broadcast_id_desk: true,
   rotation_minutes: 2,
   camera_sets: 4,
-  social_preview: { file: 'global-sky-social-preview.png', width: 1447, height: 702 },
+  social_preview: {
+    file: 'global-sky-social-preview.png',
+    width: preview.width,
+    height: preview.height,
+    sha256: preview.sha256,
+    source: PREVIEW_URL
+  },
   tokyo_station_attribution: true,
   required_camera_ids: requiredIds
 }, null, 2) + '\n', 'utf8');
 
-console.log('Global Sky static build OK: 28 cameras in 4 distributed sets; Scout/ledger/API removed; attribution and social metadata present; future 21/28 source rebuilds supported.');
+console.log(`Global Sky static build OK: 28 cameras in 4 distributed sets; Scout/ledger/API removed; preview ${preview.width}x${preview.height} sha256=${preview.sha256}; future 21/28 source rebuilds supported.`);
