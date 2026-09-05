@@ -31,18 +31,44 @@ jobs:
           const html = fs.readFileSync('public/global-sky.html', 'utf8');
           const ids = [...html.matchAll(/camera_id:'([^']+)'/g)].map(m => m[1]);
           const unique = new Set(ids);
-          if (manifest.total_camera_count !== 28) throw new Error('manifest camera count is not 28');
-          if (manifest.baseline_camera_count !== 21 || manifest.added_camera_count !== 7) throw new Error('21+7 contract failed');
-          if (manifest.scout !== false) throw new Error('Scout must be disabled');
-          if (manifest.ledger !== false || manifest.backend_api !== false) throw new Error('ledger/backend must be disabled');
+          if (manifest.total_camera_count !== 28 || manifest.added_camera_count !== 7) throw new Error('28-camera contract failed');
+          if (JSON.stringify(manifest.accepted_source_camera_counts) !== JSON.stringify([21,28])) throw new Error('future 21/28 rebuild guard missing');
+          if (manifest.camera_sets !== 4 || manifest.rotation_minutes !== 2) throw new Error('rotation/set contract failed');
+          if (manifest.scout !== false || manifest.ledger !== false || manifest.backend_api !== false || manifest.functions !== false) throw new Error('static-only contract failed');
           if (manifest.broadcast_id_desk !== true) throw new Error('Broadcast ID desk must remain');
+          if (manifest.tokyo_station_attribution !== true) throw new Error('Tokyo Station attribution flag missing');
+          if (manifest.social_preview?.width !== 1447 || manifest.social_preview?.height !== 702) throw new Error('social preview dimensions wrong');
           if (unique.size !== 28) throw new Error(`expected 28 unique cameras, got ${unique.size}`);
           if (!html.includes('const SET_INTERVAL_MS = 2 * 60 * 1000;')) throw new Error('2-minute rotation constant missing');
           if (!html.includes('CAM-FI-ROVANIEMI-CS-6452')) throw new Error('Rovaniemi was lost');
           if (!html.includes('GLOBAL SKY DESK')) throw new Error('Broadcast ID desk missing');
+          if (!html.includes('© Otemachi–Marunouchi–Yurakucho District Council') || !html.includes('feed-focus-attribution')) throw new Error('visible Tokyo Station attribution missing');
+          if (!html.includes('<meta property="og:image:width" content="1447">') || !html.includes('<meta property="og:image:height" content="702">')) throw new Error('OG dimensions wrong');
+          if (!fs.existsSync('public/robots.txt') || !fs.existsSync('public/sitemap.xml')) throw new Error('SEO support files missing');
           for (const forbidden of ['/api/','ledgerOnline','receipt-view','receipt-mode','renderReceipt','initReceiptView','open-broadcast-receipt','openCurrentReceipt']) {
             if (html.includes(forbidden)) throw new Error(`ledger/backend residue remains: ${forbidden}`);
           }
           if (fs.existsSync('netlify/functions')) throw new Error('Netlify Functions directory still exists');
-          console.log('Verified: static only, 21 + 7 = 28, 2-minute rotation, Broadcast ID desk preserved, no Scout, no ledger, no API, no functions.');
+          for (const expected of [
+            'EMBEDDED_CAMERA_SET[0],\n            VERIFIED_CAMERA_ADDITIONS_20260905[0]',
+            'VERIFIED_CAMERA_SET_B[5],\n            VERIFIED_CAMERA_ADDITIONS_20260905[1]',
+            'VERIFIED_CAMERA_ADDITIONS_20260905[2],\n            VERIFIED_CAMERA_ADDITIONS_20260905[4]',
+            'VERIFIED_CAMERA_ADDITIONS_20260905[5],\n            EMBEDDED_CAMERA_SET[4]'
+          ]) if (!html.includes(expected)) throw new Error('distributed camera-set contract failed');
+          console.log('Verified release contract: static 28, four distributed sets, attribution, SEO metadata, no Scout/ledger/API/functions.');
+          NODE
+      - name: Verify next deployment can rebuild from the 28-camera page
+        run: |
+          cp public/global-sky.html /tmp/global-sky-28.html
+          rm -rf public
+          GLOBAL_SKY_SOURCE_FILE=/tmp/global-sky-28.html npm run build
+          node - <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('public/global-sky.html', 'utf8');
+          const ids = new Set([...html.matchAll(/camera_id:'([^']+)'/g)].map(m => m[1]));
+          if (ids.size !== 28) throw new Error(`future rebuild produced ${ids.size} cameras`);
+          if ((html.match(/const VERIFIED_CAMERA_ADDITIONS_20260905/g) || []).length !== 1) throw new Error('future rebuild duplicated additions');
+          if ((html.match(/const VERIFIED_CAMERA_INVENTORY/g) || []).length !== 1) throw new Error('future rebuild duplicated inventory');
+          if (html.includes('/api/') || html.includes('receipt-view')) throw new Error('future rebuild restored backend/ledger residue');
+          console.log('Verified: a later deployment can safely rebuild from the live 28-camera page.');
           NODE
