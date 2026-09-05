@@ -47,7 +47,17 @@ if (!html.includes('feed-attribution')) {
 
 // Remove the old browser-generated canonical/OG URL script. Social crawlers need
 // these values in the server-delivered HTML and may not execute JavaScript.
-html = html.replace(/\n\s*<script>\s*\/\* Canonical and og:url resolve to the final deployed URL automatically,[\s\S]*?<\/script>\s*/m, '\n');
+const dynamicMarker = '/* Canonical and og:url resolve to the final deployed URL automatically,';
+const dynamicMarkerIndex = html.indexOf(dynamicMarker);
+if (dynamicMarkerIndex >= 0) {
+  const dynamicScriptStart = html.lastIndexOf('<script>', dynamicMarkerIndex);
+  const dynamicScriptEnd = html.indexOf('</script>', dynamicMarkerIndex);
+  if (dynamicScriptStart < 0 || dynamicScriptEnd < 0) {
+    throw new Error('Finalizer guard failed: dynamic canonical/social script boundaries were not found.');
+  }
+  html = html.slice(0, dynamicScriptStart) + html.slice(dynamicScriptEnd + '</script>'.length);
+}
+
 html = html.replace(/\s*<link rel="canonical"[^>]*>\s*/g, '\n');
 html = html.replace(/\s*<meta property="og:url"[^>]*>\s*/g, '\n');
 
@@ -76,7 +86,7 @@ for (const required of [
   if (!html.includes(required)) throw new Error(`Finalizer contract failed: ${required} missing.`);
 }
 
-if (html.includes('location.origin + location.pathname') || html.includes('absolutePreview = location.origin')) {
+if (html.includes(dynamicMarker) || html.includes('location.origin + location.pathname') || html.includes('absolutePreview = location.origin')) {
   throw new Error('Finalizer contract failed: dynamic social/canonical metadata code remains.');
 }
 
