@@ -4,9 +4,7 @@
   "type": "module",
   "version": "1.0.0",
   "scripts": {
-    "check": "node --check netlify/functions/api.mjs && node --check netlify/functions/_lib/global-sky.mjs"
-  },
-  "dependencies": {
-    "@netlify/blobs": "^11.0.3"
+    "check": "node --check build-static.mjs",
+    "build": "node build-static.mjs"
   }
 }
