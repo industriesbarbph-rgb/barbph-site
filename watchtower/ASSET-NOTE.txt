@@ -1,0 +1,1 @@
+The final Global Sky social preview is supplied by the user as watchtower.barbph.com.png (1447x702). The release build expects it as public/global-sky-social-preview.png. This note is temporary until the binary asset is attached to the release branch.
