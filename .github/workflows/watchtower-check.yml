@@ -1,0 +1,26 @@
+name: Watch Tower Camera Scout check
+
+on:
+  push:
+    branches: [watchtower-camera-scout]
+    paths:
+      - 'watchtower/**'
+      - 'netlify.toml'
+      - '.github/workflows/watchtower-check.yml'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: watchtower
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: watchtower/package.json
+      - run: npm install --no-audit --no-fund
+      - run: npm run check
