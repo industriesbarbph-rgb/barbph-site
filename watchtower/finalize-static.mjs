@@ -45,17 +45,38 @@ if (!html.includes('feed-attribution')) {
   html = requireReplace(html, cssAnchor, attributionCss + cssAnchor, 'feed attribution CSS anchor');
 }
 
-// Remove the old browser-generated canonical/OG URL script. Social crawlers need
-// these values in the server-delivered HTML and may not execute JavaScript.
+// Remove every copy of the old browser-generated canonical/OG URL script.
+// Production has gone through several packaging layers, so this deliberately
+// tolerates duplicate copies while still requiring clean server-delivered HTML.
 const dynamicMarker = '/* Canonical and og:url resolve to the final deployed URL automatically,';
-const dynamicMarkerIndex = html.indexOf(dynamicMarker);
-if (dynamicMarkerIndex >= 0) {
-  const dynamicScriptStart = html.lastIndexOf('<script>', dynamicMarkerIndex);
-  const dynamicScriptEnd = html.indexOf('</script>', dynamicMarkerIndex);
-  if (dynamicScriptStart < 0 || dynamicScriptEnd < 0) {
+let removedDynamicScripts = 0;
+while (html.includes(dynamicMarker)) {
+  const markerIndex = html.indexOf(dynamicMarker);
+  const scriptStart = html.lastIndexOf('<script>', markerIndex);
+  const scriptEnd = html.indexOf('</script>', markerIndex);
+  if (scriptStart < 0 || scriptEnd < 0 || scriptEnd < scriptStart) {
     throw new Error('Finalizer guard failed: dynamic canonical/social script boundaries were not found.');
   }
-  html = html.slice(0, dynamicScriptStart) + html.slice(dynamicScriptEnd + '</script>'.length);
+  html = html.slice(0, scriptStart) + html.slice(scriptEnd + '</script>'.length);
+  removedDynamicScripts += 1;
+}
+
+// If a packaging variant lost the identifying comment but retained the exact
+// old metadata body, remove that script too. Do not touch unrelated location code.
+for (const legacyToken of ['location.origin + location.pathname', 'absolutePreview = location.origin']) {
+  while (html.includes(legacyToken)) {
+    const tokenIndex = html.indexOf(legacyToken);
+    const scriptStart = html.lastIndexOf('<script>', tokenIndex);
+    const scriptEnd = html.indexOf('</script>', tokenIndex);
+    const scriptText = scriptStart >= 0 && scriptEnd >= 0 ? html.slice(scriptStart, scriptEnd + '</script>'.length) : '';
+    const isLegacyMetadataScript = scriptText.includes('canonical') && scriptText.includes('og:url') && scriptText.includes('global-sky-social-preview.png');
+    if (!isLegacyMetadataScript) {
+      const context = html.slice(Math.max(0, tokenIndex - 120), Math.min(html.length, tokenIndex + 220)).replace(/\s+/g, ' ');
+      throw new Error(`Finalizer guard failed: legacy metadata token remains outside the known metadata script: ${legacyToken}; context=${context}`);
+    }
+    html = html.slice(0, scriptStart) + html.slice(scriptEnd + '</script>'.length);
+    removedDynamicScripts += 1;
+  }
 }
 
 html = html.replace(/\s*<link rel="canonical"[^>]*>\s*/g, '\n');
@@ -86,15 +107,15 @@ for (const required of [
   if (!html.includes(required)) throw new Error(`Finalizer contract failed: ${required} missing.`);
 }
 
-if (html.includes(dynamicMarker) || html.includes('location.origin + location.pathname') || html.includes('absolutePreview = location.origin')) {
-  throw new Error('Finalizer contract failed: dynamic social/canonical metadata code remains.');
+for (const forbidden of [dynamicMarker, 'location.origin + location.pathname', 'absolutePreview = location.origin']) {
+  if (html.includes(forbidden)) throw new Error(`Finalizer contract failed: dynamic social/canonical metadata code remains: ${forbidden}`);
 }
 
 await writeFile(HTML_FILE, html, 'utf8');
 await writeFile(
   SITEMAP_FILE,
-  '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>https://watchtower.barbph.com/</loc></url>\n</urlset>\n',
+  '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/sitemap/0.9">\n  <url><loc>https://watchtower.barbph.com/</loc></url>\n</urlset>\n',
   'utf8'
 );
 
-console.log('Watch Tower finalizer OK: exact Tokyo attribution visible on-panel and in focus view; canonical/social metadata static; sitemap canonical-only.');
+console.log(`Watch Tower finalizer OK: exact Tokyo attribution visible on-panel and in focus view; static canonical/social metadata; canonical-only sitemap; removed ${removedDynamicScripts} legacy metadata script(s).`);
