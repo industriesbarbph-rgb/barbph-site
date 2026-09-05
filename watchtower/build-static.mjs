@@ -1,15 +1,23 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
-// During this migration build, the public production URL still serves the
-// preserved 21-camera Global Sky. The source guards below deliberately refuse
-// to mutate an unexpected page shape.
 const SOURCE_URL = 'https://watchtower.barbph.com/global-sky.html';
 const OUT_DIR = new URL('./public/', import.meta.url);
+
+const requiredIds = [
+  'CAM-JP-TOKYO-STATION-20260905',
+  'CAM-JP-YOKOSUKA-NAGAI-20260905',
+  'CAM-JP-SHINJUKU-EAST-20260905',
+  'CAM-KR-SEOUL-NAMSAN-20260905',
+  'CAM-JP-HAKONE-JUKKOKU-20260905',
+  'CAM-JP-FUJI-VIEW-HOTEL-20260905',
+  'CAM-ID-BALI-TROPICAL-20260905'
+];
 
 const additions = `
         const VERIFIED_CAMERA_ADDITIONS_20260905 = [
             {
                 camera_id:'CAM-JP-TOKYO-STATION-20260905', city:'Tokyo Station – Marunouchi Plaza', country:'Japan', provider:'Otemachi-Marunouchi-Yurakucho District Council / YouTube',
+                attribution:'© Otemachi–Marunouchi–Yurakucho District Council',
                 embed_url:'https://www.youtube-nocookie.com/embed/ZN4gh5IOowM?autoplay=1&mute=1&playsinline=1&rel=0',
                 source_page:'https://seetheview.com/cam/1811/tokyo-station-marunouchi-plaza-live-camera'
             },
@@ -47,17 +55,48 @@ const additions = `
 
 `;
 
+const distributedInventory = `        const VERIFIED_CAMERA_INVENTORY = [
+            // Set 1 — Europe / Oceania / US / Korea / Thailand / Japan
+            EMBEDDED_CAMERA_SET[0],
+            VERIFIED_CAMERA_ADDITIONS_20260905[0],
+            EMBEDDED_CAMERA_SET[1],
+            EMBEDDED_CAMERA_SET[5],
+            VERIFIED_CAMERA_SET_B[0],
+            VERIFIED_CAMERA_EXPANSION[0],
+            VERIFIED_CAMERA_EXPANSION[1],
+
+            // Set 2 — Europe / Canada / US / Thailand / Philippines / Japan
+            VERIFIED_CAMERA_SET_B[5],
+            VERIFIED_CAMERA_ADDITIONS_20260905[1],
+            EMBEDDED_CAMERA_SET[2],
+            EMBEDDED_CAMERA_SET[6],
+            VERIFIED_CAMERA_SET_B[1],
+            VERIFIED_CAMERA_EXPANSION[2],
+            VERIFIED_CAMERA_EXPANSION[3],
+
+            // Set 3 — Norway / Finland / Netherlands / Hong Kong / Korea / Japan
+            VERIFIED_CAMERA_ADDITIONS_20260905[2],
+            VERIFIED_CAMERA_ADDITIONS_20260905[4],
+            EMBEDDED_CAMERA_SET[3],
+            VERIFIED_CAMERA_SET_B[2],
+            VERIFIED_CAMERA_SET_B[4],
+            VERIFIED_CAMERA_EXPANSION[5],
+            VERIFIED_CAMERA_ADDITIONS_20260905[3],
+
+            // Set 4 — Slovenia / Finland / US / Philippines / Hong Kong / Bali / Japan
+            VERIFIED_CAMERA_ADDITIONS_20260905[5],
+            EMBEDDED_CAMERA_SET[4],
+            VERIFIED_CAMERA_SET_B[3],
+            VERIFIED_CAMERA_SET_B[6],
+            VERIFIED_CAMERA_EXPANSION[4],
+            VERIFIED_CAMERA_EXPANSION[6],
+            VERIFIED_CAMERA_ADDITIONS_20260905[6]
+        ];`;
+
 const oldInventory = `        const VERIFIED_CAMERA_INVENTORY = [
             ...EMBEDDED_CAMERA_SET,
             ...VERIFIED_CAMERA_SET_B,
             ...VERIFIED_CAMERA_EXPANSION
-        ];`;
-
-const newInventory = `${additions}        const VERIFIED_CAMERA_INVENTORY = [
-            ...EMBEDDED_CAMERA_SET,
-            ...VERIFIED_CAMERA_SET_B,
-            ...VERIFIED_CAMERA_EXPANSION,
-            ...VERIFIED_CAMERA_ADDITIONS_20260905
         ];`;
 
 async function sourceHtml() {
@@ -73,7 +112,7 @@ async function sourceHtml() {
       if (attempt < 3) await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
     }
   }
-  throw new Error(`Unable to fetch preserved Global Sky source: ${lastError}`);
+  throw new Error(`Unable to fetch Global Sky source: ${lastError}`);
 }
 
 function idsFrom(html) {
@@ -82,139 +121,150 @@ function idsFrom(html) {
 
 function removeRange(html, startMarker, endMarker, label) {
   const start = html.indexOf(startMarker);
+  if (start < 0) return html;
   const end = html.indexOf(endMarker, start + startMarker.length);
-  if (start < 0 || end < 0) throw new Error(`Static cleanup guard failed: ${label} markers not found.`);
+  if (end < 0) throw new Error(`Static cleanup guard failed: ${label} end marker not found.`);
   return html.slice(0, start) + html.slice(end);
+}
+
+function ensureCameraInventory(html) {
+  const hasAllAdditions = requiredIds.every(id => html.includes(`camera_id:'${id}'`));
+  const addStart = html.indexOf('        const VERIFIED_CAMERA_ADDITIONS_20260905 = [');
+  const invStart = html.indexOf('        const VERIFIED_CAMERA_INVENTORY = [');
+
+  if (addStart >= 0 && invStart > addStart && hasAllAdditions) {
+    const invEndMarker = '\n        ];';
+    const invEnd = html.indexOf(invEndMarker, invStart);
+    if (invEnd < 0) throw new Error('Inventory guard failed: existing 28-camera inventory end not found.');
+    return html.slice(0, addStart) + additions + distributedInventory + html.slice(invEnd + invEndMarker.length);
+  }
+
+  if (!html.includes(oldInventory)) {
+    throw new Error('Inventory guard failed: source is neither the preserved 21-camera page nor the approved 28-camera page.');
+  }
+  return html.replace(oldInventory, additions + distributedInventory);
 }
 
 function stripLedgerAndBackend(html) {
   let out = html;
 
-  // Remove the hidden receipt page and its CSS, but keep the visible Broadcast
-  // ID icon and Global Sky Desk exactly as they are.
-  out = removeRange(
-    out,
-    '        /* Built-in receipt view.',
-    '        @media (prefers-reduced-motion: reduce)',
-    'receipt CSS'
-  );
-  out = removeRange(
-    out,
-    '    <section id="receipt-view"',
-    '    <div id="feed-focus-overlay"',
-    'receipt HTML'
-  );
+  out = removeRange(out, '        /* Built-in receipt view.', '        @media (prefers-reduced-motion: reduce)', 'receipt CSS');
+  out = removeRange(out, '    <section id="receipt-view"', '    <div id="feed-focus-overlay"', 'receipt HTML');
 
-  // Remove the dead receipt-button hook. The Global Sky Desk itself remains.
   const receiptHook = `                const receiptButton = document.getElementById('open-broadcast-receipt');\n                if (receiptButton) receiptButton.addEventListener('click', openCurrentReceipt);\n`;
-  if (!out.includes(receiptHook)) throw new Error('Static cleanup guard failed: receipt hook missing.');
   out = out.replace(receiptHook, '');
 
-  // Event logging becomes an intentional local no-op. Camera health/failover
-  // code may still call postEvent(), but it no longer performs a network call.
-  out = removeRange(
-    out,
-    '        async function postEvent(event) {',
-    '        function startPanelModeHealthProbe',
-    'event API function'
-  );
-  out = out.replace(
-    '        function startPanelModeHealthProbe',
-    '        function postEvent() {}\n\n        function startPanelModeHealthProbe'
-  );
+  if (out.includes('        async function postEvent(event) {')) {
+    out = removeRange(out, '        async function postEvent(event) {', '        function startPanelModeHealthProbe', 'event API function');
+    out = out.replace('        function startPanelModeHealthProbe', '        function postEvent() {}\n\n        function startPanelModeHealthProbe');
+  }
 
-  // Remove receipt rendering/fetching and replace startup with the existing
-  // detached browser-side stage only. No /api/stage/current request remains.
-  out = removeRange(
-    out,
-    '        function renderReceipt(',
-    '        async function init() {',
-    'receipt functions'
-  );
-  out = removeRange(
-    out,
-    '        async function init() {',
-    '        function handleViewportChange()',
-    'remote startup function'
-  );
-  out = out.replace(
-    '        function handleViewportChange()',
-    `        async function init() {\n            makeStatusPanels();\n            makeFeedPanels();\n            stageData = detachedStageData();\n            mountStageData();\n            scheduleGeometry();\n        }\n\n        function handleViewportChange()`
-  );
+  if (out.includes('        function renderReceipt(')) {
+    out = removeRange(out, '        function renderReceipt(', '        async function init() {', 'receipt functions');
+  }
 
-  // Remove the backend-state switch so the two-minute local rotation always
-  // remains active.
+  if (out.includes("fetch('/api/stage/current'")) {
+    out = removeRange(out, '        async function init() {', '        function handleViewportChange()', 'remote startup function');
+    out = out.replace(
+      '        function handleViewportChange()',
+      `        async function init() {\n            makeStatusPanels();\n            makeFeedPanels();\n            stageData = detachedStageData();\n            mountStageData();\n            scheduleGeometry();\n        }\n\n        function handleViewportChange()`
+    );
+  }
+
   out = out.replace('        let ledgerOnline = false;\n', '');
-  const rotationGate = '            if (ledgerOnline || !stageData?.session) return false;';
-  if (!out.includes(rotationGate)) throw new Error('Static cleanup guard failed: rotation gate missing.');
-  out = out.replace(rotationGate, '            if (!stageData?.session) return false;');
+  out = out.replace('            if (ledgerOnline || !stageData?.session) return false;', '            if (!stageData?.session) return false;');
 
-  // Remove the heartbeat logging branch; the visible signal indicator stays.
   const heartbeatStart = "                    if (ledgerOnline && stageData?.session?.broadcast_id) {";
   const heartbeatEnd = '                        });\n                    }';
   const hs = out.indexOf(heartbeatStart);
-  const he = out.indexOf(heartbeatEnd, hs);
-  if (hs < 0 || he < 0) throw new Error('Static cleanup guard failed: heartbeat ledger block missing.');
-  out = out.slice(0, hs) + out.slice(he + heartbeatEnd.length);
+  if (hs >= 0) {
+    const he = out.indexOf(heartbeatEnd, hs);
+    if (he < 0) throw new Error('Static cleanup guard failed: heartbeat ledger block end missing.');
+    out = out.slice(0, hs) + out.slice(he + heartbeatEnd.length);
+  }
 
-  const forbidden = [
-    '/api/',
-    'ledgerOnline',
-    'receipt-view',
-    'receipt-mode',
-    'renderReceipt',
-    'initReceiptView',
-    'open-broadcast-receipt',
-    'openCurrentReceipt'
-  ];
+  const forbidden = ['/api/', 'ledgerOnline', 'receipt-view', 'receipt-mode', 'renderReceipt', 'initReceiptView', 'open-broadcast-receipt', 'openCurrentReceipt'];
   for (const token of forbidden) {
     if (out.includes(token)) throw new Error(`Static cleanup failed: forbidden ledger/backend token remains: ${token}`);
+  }
+  return out;
+}
+
+function applySocialMetadata(html) {
+  let out = html;
+  out = out.replace(/<meta property="og:image:width" content="[^"]+">/, '<meta property="og:image:width" content="1447">');
+  out = out.replace(/<meta property="og:image:height" content="[^"]+">/, '<meta property="og:image:height" content="702">');
+  return out;
+}
+
+function applyAttributionUI(html) {
+  let out = html;
+  if (!out.includes('.feed-focus-country')) throw new Error('Attribution guard failed: focus caption CSS marker missing.');
+  if (!out.includes("const feedFocusCountry = document.getElementById('feed-focus-country');")) throw new Error('Attribution guard failed: focus country element missing.');
+
+  if (!out.includes('feed-focus-attribution')) {
+    out = out.replace(
+      '                <span id="feed-focus-country" class="feed-focus-country"></span>',
+      '                <span id="feed-focus-country" class="feed-focus-country"></span>\n                <span id="feed-focus-attribution" class="feed-focus-attribution"></span>'
+    );
+    out = out.replace(
+      '        .feed-focus-media iframe { pointer-events: auto; }',
+      `        .feed-focus-media iframe { pointer-events: auto; }\n        .feed-focus-attribution {\n            display: block;\n            margin-top: 5px;\n            max-width: min(92vw, 760px);\n            font: 500 clamp(8px, .85vw, 12px)/1.25 'Oswald', sans-serif;\n            letter-spacing: .025em;\n            color: rgba(255,255,255,.86);\n            text-transform: none;\n        }`
+    );
+    out = out.replace(
+      "        const feedFocusCountry = document.getElementById('feed-focus-country');",
+      "        const feedFocusCountry = document.getElementById('feed-focus-country');\n        const feedFocusAttribution = document.getElementById('feed-focus-attribution');"
+    );
+    out = out.replace(
+      "            feedFocusCountry.textContent = cam.country || '';",
+      "            feedFocusCountry.textContent = cam.country || '';\n            if (feedFocusAttribution) feedFocusAttribution.textContent = cam.attribution || cam.provider || '';"
+    );
   }
 
   return out;
 }
 
-const html = await sourceHtml();
-if (!html.includes('<title>Global Sky Live Cameras | Coach Doll Patrols</title>')) throw new Error('Source guard failed: Global Sky title marker missing.');
-if (!html.includes(oldInventory)) throw new Error('Source guard failed: expected 21-camera inventory block was not found.');
+const source = await sourceHtml();
+if (!source.includes('<title>Global Sky Live Cameras | Coach Doll Patrols</title>')) throw new Error('Source guard failed: Global Sky title marker missing.');
 
-const uniqueBaseline = new Set(idsFrom(html).filter(id => id.startsWith('CAM-')));
-if (uniqueBaseline.size !== 21) throw new Error(`Source guard failed: expected 21 unique baseline cameras, found ${uniqueBaseline.size}.`);
+const sourceUnique = new Set(idsFrom(source).filter(id => id.startsWith('CAM-')));
+if (![21, 28].includes(sourceUnique.size)) throw new Error(`Source guard failed: expected 21 or 28 unique cameras, found ${sourceUnique.size}.`);
 
-let patched = html.replace(oldInventory, newInventory);
+let patched = ensureCameraInventory(source);
 patched = stripLedgerAndBackend(patched);
+patched = applySocialMetadata(patched);
+patched = applyAttributionUI(patched);
 
 const uniqueAfter = new Set(idsFrom(patched));
-const requiredIds = [
-  'CAM-JP-TOKYO-STATION-20260905',
-  'CAM-JP-YOKOSUKA-NAGAI-20260905',
-  'CAM-JP-SHINJUKU-EAST-20260905',
-  'CAM-KR-SEOUL-NAMSAN-20260905',
-  'CAM-JP-HAKONE-JUKKOKU-20260905',
-  'CAM-JP-FUJI-VIEW-HOTEL-20260905',
-  'CAM-ID-BALI-TROPICAL-20260905'
-];
 for (const required of requiredIds) if (!uniqueAfter.has(required)) throw new Error(`Camera injection failed: ${required} missing.`);
 if (uniqueAfter.size !== 28) throw new Error(`Camera count guard failed: expected 28 unique cameras, found ${uniqueAfter.size}.`);
 if (!patched.includes('const SET_INTERVAL_MS = 2 * 60 * 1000;')) throw new Error('Rotation guard failed: 2-minute set interval missing.');
 if (!patched.includes("camera_id:'CAM-FI-ROVANIEMI-CS-6452'")) throw new Error('Inventory guard failed: Rovaniemi missing.');
 if (!patched.includes('GLOBAL SKY DESK')) throw new Error('Broadcast ID desk guard failed.');
+if (!patched.includes('© Otemachi–Marunouchi–Yurakucho District Council')) throw new Error('Attribution guard failed: Tokyo Station attribution missing.');
+if (!patched.includes('feed-focus-attribution')) throw new Error('Attribution guard failed: visible attribution UI missing.');
+if (!patched.includes('<meta property="og:image:width" content="1447">') || !patched.includes('<meta property="og:image:height" content="702">')) throw new Error('Social preview metadata guard failed.');
 
 await mkdir(OUT_DIR, { recursive: true });
 await writeFile(new URL('global-sky.html', OUT_DIR), patched, 'utf8');
 await writeFile(new URL('_redirects', OUT_DIR), '/  /global-sky.html  200\n', 'utf8');
+await writeFile(new URL('robots.txt', OUT_DIR), 'User-agent: *\nAllow: /\nSitemap: https://watchtower.barbph.com/sitemap.xml\n', 'utf8');
+await writeFile(new URL('sitemap.xml', OUT_DIR), '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>https://watchtower.barbph.com/</loc></url>\n  <url><loc>https://watchtower.barbph.com/global-sky.html</loc></url>\n</urlset>\n', 'utf8');
 await writeFile(new URL('build-manifest.json', OUT_DIR), JSON.stringify({
   source: SOURCE_URL,
-  baseline_camera_count: 21,
-  added_camera_count: 7,
+  accepted_source_camera_counts: [21, 28],
   total_camera_count: 28,
+  added_camera_count: 7,
   scout: false,
   functions: false,
   ledger: false,
   backend_api: false,
   broadcast_id_desk: true,
   rotation_minutes: 2,
+  camera_sets: 4,
+  social_preview: { file: 'global-sky-social-preview.png', width: 1447, height: 702 },
+  tokyo_station_attribution: true,
   required_camera_ids: requiredIds
 }, null, 2) + '\n', 'utf8');
 
-console.log('Global Sky static build OK: 28 cameras; Scout and ledger/backend removed; Broadcast ID desk and 2-minute rotation preserved.');
+console.log('Global Sky static build OK: 28 cameras in 4 distributed sets; Scout/ledger/API removed; attribution and social metadata present; future 21/28 source rebuilds supported.');
