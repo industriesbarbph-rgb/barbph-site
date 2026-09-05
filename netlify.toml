@@ -1,8 +1,26 @@
-# BarbPH catalog freshness production trigger 2026-09-01
 [build]
-  command = "node build-site.js && node post-build-fix.js"
-  publish = "dist"
-  functions = "dist-functions"
+  base = "watchtower"
+  publish = "public"
+  functions = "netlify/functions"
+  command = "npm run check"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+# Preserve the exact Aug 29 Global Sky visual while the backend migration goes live.
+# The old deploy URL is immutable, so this is a controlled reverse proxy rather than
+# a redirect away from watchtower.barbph.com. Relative /api calls still hit the new site.
+[[redirects]]
+  from = "/*"
+  to = "https://6a92f93b90ee21cdc0f68168--thriving-pie-e168bd.netlify.app/:splat"
+  status = 200
+  force = false
 
 [[headers]]
   for = "/*"
@@ -13,21 +31,7 @@
     Strict-Transport-Security = "max-age=31536000"
 
 [[headers]]
-  for = "/*.html"
+  for = "/camera-scout.html"
   [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-[[headers]]
-  for = "/assets/*"
-  [headers.values]
-    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
-
-[[headers]]
-  for = "/web/*"
-  [headers.values]
-    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
-
-[[headers]]
-  for = "/*.png"
-  [headers.values]
-    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+    Cache-Control = "no-store"
+    X-Robots-Tag = "noindex, nofollow"
