@@ -30,10 +30,10 @@ if (!html.includes('feed-attribution')) {
     'feed label creation'
   );
 
-  const appendNeedle = '                panel.appendChild(label);';
-  const appendCount = html.split(appendNeedle).length - 1;
-  if (appendCount !== 2) throw new Error(`Finalizer guard failed: expected 2 feed-label append points, found ${appendCount}.`);
-  html = html.replaceAll(appendNeedle, `${appendNeedle}\n                panel.appendChild(feedAttribution);`);
+  const appendRegex = /^(\s*)panel\.appendChild\(label\);$/gm;
+  const appendMatches = [...html.matchAll(appendRegex)];
+  if (appendMatches.length !== 2) throw new Error(`Finalizer guard failed: expected 2 feed-label append points, found ${appendMatches.length}.`);
+  html = html.replace(appendRegex, (_match, indent) => `${indent}panel.appendChild(label);\n${indent}panel.appendChild(feedAttribution);`);
 
   const cssAnchor = '        .feed-fallback {';
   const attributionCss = `        .feed-attribution {\n            position: absolute;\n            top: 4px;\n            left: 4px;\n            right: 4px;\n            z-index: 3;\n            padding: 2px 4px;\n            border-radius: 4px;\n            background: rgba(0,0,0,.46);\n            color: rgba(255,255,255,.94);\n            font: 500 clamp(4.8px, .38vw, 7px)/1.15 'Oswald', sans-serif;\n            letter-spacing: .01em;\n            text-align: left;\n            white-space: normal;\n            pointer-events: none;\n            text-shadow: 0 1px 3px rgba(0,0,0,.96);\n        }\n        .feed-attribution[hidden] { display: none !important; }\n        @media (max-width: 760px) {\n            .feed-attribution {\n                top: 2px;\n                left: 2px;\n                right: 2px;\n                padding: 1px 2px;\n                font-size: 3.7px;\n            }\n        }\n\n`;
