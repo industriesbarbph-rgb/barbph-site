@@ -4,6 +4,7 @@ const html = await readFile(new URL('./public/global-sky.html', import.meta.url)
 const CANONICAL_URL = 'https://watchtower.barbph.com/';
 const PREVIEW_URL = 'https://watchtower.barbph.com/global-sky-social-preview.png';
 const BARBPH_URL = 'https://barbph.com/';
+const TAIPEI_CAMERA_ID = 'CAM-TW-TAIPEI-XIANGSHAN-20260906';
 
 // Structural HTML sanity checks around the areas our build mutates.
 for (const [openPattern, closePattern, label] of [
@@ -51,30 +52,30 @@ for (const match of html.matchAll(scriptRegex)) {
 }
 if (executableScripts < 1) throw new Error('Generated page has no executable inline JavaScript.');
 
-// The 28-camera inventory must reference every member of each seven-camera
-// source family exactly once. This proves the four 7-camera rotation blocks do
-// not silently duplicate one camera while omitting another.
+// The inventory must preserve all original 28 references and add Taipei once.
 const inventoryStart = html.indexOf('        const VERIFIED_CAMERA_INVENTORY = [');
 if (inventoryStart < 0) throw new Error('Generated camera inventory marker missing.');
 const inventoryEnd = html.indexOf('\n        ];', inventoryStart);
 if (inventoryEnd < 0) throw new Error('Generated camera inventory end missing.');
 const inventoryText = html.slice(inventoryStart, inventoryEnd);
-const refs = [...inventoryText.matchAll(/\b(EMBEDDED_CAMERA_SET|VERIFIED_CAMERA_SET_B|VERIFIED_CAMERA_EXPANSION|VERIFIED_CAMERA_ADDITIONS_20260905)\[(\d+)\]/g)]
+const refs = [...inventoryText.matchAll(/\b(EMBEDDED_CAMERA_SET|VERIFIED_CAMERA_SET_B|VERIFIED_CAMERA_EXPANSION|VERIFIED_CAMERA_ADDITIONS_20260905|VERIFIED_CAMERA_ADDITIONS_20260906)\[(\d+)\]/g)]
   .map(match => `${match[1]}[${match[2]}]`);
-if (refs.length !== 28) throw new Error(`Expected 28 camera references in rotation inventory, found ${refs.length}.`);
+if (refs.length !== 29) throw new Error(`Expected 29 camera references in rotation inventory, found ${refs.length}.`);
 const uniqueRefs = new Set(refs);
-if (uniqueRefs.size !== 28) throw new Error(`Rotation inventory contains duplicate references: ${refs.filter((ref, i) => refs.indexOf(ref) !== i).join(', ')}`);
+if (uniqueRefs.size !== 29) throw new Error(`Rotation inventory contains duplicate references: ${refs.filter((ref, i) => refs.indexOf(ref) !== i).join(', ')}`);
 for (const family of ['EMBEDDED_CAMERA_SET', 'VERIFIED_CAMERA_SET_B', 'VERIFIED_CAMERA_EXPANSION', 'VERIFIED_CAMERA_ADDITIONS_20260905']) {
   for (let i = 0; i < 7; i++) {
     const ref = `${family}[${i}]`;
     if (!uniqueRefs.has(ref)) throw new Error(`Rotation inventory omitted ${ref}.`);
   }
 }
+if (!uniqueRefs.has('VERIFIED_CAMERA_ADDITIONS_20260906[0]')) throw new Error('Rotation inventory omitted Taipei Xiangshan.');
+if (!html.includes(`camera_id:'${TAIPEI_CAMERA_ID}'`)) throw new Error('Taipei Xiangshan camera record missing.');
+if (!html.includes("embed_url:'https://www.youtube-nocookie.com/embed/z_fY1pj1VBw?autoplay=1&mute=1&playsinline=1&rel=0'")) throw new Error('Taipei Xiangshan embed URL changed or missing.');
 
-// With 28 cameras and a seven-slot step, the browser-side algorithm must form
-// exactly four non-overlapping sets before repeating.
+// Preserve the seven-slot, two-minute browser-side rotation contract.
 if (!html.includes('const SET_INTERVAL_MS = 2 * 60 * 1000;')) throw new Error('2-minute rotation constant missing.');
 if (!html.includes('const start = (setIndex * FEED_SLOT_COUNT) % inventory.length;')) throw new Error('Seven-position rotation stepping logic changed unexpectedly.');
 if (!html.includes('chosen.push(inventory[(start + i) % inventory.length]);')) throw new Error('Circular seven-camera selection logic changed unexpectedly.');
 
-console.log(`Generated HTML audit OK: JSON-LD parses with BarbPH relationship; ${executableScripts} inline script(s) parse; HTML script/style tags balanced; 28/28 rotation references unique; four 7-camera sets preserved.`);
+console.log(`Generated HTML audit OK: JSON-LD parses with BarbPH relationship; ${executableScripts} inline script(s) parse; HTML script/style tags balanced; 29/29 rotation references unique; Taipei Xiangshan present; seven-slot two-minute rotation preserved.`);
