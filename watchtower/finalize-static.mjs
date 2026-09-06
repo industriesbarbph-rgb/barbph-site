@@ -4,6 +4,7 @@ const HTML_FILE = new URL('./public/global-sky.html', import.meta.url);
 const SITEMAP_FILE = new URL('./public/sitemap.xml', import.meta.url);
 const CANONICAL_URL = 'https://watchtower.barbph.com/';
 const PREVIEW_URL = 'https://watchtower.barbph.com/global-sky-social-preview.png';
+const BARBPH_URL = 'https://barbph.com/';
 const TOKYO_ATTRIBUTION = '著作権者: (一社)大手町・丸の内・有楽町地区まちづくり協議会';
 
 function requireReplace(text, pattern, replacement, label) {
@@ -95,11 +96,46 @@ html = matchReplace(html, /<meta name="twitter:image" content="[^"]*">/, `<meta 
 html = matchReplace(html, /<meta property="og:image:width" content="[^"]*">/, '<meta property="og:image:width" content="1447">', 'og:image width');
 html = matchReplace(html, /<meta property="og:image:height" content="[^"]*">/, '<meta property="og:image:height" content="702">', 'og:image height');
 
+// Enrich the existing WebPage JSON-LD without changing the visible Watch Tower.
+const jsonLdRegex = /<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/i;
+const jsonLdMatch = html.match(jsonLdRegex);
+if (!jsonLdMatch) throw new Error('Finalizer guard failed: WebPage JSON-LD block missing.');
+let schema;
+try {
+  schema = JSON.parse(jsonLdMatch[1]);
+} catch (error) {
+  throw new Error(`Finalizer guard failed: JSON-LD does not parse: ${error.message}`);
+}
+if (schema['@type'] !== 'WebPage') throw new Error(`Finalizer guard failed: expected WebPage JSON-LD, found ${schema['@type'] || 'none'}.`);
+schema.url = CANONICAL_URL;
+schema.image = PREVIEW_URL;
+schema.primaryImageOfPage = {
+  '@type': 'ImageObject',
+  url: PREVIEW_URL,
+  width: 1447,
+  height: 702
+};
+schema.isPartOf = {
+  '@type': 'WebSite',
+  name: 'BarbPH',
+  url: BARBPH_URL
+};
+if (!schema.publisher || typeof schema.publisher !== 'object') {
+  schema.publisher = { '@type': 'Organization', name: 'Coach Doll Patrols' };
+}
+schema.publisher.url = BARBPH_URL;
+const serializedSchema = JSON.stringify(schema, null, 2);
+html = html.replace(jsonLdRegex, `<script type="application/ld+json">\n${serializedSchema}\n    </script>`);
+
 for (const required of [
   `<link rel="canonical" href="${CANONICAL_URL}">`,
   `<meta property="og:url" content="${CANONICAL_URL}">`,
   `<meta property="og:image" content="${PREVIEW_URL}">`,
   `<meta name="twitter:image" content="${PREVIEW_URL}">`,
+  `"url": "${CANONICAL_URL}"`,
+  `"image": "${PREVIEW_URL}"`,
+  '"isPartOf": {',
+  '"name": "BarbPH"',
   TOKYO_ATTRIBUTION,
   'feed-attribution',
   'feed-focus-attribution'
@@ -114,8 +150,8 @@ for (const forbidden of [dynamicMarker, 'location.origin + location.pathname', '
 await writeFile(HTML_FILE, html, 'utf8');
 await writeFile(
   SITEMAP_FILE,
-  '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/sitemap/0.9">\n  <url><loc>https://watchtower.barbph.com/</loc></url>\n</urlset>\n',
+  '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>https://watchtower.barbph.com/</loc></url>\n</urlset>\n',
   'utf8'
 );
 
-console.log(`Watch Tower finalizer OK: exact Tokyo attribution visible on-panel and in focus view; static canonical/social metadata; canonical-only sitemap; removed ${removedDynamicScripts} legacy metadata script(s).`);
+console.log(`Watch Tower finalizer OK: exact Tokyo attribution visible on-panel and in focus view; static canonical/social metadata; enriched WebPage JSON-LD; canonical-only sitemap; removed ${removedDynamicScripts} legacy metadata script(s).`);
