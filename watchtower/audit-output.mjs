@@ -1,6 +1,9 @@
 import { readFile } from 'node:fs/promises';
 
 const html = await readFile(new URL('./public/global-sky.html', import.meta.url), 'utf8');
+const CANONICAL_URL = 'https://watchtower.barbph.com/';
+const PREVIEW_URL = 'https://watchtower.barbph.com/global-sky-social-preview.png';
+const BARBPH_URL = 'https://barbph.com/';
 
 // Structural HTML sanity checks around the areas our build mutates.
 for (const [openPattern, closePattern, label] of [
@@ -11,6 +14,22 @@ for (const [openPattern, closePattern, label] of [
   const closes = html.match(closePattern)?.length || 0;
   if (opens !== closes) throw new Error(`Generated HTML has unbalanced ${label} tags: ${opens} open / ${closes} close.`);
 }
+
+// Parse and validate the page's JSON-LD relationship metadata.
+const jsonLdMatches = [...html.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
+if (jsonLdMatches.length !== 1) throw new Error(`Expected exactly one JSON-LD block, found ${jsonLdMatches.length}.`);
+let schema;
+try {
+  schema = JSON.parse(jsonLdMatches[0][1]);
+} catch (error) {
+  throw new Error(`Generated JSON-LD does not parse: ${error.message}`);
+}
+if (schema['@context'] !== 'https://schema.org' || schema['@type'] !== 'WebPage') throw new Error('Generated JSON-LD is not the expected Schema.org WebPage.');
+if (schema.url !== CANONICAL_URL) throw new Error(`JSON-LD canonical URL mismatch: ${schema.url}`);
+if (schema.image !== PREVIEW_URL) throw new Error(`JSON-LD image mismatch: ${schema.image}`);
+if (schema.primaryImageOfPage?.url !== PREVIEW_URL || schema.primaryImageOfPage?.width !== 1447 || schema.primaryImageOfPage?.height !== 702) throw new Error('JSON-LD primaryImageOfPage contract failed.');
+if (schema.isPartOf?.['@type'] !== 'WebSite' || schema.isPartOf?.name !== 'BarbPH' || schema.isPartOf?.url !== BARBPH_URL) throw new Error('JSON-LD BarbPH isPartOf relationship missing or incorrect.');
+if (schema.publisher?.['@type'] !== 'Organization' || schema.publisher?.name !== 'Coach Doll Patrols' || schema.publisher?.url !== BARBPH_URL) throw new Error('JSON-LD publisher relationship missing or incorrect.');
 
 // Parse every executable inline script. JSON-LD is data, not JavaScript.
 let executableScripts = 0;
@@ -58,4 +77,4 @@ if (!html.includes('const SET_INTERVAL_MS = 2 * 60 * 1000;')) throw new Error('2
 if (!html.includes('const start = (setIndex * FEED_SLOT_COUNT) % inventory.length;')) throw new Error('Seven-position rotation stepping logic changed unexpectedly.');
 if (!html.includes('chosen.push(inventory[(start + i) % inventory.length]);')) throw new Error('Circular seven-camera selection logic changed unexpectedly.');
 
-console.log(`Generated HTML audit OK: ${executableScripts} inline script(s) parse; HTML script/style tags balanced; 28/28 rotation references unique; four 7-camera sets preserved.`);
+console.log(`Generated HTML audit OK: JSON-LD parses with BarbPH relationship; ${executableScripts} inline script(s) parse; HTML script/style tags balanced; 28/28 rotation references unique; four 7-camera sets preserved.`);
