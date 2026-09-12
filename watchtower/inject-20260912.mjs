@@ -54,13 +54,23 @@ function injectCameras(html) {
 
 const NOTE_STYLE = `
 <style id="behind-cameras-note-style">
+  #status-tooltip.global-sky-desk-tooltip {
+    width: min(520px, calc(100vw - 24px));
+    max-width: 520px;
+  }
+  #status-tooltip.global-sky-desk-tooltip .global-sky-desk {
+    position: relative;
+    min-height: 190px;
+    padding-right: 170px;
+    box-sizing: border-box;
+  }
   .behind-cameras-note {
     position: absolute;
-    top: 8%;
-    right: 3.2%;
+    top: 10px;
+    right: 0;
     z-index: 12;
-    width: clamp(118px, 29%, 188px);
-    min-height: 104px;
+    width: 150px;
+    min-height: 160px;
     padding: 22px 14px 13px;
     box-sizing: border-box;
     color: #151515;
@@ -142,8 +152,24 @@ const NOTE_STYLE = `
   @media (prefers-reduced-motion: reduce) {
     .behind-cameras-note { animation: none; transform: rotate(-.35deg); }
   }
-  @media (max-width: 760px) {
-    .behind-cameras-note { right: 2.5%; width: 30%; min-height: 82px; padding: 17px 8px 8px; }
+  @media (max-width: 620px) {
+    #status-tooltip.global-sky-desk-tooltip {
+      width: min(296px, calc(100vw - 20px));
+      max-width: 296px;
+    }
+    #status-tooltip.global-sky-desk-tooltip .global-sky-desk {
+      min-height: 0;
+      padding-right: 0;
+    }
+    .behind-cameras-note {
+      position: relative;
+      top: auto;
+      right: auto;
+      width: 100%;
+      min-height: 110px;
+      margin-top: 12px;
+      padding: 19px 10px 10px;
+    }
     .behind-cameras-note::before { width: 9px; height: 9px; margin-left: -4.5px; top: 4px; }
     .behind-cameras-note__body { margin-bottom: 6px; }
   }
@@ -153,24 +179,8 @@ const NOTE_SCRIPT = `
 <script id="behind-cameras-note-loader">
 (() => {
   const DOC_URL = ${JSON.stringify(DOC_URL)};
-  const mount = () => {
-    if (document.getElementById('behind-cameras-note')) return;
-    const marker = Array.from(document.querySelectorAll('body *')).find(el => (el.textContent || '').trim() === 'GLOBAL SKY DESK');
-    if (!marker) return;
 
-    let desk = marker;
-    while (desk.parentElement && desk.parentElement !== document.body) {
-      const parent = desk.parentElement;
-      const text = (parent.innerText || parent.textContent || '').replace(/\\s+/g, ' ').trim();
-      if (text.includes('GLOBAL SKY DESK') && text.includes('BROADCAST ID') && text.includes('YOUTUBE')) {
-        desk = parent;
-        break;
-      }
-      desk = parent;
-    }
-    if (!desk || desk === document.body) return;
-    if (getComputedStyle(desk).position === 'static') desk.style.position = 'relative';
-
+  const makeNote = () => {
     const note = document.createElement('a');
     note.id = 'behind-cameras-note';
     note.className = 'behind-cameras-note';
@@ -178,14 +188,30 @@ const NOTE_SCRIPT = `
     note.target = '_blank';
     note.rel = 'noopener noreferrer';
     note.setAttribute('aria-label', 'Open Behind the Cameras — the ongoing Global Sky Forever Scout Ledger in a new tab');
-    note.innerHTML = \
+    note.innerHTML = \\
       '<span class="behind-cameras-note__title">BEHIND THE CAMERAS</span>' +
       '<span class="behind-cameras-note__body">A living field record of the cameras we scout — what passed, what didn’t, and why.</span>' +
       '<span class="behind-cameras-note__cta"><svg class="behind-cameras-note__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.75h8.3L19 7.45V21.25H6z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M14.2 2.9v4.7h4.6M9 12h7M9 15.5h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>OPEN THE ONGOING RECORD ↗</span>';
-    desk.appendChild(note);
+    return note;
   };
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount, { once: true });
-  else mount();
+
+  const mount = () => {
+    const desk = document.querySelector('#status-tooltip .global-sky-desk');
+    if (!desk) return false;
+    if (desk.querySelector('#behind-cameras-note')) return true;
+    if (getComputedStyle(desk).position === 'static') desk.style.position = 'relative';
+    desk.appendChild(makeNote());
+    return true;
+  };
+
+  const observer = new MutationObserver(() => mount());
+  const start = () => {
+    mount();
+    observer.observe(document.body, { childList: true, subtree: true });
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+  else start();
 })();
 </script>`;
 
