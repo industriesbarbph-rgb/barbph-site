@@ -48,10 +48,7 @@ function injectCameras(html) {
   const addition = `        const ${ADDITION_FAMILY} = [\n${CAMERAS.map(serializeCamera).join(',\n')}\n        ];\n\n`;
   const refs = CAMERAS.map((_, i) => `            ${ADDITION_FAMILY}[${i}],`).join('\n') + '\n';
   html = html.replace(INVENTORY_MARKER, addition + INVENTORY_MARKER);
-  const invStart = html.indexOf(INVENTORY_MARKER);
-  const invEnd = html.indexOf('\n        ];', invStart);
-  if (invEnd < 0) throw new Error('2026-09-12 camera injection failed: inventory end missing.');
-  html = html.slice(0, invEnd) + '\n' + refs.trimEnd() + html.slice(invEnd);
+  html = html.replace(INVENTORY_MARKER, INVENTORY_MARKER + refs);
   return html;
 }
 
