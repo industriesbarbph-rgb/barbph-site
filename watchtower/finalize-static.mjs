@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 
 const HTML_FILE = new URL('./public/global-sky.html', import.meta.url);
 const SITEMAP_FILE = new URL('./public/sitemap.xml', import.meta.url);
+const ROBOTS_FILE = new URL('./public/robots.txt', import.meta.url);
 const CANONICAL_URL = 'https://watchtower.barbph.com/';
 const PREVIEW_URL = 'https://watchtower.barbph.com/global-sky-social-preview.png';
 const BARBPH_URL = 'https://barbph.com/';
@@ -91,6 +92,25 @@ html = requireReplace(
   'application-name metadata anchor'
 );
 
+const SEO_TITLE = 'Live Cameras & Webcams Around the World | Global Sky';
+const SEO_DESCRIPTION = 'Watch real-time live cameras and webcams around the world with Global Sky, rotating through city, street, beach, scenic, wildlife and weather views every two minutes.';
+
+html = matchReplace(html, /<title>[^<]*<\/title>/, `<title>${SEO_TITLE}</title>`, 'document title');
+html = matchReplace(html, /<meta name="description" content="[^"]*">/, `<meta name="description" content="${SEO_DESCRIPTION}">`, 'meta description');
+html = matchReplace(html, /<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${SEO_TITLE}">`, 'og:title');
+html = matchReplace(html, /<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${SEO_DESCRIPTION}">`, 'og:description');
+html = matchReplace(html, /<meta name="twitter:title" content="[^"]*">/, `<meta name="twitter:title" content="${SEO_TITLE}">`, 'twitter:title');
+html = matchReplace(html, /<meta name="twitter:description" content="[^"]*">/, `<meta name="twitter:description" content="${SEO_DESCRIPTION}">`, 'twitter:description');
+
+html = html.replace(
+  '<h1>Global Sky Live Cameras by Coach Doll Patrols</h1>',
+  '<h1>Live Cameras &amp; Webcams Around the World — Global Sky</h1>'
+);
+html = html.replace(
+  '<p>Global Sky is a live worldwide camera experience that rotates through real-time views from locations around the world every two minutes.</p>',
+  '<p>Global Sky by Coach Doll Patrols is a real-time live camera and webcam experience with city, street, beach, scenic, wildlife and weather views from locations around the world, rotating every two minutes.</p>'
+);
+
 html = matchReplace(html, /<meta property="og:image" content="[^"]*">/, `<meta property="og:image" content="${PREVIEW_URL}">`, 'og:image');
 html = matchReplace(html, /<meta name="twitter:image" content="[^"]*">/, `<meta name="twitter:image" content="${PREVIEW_URL}">`, 'twitter:image');
 html = matchReplace(html, /<meta property="og:image:width" content="[^"]*">/, '<meta property="og:image:width" content="1447">', 'og:image width');
@@ -107,6 +127,25 @@ try {
   throw new Error(`Finalizer guard failed: JSON-LD does not parse: ${error.message}`);
 }
 if (schema['@type'] !== 'WebPage') throw new Error(`Finalizer guard failed: expected WebPage JSON-LD, found ${schema['@type'] || 'none'}.`);
+schema.name = SEO_TITLE;
+schema.description = SEO_DESCRIPTION;
+schema.keywords = [
+  'live cameras around the world',
+  'worldwide live cameras',
+  'live webcams',
+  'live webcam feeds',
+  'real-time live cameras',
+  'live city cameras',
+  'live street cameras',
+  'live scenic cameras',
+  'live beach cameras',
+  'live wildlife cameras',
+  'live weather cameras'
+];
+schema.about = [
+  { '@type': 'Thing', name: 'Live cameras and webcams around the world' },
+  { '@type': 'Thing', name: 'Real-time city, street, beach, scenic, wildlife and weather views' }
+];
 schema.url = CANONICAL_URL;
 schema.image = PREVIEW_URL;
 schema.primaryImageOfPage = {
@@ -153,5 +192,10 @@ await writeFile(
   '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>https://watchtower.barbph.com/</loc></url>\n</urlset>\n',
   'utf8'
 );
+await writeFile(
+  ROBOTS_FILE,
+  'User-agent: *\nAllow: /\n\nSitemap: https://watchtower.barbph.com/sitemap.xml\n',
+  'utf8'
+);
 
-console.log(`Watch Tower finalizer OK: exact Tokyo attribution visible on-panel and in focus view; static canonical/social metadata; enriched WebPage JSON-LD; canonical-only sitemap; removed ${removedDynamicScripts} legacy metadata script(s).`);
+console.log(`Watch Tower finalizer OK: exact Tokyo attribution visible on-panel and in focus view; static canonical/social metadata; search-focused title/description; enriched WebPage JSON-LD; canonical sitemap + robots.txt; removed ${removedDynamicScripts} legacy metadata script(s).`);

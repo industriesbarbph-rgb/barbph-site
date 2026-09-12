@@ -70,8 +70,8 @@ const NOTE_STYLE = `
     right: 0;
     z-index: 12;
     width: 150px;
-    min-height: 160px;
-    padding: 22px 14px 13px;
+    min-height: 0;
+    padding: 22px 14px 9px;
     box-sizing: border-box;
     color: #151515;
     text-decoration: none;
@@ -85,7 +85,7 @@ const NOTE_STYLE = `
       0 4px 8px rgba(0,0,0,.15),
       inset 0 0 0 1px rgba(255,255,255,.7);
     transform-origin: 50% 6px;
-    animation: behindCamerasSway 9.6s ease-in-out infinite;
+    animation: behindCamerasSway 18s ease-in-out infinite;
     will-change: transform;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
@@ -144,13 +144,12 @@ const NOTE_STYLE = `
     outline: none;
   }
   @keyframes behindCamerasSway {
-    0%, 100% { transform: rotate(-.55deg) translate3d(0,0,0); }
-    25% { transform: rotate(.34deg) translate3d(.35px,.2px,0); }
-    52% { transform: rotate(.72deg) translate3d(.15px,.7px,0); }
-    76% { transform: rotate(-.18deg) translate3d(-.25px,.3px,0); }
+    0%, 30%, 100% { transform: rotate(-.08deg); }
+    52% { transform: rotate(.11deg); }
+    76% { transform: rotate(-.04deg); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .behind-cameras-note { animation: none; transform: rotate(-.35deg); }
+    .behind-cameras-note { animation: none; transform: rotate(-.08deg); }
   }
   @media (max-width: 620px) {
     #status-tooltip.global-sky-desk-tooltip {
@@ -166,9 +165,9 @@ const NOTE_STYLE = `
       top: auto;
       right: auto;
       width: 100%;
-      min-height: 110px;
+      min-height: 0;
       margin-top: 12px;
-      padding: 19px 10px 10px;
+      padding: 19px 10px 8px;
     }
     .behind-cameras-note::before { width: 9px; height: 9px; margin-left: -4.5px; top: 4px; }
     .behind-cameras-note__body { margin-bottom: 6px; }
@@ -190,7 +189,7 @@ const NOTE_SCRIPT = `
     note.setAttribute('aria-label', 'Open Behind the Cameras — the ongoing Global Sky Forever Scout Ledger in a new tab');
     note.innerHTML =
       '<span class="behind-cameras-note__title">BEHIND THE CAMERAS</span>' +
-      '<span class="behind-cameras-note__body">A living field record of the cameras we scout — what passed, what didn’t, and why.</span>' +
+      '<span class="behind-cameras-note__body">A living field record of the live-feed technology we scout — what passed, what didn’t, and why.</span>' +
       '<span class="behind-cameras-note__cta"><svg class="behind-cameras-note__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.75h8.3L19 7.45V21.25H6z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M14.2 2.9v4.7h4.6M9 12h7M9 15.5h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>OPEN THE ONGOING RECORD ↗</span>';
     return note;
   };
