@@ -99,8 +99,19 @@ for (const required of [
   'OPEN THE ONGOING RECORD',
   DOC_URL,
   "note.target = '_blank'",
-  "note.rel = 'noopener noreferrer'"
+  "note.rel = 'noopener noreferrer'",
+  'Behind the Cameras mobile containment: one physical paper block.',
+  'display: block;',
+  'animation: none;',
+  'transform: none;'
 ]) if (!html.includes(required)) throw new Error(`Behind the Cameras contract failed: ${required} missing.`);
+
+for (const required of [
+  'id="global-sky-feed-text-fix"',
+  "label.classList.add('global-sky-feed-label')",
+  "fullPlace.textContent = String(cam.city || cityText || '')",
+  'overflow-wrap: anywhere !important'
+]) if (!html.includes(required)) throw new Error(`Mobile feed text contract failed: ${required} missing.`);
 
 if (manifest.total_camera_count !== 50) throw new Error(`Build manifest expected 50 cameras, found ${manifest.total_camera_count}.`);
 if (manifest.release_camera_additions_20260912 !== 21) throw new Error('Build manifest September 12 addition count must be 21.');

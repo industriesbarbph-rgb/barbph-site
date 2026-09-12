@@ -64,7 +64,9 @@ const NOTE_STYLE = `
     padding-right: 170px;
     box-sizing: border-box;
   }
+  /* Behind the Cameras mobile containment: one physical paper block. */
   .behind-cameras-note {
+    display: block;
     position: absolute;
     top: 10px;
     right: 0;
@@ -85,7 +87,7 @@ const NOTE_STYLE = `
       0 4px 8px rgba(0,0,0,.15),
       inset 0 0 0 1px rgba(255,255,255,.7);
     transform-origin: 50% 6px;
-    animation: behindCamerasSway 18s ease-in-out infinite;
+    animation: behindCamerasSway 28s cubic-bezier(.37,0,.25,1) infinite;
     will-change: transform;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
@@ -133,6 +135,9 @@ const NOTE_STYLE = `
     border-bottom: 1px solid rgba(0,0,0,.42);
     padding-bottom: 2px;
   }
+  .behind-cameras-note__title,
+  .behind-cameras-note__body,
+  .behind-cameras-note__cta { position: relative; z-index: 1; }
   .behind-cameras-note__icon {
     width: 11px;
     height: 11px;
@@ -144,12 +149,12 @@ const NOTE_STYLE = `
     outline: none;
   }
   @keyframes behindCamerasSway {
-    0%, 30%, 100% { transform: rotate(-.08deg); }
-    52% { transform: rotate(.11deg); }
-    76% { transform: rotate(-.04deg); }
+    0%, 38%, 100% { transform: rotate(-.03deg); }
+    56% { transform: rotate(.05deg); }
+    72%, 88% { transform: rotate(-.01deg); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .behind-cameras-note { animation: none; transform: rotate(-.08deg); }
+    .behind-cameras-note { animation: none; transform: none; }
   }
   @media (max-width: 620px) {
     #status-tooltip.global-sky-desk-tooltip {
@@ -161,13 +166,17 @@ const NOTE_STYLE = `
       padding-right: 0;
     }
     .behind-cameras-note {
+      display: block;
       position: relative;
       top: auto;
       right: auto;
+      clear: both;
       width: 100%;
       min-height: 0;
-      margin-top: 12px;
-      padding: 19px 10px 8px;
+      margin: 16px 0 0;
+      padding: 19px 10px 9px;
+      animation: none;
+      transform: none;
     }
     .behind-cameras-note::before { width: 9px; height: 9px; margin-left: -4.5px; top: 4px; }
     .behind-cameras-note__body { margin-bottom: 6px; }

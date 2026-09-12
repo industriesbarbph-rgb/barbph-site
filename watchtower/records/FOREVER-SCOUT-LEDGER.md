@@ -201,3 +201,22 @@ The Watch Tower release adds a realistic pinned white note in the Global Sky Des
 A public Markdown copy of this FOREVER Scout Ledger is also stored in the Watch Tower GitHub branch as a version-controlled historical record.
 
 **Release principle preserved:** build once, deploy the camera batch and historical-document doorway together, and avoid a second Netlify build merely to change the Google Doc itself.
+
+## 2026-09-12 — MOBILE DESK / FEED-TEXT CORRECTION BATCH
+
+**Trigger:** Production mobile screenshots exposed two presentation failures after the initial Behind the Cameras release: the pinned paper's contents were escaping the white sheet on mobile, and long feed-location / attribution text was being visibly cropped in narrow camera panels.
+
+### Root cause — Behind the Cameras paper
+The note is an anchor element. On desktop its absolute positioning gave it a contained visual box, but the mobile rule changed it to relative positioning without explicitly making the anchor a block. The paper background therefore followed fragmented inline content instead of behaving as one physical sheet.
+
+**Correction committed:** the note is now an explicit block, remains in normal mobile document flow after the Desk controls, clears neighboring content, sizes itself to its actual content, and has no mobile sway. Desktop keeps only a very small, slow pinned-paper drift. The wording remains: “A living field record of the live-feed technology we scout — what passed, what didn’t, and why.”
+
+### Root cause — cropped feed text
+Long location names and source / copyright attribution were being constrained by the narrow mobile feed cards and existing ellipsis/overflow behavior.
+
+**Correction committed:** generated feed labels now restore the full camera city and country values, use a dedicated wrapping class, and allow multi-line text rather than ellipsizing it. Attribution text is also allowed to wrap completely with a smaller mobile type size. The seven-feed geometry and two-minute rotation are not changed.
+
+### Powered by Netlify badge investigation
+The repository contains no “Powered by Netlify” badge code. Netlify's current platform documentation confirms that eligible public projects can receive this badge through edge injection, outside the site's source and build. The correct removal is the per-project Netlify setting; no CSS concealment or source hack was added to Watch Tower.
+
+**Deployment control:** this correction is committed to the production branch only with the existing automated 50-camera release gate. It is not considered accepted until the workflow passes and Netlify reports the corresponding production deploy ready.

@@ -29,7 +29,12 @@ if (!html.includes(`attribution:'${TOKYO_ATTRIBUTION}'`)) {
 
 // Make the required attribution visible even before the user enlarges the camera.
 if (!html.includes('feed-attribution')) {
-  const labelNeedle = '            label.innerHTML = `<span class="place">${cityText}</span><span class="country">${countryText}</span><span class="state" id="feed-state-${item.slot}"></span>`;';
+  const labelNeedle = '            label.innerHTML = `<span class="place">${cityText}</span><span class="country">${countryText}</span><span class="state" id="feed-state-${item.slot}"></span>`;
+            label.classList.add('global-sky-feed-label');
+            const fullPlace = label.querySelector('.place');
+            const fullCountry = label.querySelector('.country');
+            if (fullPlace) fullPlace.textContent = String(cam.city || cityText || '');
+            if (fullCountry) fullCountry.textContent = String(cam.country || countryText || '');';
   html = requireReplace(
     html,
     labelNeedle,
@@ -46,6 +51,61 @@ if (!html.includes('feed-attribution')) {
   const attributionCss = `        .feed-attribution {\n            position: absolute;\n            top: 4px;\n            left: 4px;\n            right: 4px;\n            z-index: 3;\n            padding: 2px 4px;\n            border-radius: 4px;\n            background: rgba(0,0,0,.46);\n            color: rgba(255,255,255,.94);\n            font: 500 clamp(4.8px, .38vw, 7px)/1.15 'Oswald', sans-serif;\n            letter-spacing: .01em;\n            text-align: left;\n            white-space: normal;\n            pointer-events: none;\n            text-shadow: 0 1px 3px rgba(0,0,0,.96);\n        }\n        .feed-attribution[hidden] { display: none !important; }\n        @media (max-width: 760px) {\n            .feed-attribution {\n                top: 2px;\n                left: 2px;\n                right: 2px;\n                padding: 1px 2px;\n                font-size: 3.7px;\n            }\n        }\n\n`;
   html = requireReplace(html, cssAnchor, attributionCss + cssAnchor, 'feed attribution CSS anchor');
 }
+
+
+// Keep narrow mobile feed captions readable without changing the feed-band geometry.
+const GLOBAL_SKY_FEED_TEXT_STYLE = `
+<style id="global-sky-feed-text-fix">
+  .global-sky-feed-label {
+    height: auto !important;
+    min-height: 0 !important;
+    max-width: calc(100% - 4px) !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+  }
+  .global-sky-feed-label .place,
+  .global-sky-feed-label .country {
+    display: block !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+  .feed-attribution {
+    max-height: none !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+  }
+  @media (max-width: 760px) {
+    .global-sky-feed-label {
+      padding-top: 2px !important;
+      padding-bottom: 2px !important;
+      line-height: 1.05 !important;
+    }
+    .global-sky-feed-label .place {
+      font-size: clamp(4.5px, 1.55vw, 7px) !important;
+      line-height: 1.05 !important;
+    }
+    .global-sky-feed-label .country {
+      font-size: clamp(3.8px, 1.25vw, 5.8px) !important;
+      line-height: 1.05 !important;
+    }
+    .feed-attribution {
+      font-size: 3.45px !important;
+      line-height: 1.12 !important;
+    }
+  }
+</style>`;
+
+html = html.replace(/\s*<style id="global-sky-feed-text-fix">[\s\S]*?<\/style>\s*/g, '\n');
+if (!html.includes('</head>')) throw new Error('Finalizer guard failed: </head> missing for mobile feed text style.');
+html = html.replace('</head>', `${GLOBAL_SKY_FEED_TEXT_STYLE}\n</head>`);
 
 // Remove every copy of the old browser-generated canonical/OG URL script.
 // Production has gone through several packaging layers, so this deliberately
