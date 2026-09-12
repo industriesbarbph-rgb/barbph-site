@@ -87,8 +87,9 @@ const NOTE_STYLE = `
       0 4px 8px rgba(0,0,0,.15),
       inset 0 0 0 1px rgba(255,255,255,.7);
     transform-origin: 50% 6px;
-    animation: behindCamerasSway 28s cubic-bezier(.37,0,.25,1) infinite;
-    will-change: transform;
+    animation: none;
+    transform: none;
+    will-change: auto;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
@@ -148,11 +149,6 @@ const NOTE_STYLE = `
     box-shadow: 0 16px 30px rgba(0,0,0,.22), 0 5px 10px rgba(0,0,0,.16);
     outline: none;
   }
-  @keyframes behindCamerasSway {
-    0%, 38%, 100% { transform: rotate(-.03deg); }
-    56% { transform: rotate(.05deg); }
-    72%, 88% { transform: rotate(-.01deg); }
-  }
   @media (prefers-reduced-motion: reduce) {
     .behind-cameras-note { animation: none; transform: none; }
   }
@@ -203,6 +199,29 @@ const NOTE_SCRIPT = `
     return note;
   };
 
+  const enhanceDeskHtml = html => {
+    const template = document.createElement('template');
+    template.innerHTML = String(html ?? '');
+    const desk = template.content.querySelector('.global-sky-desk');
+    if (!desk || desk.querySelector('#behind-cameras-note')) return String(html ?? '');
+    desk.appendChild(makeNote());
+    return template.innerHTML;
+  };
+
+  const installRendererHook = () => {
+    const original = window.tooltipContent;
+    if (typeof original !== 'function') return false;
+    if (original.__behindCamerasStableRenderer) return true;
+
+    const wrapped = function(...args) {
+      return enhanceDeskHtml(original.apply(this, args));
+    };
+    wrapped.__behindCamerasStableRenderer = true;
+    wrapped.__behindCamerasOriginal = original;
+    window.tooltipContent = wrapped;
+    return true;
+  };
+
   const mount = () => {
     const desk = document.querySelector('#status-tooltip .global-sky-desk');
     if (!desk) return false;
@@ -212,8 +231,12 @@ const NOTE_SCRIPT = `
     return true;
   };
 
-  const observer = new MutationObserver(() => mount());
+  const observer = new MutationObserver(() => {
+    installRendererHook();
+    mount();
+  });
   const start = () => {
+    installRendererHook();
     mount();
     observer.observe(document.body, { childList: true, subtree: true });
   };

@@ -238,3 +238,18 @@ The corrected finalizer then passed syntax, but the next automated build stopped
 **Production impact:** none from this attempted correction. The gate stopped before the camera build/audit and before a corresponding production publish.
 
 **Response:** expand the deterministic source guard to accept both the preserved historical title and the current approved SEO title. This keeps the guard strict to Global Sky while allowing the production source to rebuild after its own SEO improvement.
+
+## 2026-09-12 — VIDEO-VERIFIED PINNED-PAPER FLICKER
+
+A mobile screen recording supplied after the first containment fix exposed a second, different failure: while the Global Sky Desk remained open, the white **BEHIND THE CAMERAS** paper periodically disappeared and returned. The recording shows the paper present, absent for a refresh frame, then present again. This was not the intended paper movement.
+
+### Root cause
+The note was being appended to the dynamically generated Desk only after the Desk existed. The Desk renderer refreshes its generated content, so the note could be removed and then re-mounted by the MutationObserver. Even when that interval was brief, the remove/re-add cycle created a visible twitch/flicker.
+
+### Correction prepared
+- The paper is now fully static on every viewport: no sway keyframes, no transform animation, and no transform optimization hint.
+- The existing `tooltipContent()` renderer is wrapped so every newly generated Global Sky Desk contains the paper **synchronously in the returned Desk HTML**.
+- The old MutationObserver remains only as a fallback for the first/current Desk instance; it is no longer the primary mechanism that must reinsert the paper after normal Desk refreshes.
+- Camera count, seven-slot geometry, two-minute rotation, full mobile label wrapping, attribution wrapping, and the living Google Doc link are unchanged.
+
+**Release rule:** production acceptance still requires the full Watch Tower syntax/build/audit workflow and Netlify ready state.

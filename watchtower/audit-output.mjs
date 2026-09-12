@@ -103,8 +103,14 @@ for (const required of [
   'Behind the Cameras mobile containment: one physical paper block.',
   'display: block;',
   'animation: none;',
-  'transform: none;'
+  'transform: none;',
+  '__behindCamerasStableRenderer',
+  'const enhanceDeskHtml = html =>',
+  'window.tooltipContent = wrapped;',
+  'will-change: auto;'
 ]) if (!html.includes(required)) throw new Error(`Behind the Cameras contract failed: ${required} missing.`);
+
+if (html.includes('@keyframes behindCamerasSway')) throw new Error('Behind the Cameras paper must remain physically pinned with no sway keyframes.');
 
 for (const required of [
   'id="global-sky-feed-text-fix"',
