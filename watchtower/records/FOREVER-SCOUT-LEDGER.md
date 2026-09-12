@@ -270,3 +270,12 @@ On mobile, the paper is absolutely pinned to the bottom of the Desk and the Desk
 The living Google Doc URL, new-tab behavior, 50-camera inventory, full label/attribution wrapping, seven-feed layout, and two-minute camera rotation remain unchanged.
 
 **Acceptance rule:** this architecture is not considered production-verified until the complete GitHub syntax/build/audit gate passes and a Netlify production deploy containing this commit is actually published.
+
+
+## 2026-09-13 — NETLIFY CREDITS RESTORED — STATIC-PAPER REPUBLISH
+
+The owner restored Netlify build credits after earlier Watch Tower production attempts were skipped. The verified static-paper correction remains commit `57cb4661237c4bbad1223b797e182c5573372f7d`, which passed the complete Watch Tower release check but had not advanced the live production deploy.
+
+A fresh production-trigger commit was issued after credits were restored so Netlify can build and publish the already-verified static-paper architecture. No camera inventory, rotation logic, SEO copy, or Behind the Cameras document link is changed by this trigger.
+
+**Acceptance rule:** confirm a new Netlify production deploy whose commit is at or after the static-paper correction, then retest on both Android Chrome and iPhone Safari before declaring the twitch/crash incident closed.

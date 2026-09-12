@@ -1,4 +1,4 @@
-# production republish trigger for pinned-paper flicker fix
+# production republish trigger after Netlify credits restored 2026-09-13
 [build]
   publish = "public"
   command = "npm run build"
