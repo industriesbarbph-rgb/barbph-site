@@ -94,23 +94,27 @@ if (!html.includes('chosen.push(inventory[(start + i) % inventory.length]);')) t
 
 for (const required of [
   'id="behind-cameras-note-style"',
-  'id="behind-cameras-note-loader"',
+  'id="behind-cameras-note"',
   'BEHIND THE CAMERAS',
   'OPEN THE ONGOING RECORD',
   DOC_URL,
-  "note.target = '_blank'",
-  "note.rel = 'noopener noreferrer'",
+  'target="_blank"',
+  'rel="noopener noreferrer"',
   'Behind the Cameras mobile containment: one physical paper block.',
   'display: block;',
   'animation: none;',
   'transform: none;',
+  'padding-bottom: 102px;',
+  'bottom: 0;'
+]) if (!html.includes(required)) throw new Error(`Behind the Cameras contract failed: ${required} missing.`);
+
+for (const forbidden of [
+  'id="behind-cameras-note-loader"',
   '__behindCamerasStableRenderer',
   'const enhanceDeskHtml = html =>',
   'window.tooltipContent = wrapped;',
-  'will-change: auto;'
-]) if (!html.includes(required)) throw new Error(`Behind the Cameras contract failed: ${required} missing.`);
-
-if (html.includes('@keyframes behindCamerasSway')) throw new Error('Behind the Cameras paper must remain physically pinned with no sway keyframes.');
+  '@keyframes behindCamerasSway'
+]) if (html.includes(forbidden)) throw new Error(`Behind the Cameras static architecture failed: legacy runtime token remains: ${forbidden}`);
 
 for (const required of [
   'id="global-sky-feed-text-fix"',

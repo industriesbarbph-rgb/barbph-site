@@ -160,16 +160,18 @@ const NOTE_STYLE = `
     #status-tooltip.global-sky-desk-tooltip .global-sky-desk {
       min-height: 0;
       padding-right: 0;
+      padding-bottom: 102px;
     }
     .behind-cameras-note {
       display: block;
-      position: relative;
+      position: absolute;
       top: auto;
-      right: auto;
-      clear: both;
+      right: 0;
+      bottom: 0;
+      left: 0;
       width: 100%;
       min-height: 0;
-      margin: 16px 0 0;
+      margin: 0;
       padding: 19px 10px 9px;
       animation: none;
       transform: none;
@@ -179,81 +181,32 @@ const NOTE_STYLE = `
   }
 </style>`;
 
-const NOTE_SCRIPT = `
-<script id="behind-cameras-note-loader">
-(() => {
-  const DOC_URL = ${JSON.stringify(DOC_URL)};
-
-  const makeNote = () => {
-    const note = document.createElement('a');
-    note.id = 'behind-cameras-note';
-    note.className = 'behind-cameras-note';
-    note.href = DOC_URL;
-    note.target = '_blank';
-    note.rel = 'noopener noreferrer';
-    note.setAttribute('aria-label', 'Open Behind the Cameras — the ongoing Global Sky Forever Scout Ledger in a new tab');
-    note.innerHTML =
-      '<span class="behind-cameras-note__title">BEHIND THE CAMERAS</span>' +
-      '<span class="behind-cameras-note__body">A living field record of the live-feed technology we scout — what passed, what didn’t, and why.</span>' +
-      '<span class="behind-cameras-note__cta"><svg class="behind-cameras-note__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.75h8.3L19 7.45V21.25H6z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M14.2 2.9v4.7h4.6M9 12h7M9 15.5h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>OPEN THE ONGOING RECORD ↗</span>';
-    return note;
-  };
-
-  const enhanceDeskHtml = html => {
-    const template = document.createElement('template');
-    template.innerHTML = String(html ?? '');
-    const desk = template.content.querySelector('.global-sky-desk');
-    if (!desk || desk.querySelector('#behind-cameras-note')) return String(html ?? '');
-    desk.appendChild(makeNote());
-    return template.innerHTML;
-  };
-
-  const installRendererHook = () => {
-    const original = window.tooltipContent;
-    if (typeof original !== 'function') return false;
-    if (original.__behindCamerasStableRenderer) return true;
-
-    const wrapped = function(...args) {
-      return enhanceDeskHtml(original.apply(this, args));
-    };
-    wrapped.__behindCamerasStableRenderer = true;
-    wrapped.__behindCamerasOriginal = original;
-    window.tooltipContent = wrapped;
-    return true;
-  };
-
-  const mount = () => {
-    const desk = document.querySelector('#status-tooltip .global-sky-desk');
-    if (!desk) return false;
-    if (desk.querySelector('#behind-cameras-note')) return true;
-    if (getComputedStyle(desk).position === 'static') desk.style.position = 'relative';
-    desk.appendChild(makeNote());
-    return true;
-  };
-
-  const observer = new MutationObserver(() => {
-    installRendererHook();
-    mount();
-  });
-  const start = () => {
-    installRendererHook();
-    mount();
-    observer.observe(document.body, { childList: true, subtree: true });
-  };
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
-  else start();
-})();
-</script>`;
+const NOTE_MARKUP = `
+<a id="behind-cameras-note" class="behind-cameras-note" href="${DOC_URL}" target="_blank" rel="noopener noreferrer" aria-label="Open Behind the Cameras — the ongoing Global Sky Forever Scout Ledger in a new tab">
+  <span class="behind-cameras-note__title">BEHIND THE CAMERAS</span>
+  <span class="behind-cameras-note__body">A living field record of the live-feed technology we scout — what passed, what didn’t, and why.</span>
+  <span class="behind-cameras-note__cta"><svg class="behind-cameras-note__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.75h8.3L19 7.45V21.25H6z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M14.2 2.9v4.7h4.6M9 12h7M9 15.5h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>OPEN THE ONGOING RECORD ↗</span>
+</a>`;
 
 function injectBehindCamerasNote(html) {
   if (!html.includes('behind-cameras-note-style')) {
     if (!html.includes('</head>')) throw new Error('Behind the Cameras note injection failed: </head> missing.');
     html = html.replace('</head>', `${NOTE_STYLE}\n</head>`);
   }
-  if (!html.includes('behind-cameras-note-loader')) {
-    if (!html.includes('</body>')) throw new Error('Behind the Cameras note injection failed: </body> missing.');
-    html = html.replace('</body>', `${NOTE_SCRIPT}\n</body>`);
+
+  // Insert the paper directly into the Desk template at build time.
+  // No observer, renderer wrapper, or post-render re-mount loop.
+  if (!html.includes('id="behind-cameras-note"')) {
+    const deskOpenRegex = /<div\b[^>]*class=["'][^"']*\bglobal-sky-desk\b[^"']*["'][^>]*>/g;
+    const matches = [...html.matchAll(deskOpenRegex)];
+    if (matches.length !== 1) {
+      throw new Error(`Behind the Cameras static injection expected exactly one Global Sky Desk template, found ${matches.length}.`);
+    }
+    html = html.replace(deskOpenRegex, match => match + NOTE_MARKUP);
+  }
+
+  if (html.includes('id="behind-cameras-note-loader"')) {
+    throw new Error('Behind the Cameras static injection failed: legacy runtime loader remains.');
   }
   return html;
 }
@@ -269,8 +222,8 @@ for (const cam of CAMERAS) {
 }
 if (uniqueIds.size !== 50) throw new Error(`2026-09-12 camera count guard failed: expected 50 unique cameras, found ${uniqueIds.size}.`);
 if (html.includes("camera_id:'CAM-ID-SEMERU-A-20260912'")) throw new Error('Semeru Cam A must remain on HOLD at deployment gate; do not silently substitute another Semeru camera.');
-if (!html.includes(`href = DOC_URL`) && !html.includes('note.href = DOC_URL')) throw new Error('Behind the Cameras note link assignment missing.');
-if (!html.includes("note.target = '_blank'")) throw new Error('Behind the Cameras note must open in a new tab.');
+if (!html.includes(`href="${DOC_URL}"`)) throw new Error('Behind the Cameras static note link missing.');
+if (!html.includes('target="_blank"') || !html.includes('rel="noopener noreferrer"')) throw new Error('Behind the Cameras note must open safely in a new tab.');
 
 await writeFile(HTML_FILE, html, 'utf8');
 

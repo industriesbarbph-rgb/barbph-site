@@ -49,7 +49,8 @@ jobs:
           if (manifest.release_camera_additions_20260912 !== 21) throw new Error('September 12 addition count is not 21');
           if (!manifest.behind_cameras_note) throw new Error('Behind the Cameras note flag missing');
           if (!html.includes('BEHIND THE CAMERAS')) throw new Error('Behind the Cameras note missing');
-          if (!html.includes("note.target = '_blank'")) throw new Error('Google Doc link does not open in a new tab');
+          if (!html.includes('id="behind-cameras-note"') || !html.includes('target="_blank"')) throw new Error('Static Google Doc note/link contract missing');
+          if (html.includes('id="behind-cameras-note-loader"') || html.includes('__behindCamerasStableRenderer')) throw new Error('Legacy runtime note machinery remains');
           if (html.includes("camera_id:'CAM-ID-SEMERU-A-20260912'")) throw new Error('Semeru Cam A must remain on HOLD');
           if (!html.includes('CAM-TW-TAITUNG-SANXIANTAI-20260912')) throw new Error('Sanxiantai missing');
           if (!html.includes('const SET_INTERVAL_MS = 2 * 60 * 1000;')) throw new Error('2-minute rotation contract missing');

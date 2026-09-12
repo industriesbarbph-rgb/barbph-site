@@ -253,3 +253,20 @@ The note was being appended to the dynamically generated Desk only after the Des
 - Camera count, seven-slot geometry, two-minute rotation, full mobile label wrapping, attribution wrapping, and the living Google Doc link are unchanged.
 
 **Release rule:** production acceptance still requires the full Watch Tower syntax/build/audit workflow and Netlify ready state.
+
+
+## 2026-09-12 — CROSS-BROWSER STATIC-PAPER CORRECTION
+
+**Trigger:** After the first anti-flicker correction, the white BEHIND THE CAMERAS paper appeared stable in iPhone Safari at first, continued visibly twitching in Android Chrome, and later iPhone Safari displayed “A problem repeatedly occurred” for Watch Tower without user interaction.
+
+### Architecture finding
+The remaining risk was not CSS sway. The paper still depended on runtime note machinery: a whole-body MutationObserver plus a wrapper around the Desk renderer. On browsers where the Desk is regenerated while open, this architecture could still create remove/reinsert work and repeated DOM churn. The symptom could vary by browser: visible paper flicker on one browser and escalating page instability on another.
+
+### Correction
+The paper is now inserted **directly into the Global Sky Desk template during the Watch Tower build**. It no longer uses a MutationObserver, renderer wrapper, post-render mounting, animation, transform, or re-insertion loop.
+
+On mobile, the paper is absolutely pinned to the bottom of the Desk and the Desk reserves its space with bottom padding. This prevents the paper’s physical position from changing when the rest of the Desk content updates.
+
+The living Google Doc URL, new-tab behavior, 50-camera inventory, full label/attribution wrapping, seven-feed layout, and two-minute camera rotation remain unchanged.
+
+**Acceptance rule:** this architecture is not considered production-verified until the complete GitHub syntax/build/audit gate passes and a Netlify production deploy containing this commit is actually published.
