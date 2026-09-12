@@ -230,3 +230,11 @@ The first mobile-correction commit (`79e7f3c3ce53864a02eb15f6d57343643907c7f6`) 
 **Response:** restore the last known-good finalizer as the base, reapply the mobile feed-label fix at a safe runtime patch point, rerun the complete syntax/build/audit gate, and accept production only after a clean pass.
 
 This failure remains in the ledger by design: the gate did exactly what it exists to do.
+
+
+### SEO TITLE SOURCE-GUARD INTERCEPTION
+The corrected finalizer then passed syntax, but the next automated build stopped at the static source guard. The reason was historical rather than a camera failure: the previous successful SEO release had changed the production document title from **Global Sky Live Cameras | Coach Doll Patrols** to **Live Cameras & Webcams Around the World | Global Sky**, while the source-preparation guard still accepted only the older title.
+
+**Production impact:** none from this attempted correction. The gate stopped before the camera build/audit and before a corresponding production publish.
+
+**Response:** expand the deterministic source guard to accept both the preserved historical title and the current approved SEO title. This keeps the guard strict to Global Sky while allowing the production source to rebuild after its own SEO improvement.

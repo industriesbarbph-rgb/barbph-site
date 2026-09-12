@@ -255,7 +255,13 @@ function applyAttributionUI(html) {
 }
 
 const source = await sourceHtml();
-if (!source.includes('<title>Global Sky Live Cameras | Coach Doll Patrols</title>')) throw new Error('Source guard failed: Global Sky title marker missing.');
+const acceptedSourceTitles = [
+  '<title>Global Sky Live Cameras | Coach Doll Patrols</title>',
+  '<title>Live Cameras & Webcams Around the World | Global Sky</title>'
+];
+if (!acceptedSourceTitles.some(title => source.includes(title))) {
+  throw new Error('Source guard failed: expected a recognized Global Sky title marker.');
+}
 
 const sourceUnique = new Set(idsFrom(source).filter(id => id.startsWith('CAM-')));
 if (![21, 28].includes(sourceUnique.size)) throw new Error(`Source guard failed: expected 21 or 28 unique cameras, found ${sourceUnique.size}.`);
