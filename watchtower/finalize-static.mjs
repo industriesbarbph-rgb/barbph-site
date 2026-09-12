@@ -29,12 +29,7 @@ if (!html.includes(`attribution:'${TOKYO_ATTRIBUTION}'`)) {
 
 // Make the required attribution visible even before the user enlarges the camera.
 if (!html.includes('feed-attribution')) {
-  const labelNeedle = '            label.innerHTML = `<span class="place">${cityText}</span><span class="country">${countryText}</span><span class="state" id="feed-state-${item.slot}"></span>`;
-            label.classList.add('global-sky-feed-label');
-            const fullPlace = label.querySelector('.place');
-            const fullCountry = label.querySelector('.country');
-            if (fullPlace) fullPlace.textContent = String(cam.city || cityText || '');
-            if (fullCountry) fullCountry.textContent = String(cam.country || countryText || '');';
+  const labelNeedle = '            label.innerHTML = `<span class="place">${cityText}</span><span class="country">${countryText}</span><span class="state" id="feed-state-${item.slot}"></span>`;';
   html = requireReplace(
     html,
     labelNeedle,
@@ -52,6 +47,21 @@ if (!html.includes('feed-attribution')) {
   html = requireReplace(html, cssAnchor, attributionCss + cssAnchor, 'feed attribution CSS anchor');
 }
 
+// Restore full location strings and give narrow feed labels a wrap-safe hook.
+const mobileLabelNeedle = '            label.innerHTML = `<span class="place">${cityText}</span><span class="country">${countryText}</span><span class="state" id="feed-state-${item.slot}"></span>`;';
+if (!html.includes("label.classList.add('global-sky-feed-label')")) {
+  html = requireReplace(
+    html,
+    mobileLabelNeedle,
+    `${mobileLabelNeedle}
+            label.classList.add('global-sky-feed-label');
+            const fullPlace = label.querySelector('.place');
+            const fullCountry = label.querySelector('.country');
+            if (fullPlace) fullPlace.textContent = String(cam.city || cityText || '');
+            if (fullCountry) fullCountry.textContent = String(cam.country || countryText || '');`,
+    'full mobile feed label hook'
+  );
+}
 
 // Keep narrow mobile feed captions readable without changing the feed-band geometry.
 const GLOBAL_SKY_FEED_TEXT_STYLE = `

@@ -220,3 +220,13 @@ Long location names and source / copyright attribution were being constrained by
 The repository contains no “Powered by Netlify” badge code. Netlify's current platform documentation confirms that eligible public projects can receive this badge through edge injection, outside the site's source and build. The correct removal is the per-project Netlify setting; no CSS concealment or source hack was added to Watch Tower.
 
 **Deployment control:** this correction is committed to the production branch only with the existing automated 50-camera release gate. It is not considered accepted until the workflow passes and Netlify reports the corresponding production deploy ready.
+
+
+### AUTOMATED GATE INTERCEPTION — MOBILE CORRECTION
+The first mobile-correction commit (`79e7f3c3ce53864a02eb15f6d57343643907c7f6`) was **rejected before build** by the Watch Tower production workflow at the Syntax check. The failed patch had accidentally inserted the new feed-label hook inside the finalizer's own string literal, producing invalid JavaScript.
+
+**Production impact:** none. The automated release gate stopped the build before the 50-camera audit and before any corresponding production publish.
+
+**Response:** restore the last known-good finalizer as the base, reapply the mobile feed-label fix at a safe runtime patch point, rerun the complete syntax/build/audit gate, and accept production only after a clean pass.
+
+This failure remains in the ledger by design: the gate did exactly what it exists to do.
