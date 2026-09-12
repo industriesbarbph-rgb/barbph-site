@@ -188,7 +188,7 @@ const NOTE_SCRIPT = `
     note.target = '_blank';
     note.rel = 'noopener noreferrer';
     note.setAttribute('aria-label', 'Open Behind the Cameras — the ongoing Global Sky Forever Scout Ledger in a new tab');
-    note.innerHTML = \\
+    note.innerHTML =
       '<span class="behind-cameras-note__title">BEHIND THE CAMERAS</span>' +
       '<span class="behind-cameras-note__body">A living field record of the cameras we scout — what passed, what didn’t, and why.</span>' +
       '<span class="behind-cameras-note__cta"><svg class="behind-cameras-note__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.75h8.3L19 7.45V21.25H6z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M14.2 2.9v4.7h4.6M9 12h7M9 15.5h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>OPEN THE ONGOING RECORD ↗</span>';
