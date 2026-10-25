@@ -1,8 +1,8 @@
 /**
  * BarbPH ticker data build.
- * Reads Products, Programs and Testimonials from the safe public control sheet,
- * keeps only published=yes rows (case-insensitive), strips private testimonial
- * fields, and refreshes the JSON payload embedded in ticker.html.
+ * Reads Products, Programs and the sanitized Ticker Testimonials feed from the
+ * safe public control sheet. Only published=yes rows are admitted. The public
+ * testimonial feed contains no private contact_details field.
  */
 
 import fs from "node:fs";
@@ -78,7 +78,7 @@ async function build() {
   const [productsRaw, programsRaw, testimonialsRaw] = await Promise.all([
     readPublished("Products"),
     readPublished("Programs"),
-    readPublished("Testimonials")
+    readPublished("Ticker Testimonials")
   ]);
 
   const payload = {
