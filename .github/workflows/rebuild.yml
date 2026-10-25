@@ -1,4 +1,4 @@
-name: Rebuild Catalog
+name: Rebuild Catalog + Ticker
 
 on:
   schedule:
@@ -9,6 +9,8 @@ on:
       - main
     paths:
       - "build-catalog.js"
+      - "build-ticker.js"
+      - "ticker.html"
       - "netlify/functions/catalog-feed.mjs"
       - ".github/workflows/rebuild.yml"
 
@@ -39,9 +41,10 @@ jobs:
           const path = require('path');
           const publicId = '1NA3jrA3gdctbpfhXtz2TAiRGRFWsyWRTT6EvoJNIfUw';
           const publicThemeGid = '2000682467';
-          const buildPath = 'build-catalog.js';
-          const buildText = fs.readFileSync(buildPath, 'utf8');
-          const legacy = buildText.match(/\bconst\s+SHEET_ID\s*=\s*["']([A-Za-z0-9_-]+)["']/)?.[1] || publicId;
+          const buildPaths = ['build-catalog.js', 'build-ticker.js'].filter(fs.existsSync);
+          const legacy = buildPaths
+            .map(file => fs.readFileSync(file, 'utf8').match(/\bconst\s+SHEET_ID\s*=\s*["']([A-Za-z0-9_-]+)["']/)?.[1])
+            .find(Boolean) || publicId;
 
           function walk(dir) {
             const out = [];
@@ -53,7 +56,7 @@ jobs:
             return out;
           }
 
-          const files = [buildPath, ...walk('netlify/functions').filter(f => /\.(?:mjs|js|cjs)$/i.test(f))];
+          const files = [...buildPaths, ...walk('netlify/functions').filter(f => /\.(?:mjs|js|cjs)$/i.test(f))];
           for (const file of files) {
             let text = fs.readFileSync(file, 'utf8');
             text = text.replaceAll(legacy, publicId);
@@ -65,16 +68,19 @@ jobs:
       - name: Build catalog from safe public control sheet
         run: node build-catalog.js
 
-      - name: Commit safe control migration and catalog changes only when needed
+      - name: Build ticker from safe public control sheet
+        run: node build-ticker.js
+
+      - name: Commit safe control migration, catalog and ticker changes only when needed
         run: |
           git config user.name "barbph-auto-build"
           git config user.email "actions@github.com"
 
-          git add build-catalog.js netlify/functions products.html programs.html
+          git add build-catalog.js build-ticker.js netlify/functions products.html programs.html ticker.html
 
           if git diff --cached --quiet; then
-            echo "No catalog or control-source changes to commit."
+            echo "No catalog, ticker or control-source changes to commit."
           else
-            git commit -m "Use safe public control sheet for BarbPH runtime data [skip netlify]"
+            git commit -m "Refresh BarbPH catalog and ticker from safe public control sheet [skip netlify]"
             git push
           fi
