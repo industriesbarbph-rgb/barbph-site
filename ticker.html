@@ -15,31 +15,31 @@
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--black);color:var(--white)}
 .ticker{height:100%;background:var(--black)}
 .board{height:100%;display:grid;grid-template-rows:repeat(6,1fr);min-height:0;overflow:hidden;background:var(--black);font-family:'VT323','Courier New',monospace}
-.lane{position:relative;min-height:0;display:flex;align-items:center;overflow:hidden;border-top:1px solid rgba(255,255,255,.09);background:var(--black);color:var(--white)}
+.lane{position:relative;min-height:0;display:flex;align-items:center;overflow:hidden;border-top:1px solid rgba(255,255,255,.11);background:var(--black);color:var(--white)}
 .lane:first-child{border-top:0}
 .lane.blue{color:var(--blue)}
 .lane.green{color:var(--green)}
 .lane.white{color:var(--white)}
-.lane.inverse{background:var(--white);color:#050505;border-color:rgba(0,0,0,.18)}
-.lane::before,.lane::after{content:"";position:absolute;top:0;bottom:0;width:5vw;z-index:3;pointer-events:none}
+.lane.inverse{background:var(--white);color:#050505;border-color:rgba(0,0,0,.2)}
+.lane::before,.lane::after{content:"";position:absolute;top:0;bottom:0;width:4vw;z-index:3;pointer-events:none}
 .lane::before{left:0;background:linear-gradient(90deg,var(--black),transparent)}
 .lane::after{right:0;background:linear-gradient(-90deg,var(--black),transparent)}
 .lane.inverse::before{background:linear-gradient(90deg,var(--white),transparent)}
 .lane.inverse::after{background:linear-gradient(-90deg,var(--white),transparent)}
 .marquee{display:flex;width:max-content;white-space:nowrap;will-change:transform;animation:moveLeft var(--speed,34s) linear infinite}
 .lane[data-direction="right"] .marquee{animation-name:moveRight}
-.run{display:inline-flex;align-items:center;flex:0 0 auto;padding-right:5rem;font-size:clamp(24px,2.8vw,38px);line-height:1;letter-spacing:.035em}
-.type{display:inline-block;margin-right:1.1rem;padding:.08em .38em .12em;border:1px solid currentColor;font-size:.68em;letter-spacing:.14em}
-.name{margin-right:.35em;text-transform:uppercase}
-.desc{opacity:.78}
-.sep{margin:0 .8em;opacity:.62}
+.run{display:inline-flex;align-items:center;flex:0 0 auto;padding-right:4.5rem;font-size:clamp(22px,2.45vw,34px);line-height:1;letter-spacing:.035em}
+.type{display:inline-block;margin-right:1.15rem;padding:.08em .4em .12em;border:1px solid currentColor;font-size:.67em;letter-spacing:.14em}
+.name{text-transform:uppercase}
+.meta{margin-left:.34em;opacity:.66;text-transform:uppercase}
+.sep{margin:0 .78em;opacity:.58}
 .empty{opacity:.48}
 @keyframes moveLeft{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
 @keyframes moveRight{from{transform:translate3d(-50%,0,0)}to{transform:translate3d(0,0,0)}}
 @media(max-width:700px){
-  .run{font-size:clamp(20px,6.4vw,29px);padding-right:3rem}
-  .type{margin-right:.7rem}
-  .sep{margin:0 .55em}
+  .run{font-size:clamp(19px,5.7vw,26px);padding-right:3rem}
+  .type{margin-right:.72rem}
+  .sep{margin:0 .52em}
 }
 @media(prefers-reduced-motion:reduce){.marquee{animation:none!important}}
 </style>
@@ -73,19 +73,25 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--black
   const productLanes = split3(Array.isArray(data.products)?data.products:[]);
   const programLanes = split3(Array.isArray(data.programs)?data.programs:[]);
   const configs = [
-    {kind:'PRODUCTS',items:productLanes[0],className:'blue',dir:'left',speed:'25s'},
-    {kind:'PROGRAMS',items:programLanes[0],className:'green',dir:'right',speed:'43s'},
-    {kind:'PRODUCTS',items:productLanes[1],className:'white',dir:'left',speed:'34s'},
-    {kind:'PROGRAMS',items:programLanes[1],className:'inverse',dir:'right',speed:'25s'},
-    {kind:'PRODUCTS',items:productLanes[2],className:'blue',dir:'left',speed:'43s'},
-    {kind:'PROGRAMS',items:programLanes[2],className:'green',dir:'right',speed:'34s'}
+    {kind:'PRODUCTS',items:productLanes[0],className:'blue',dir:'left',speed:'31s'},
+    {kind:'PROGRAMS',items:programLanes[0],className:'green',dir:'right',speed:'39s'},
+    {kind:'PRODUCTS',items:productLanes[1],className:'white',dir:'left',speed:'36s'},
+    {kind:'PROGRAMS',items:programLanes[1],className:'inverse',dir:'right',speed:'32s'},
+    {kind:'PRODUCTS',items:productLanes[2],className:'blue',dir:'left',speed:'42s'},
+    {kind:'PROGRAMS',items:programLanes[2],className:'green',dir:'right',speed:'35s'}
   ];
 
+  const entryMarkup = (kind,item) => {
+    const name = clean(item.name);
+    if (!name) return '';
+    const meta = kind === 'PRODUCTS' ? clean(item.category) : '';
+    return `<span class="name">${esc(name)}</span>${meta?`<span class="meta">· ${esc(meta)}</span>`:''}<span class="sep">◆</span>`;
+  };
+
   const runMarkup = (kind,items) => {
-    const entries = items.length ? items.map(item => {
-      const desc = clean(item.description);
-      return `<span class="name">${esc(clean(item.name))}</span>${desc?`<span class="desc">${esc(desc)}</span>`:''}<span class="sep">◆</span>`;
-    }).join('') : '<span class="name empty">No published items</span><span class="sep">◆</span>';
+    const entries = items.length
+      ? items.map(item => entryMarkup(kind,item)).join('')
+      : '<span class="name empty">No published items</span><span class="sep">◆</span>';
     return `<span class="type">${kind}</span>${entries}`;
   };
 
