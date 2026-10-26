@@ -1,8 +1,7 @@
 /**
  * BarbPH ticker data build.
- * Reads Products, Programs and the sanitized Ticker Testimonials feed from the
- * safe public control sheet. Only published=yes rows are admitted. The public
- * testimonial feed contains no private contact_details field.
+ * Reads Products and Programs from the safe public control sheet.
+ * Only published=yes rows are admitted.
  */
 
 import fs from "node:fs";
@@ -75,10 +74,9 @@ function safeJson(value) {
 async function build() {
   if (!fs.existsSync(TARGET)) throw new Error(`Missing ${TARGET}`);
 
-  const [productsRaw, programsRaw, testimonialsRaw] = await Promise.all([
+  const [productsRaw, programsRaw] = await Promise.all([
     readPublished("Products"),
-    readPublished("Programs"),
-    readPublished("Ticker Testimonials")
+    readPublished("Programs")
   ]);
 
   const payload = {
@@ -90,13 +88,7 @@ async function build() {
     programs: programsRaw.map(item => ({
       name: clean(item.name),
       description: clean(item.description)
-    })),
-    testimonials: testimonialsRaw.map(item => ({
-      name: clean(item.name),
-      quote: clean(item.quote),
-      rating: clean(item.rating),
-      related_to: clean(item.related_to)
-    })).filter(item => item.quote)
+    }))
   };
 
   let html = fs.readFileSync(TARGET, "utf8");
@@ -108,7 +100,7 @@ async function build() {
   html = html.slice(0, start) + block + html.slice(end + END.length);
   fs.writeFileSync(TARGET, html);
 
-  console.log(`Ticker updated: ${payload.products.length} products, ${payload.programs.length} programs, ${payload.testimonials.length} testimonials.`);
+  console.log(`Ticker updated: ${payload.products.length} products, ${payload.programs.length} programs.`);
 }
 
 build().catch(error => {
