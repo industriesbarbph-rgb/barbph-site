@@ -4,97 +4,72 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>BarbPH Ticker</title>
-<meta name="description" content="Live BarbPH products, programs and testimonials.">
+<meta name="description" content="Live BarbPH products and programs.">
 <meta name="robots" content="noindex,follow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=VT323&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <style>
-:root{
-  --black:#030303;--white:#f6f7f4;--blue:#4ea1ff;--green:#39ff88;
-  --line:rgba(255,255,255,.12);--dim:rgba(255,255,255,.54);
-}
+:root{--black:#030303;--white:#f6f7f4;--blue:#4ea1ff;--green:#39ff88}
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--black);color:var(--white)}
-body{font-family:'Work Sans',system-ui,sans-serif}
-.ticker{height:100%;display:grid;grid-template-rows:37.5% 62.5%;background:var(--black)}
-.testimonials{position:relative;display:grid;place-items:center;padding:28px clamp(20px,5vw,78px) 18px;overflow:hidden;
-background:radial-gradient(circle at 50% -28%,rgba(255,255,255,.09),transparent 56%),linear-gradient(180deg,#080808,#030303);
-border-bottom:1px solid var(--line)}
-.label{position:absolute;left:clamp(16px,3.4vw,52px);top:12px;margin:0;font:600 9px/1 'Work Sans',sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
-.crossfade{position:relative;width:min(920px,88vw);min-height:68px;display:grid;place-items:center}
-.quote{grid-area:1/1;max-width:850px;margin:0;text-align:center;font:400 clamp(17px,2.1vw,29px)/1.35 'Marcellus',serif;letter-spacing:.02em;color:rgba(255,255,255,.82);opacity:0;transition:opacity 900ms ease}
-.quote.is-active{opacity:1}
-.quote small{display:block;margin-top:10px;font:500 9px/1.3 'Work Sans',sans-serif;letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.44)}
-.board{display:grid;grid-template-rows:repeat(6,1fr);min-height:0;overflow:hidden;background:var(--black);font-family:'VT323','Courier New',monospace}
+.ticker{height:100%;background:var(--black)}
+.board{height:100%;display:grid;grid-template-rows:repeat(6,1fr);min-height:0;overflow:hidden;background:var(--black);font-family:'VT323','Courier New',monospace}
 .lane{position:relative;min-height:0;display:flex;align-items:center;overflow:hidden;border-top:1px solid rgba(255,255,255,.09);background:var(--black);color:var(--white)}
 .lane:first-child{border-top:0}
-.lane.blue{color:var(--blue)} .lane.green{color:var(--green)} .lane.white{color:var(--white)}
+.lane.blue{color:var(--blue)}
+.lane.green{color:var(--green)}
+.lane.white{color:var(--white)}
 .lane.inverse{background:var(--white);color:#050505;border-color:rgba(0,0,0,.18)}
 .lane::before,.lane::after{content:"";position:absolute;top:0;bottom:0;width:5vw;z-index:3;pointer-events:none}
-.lane::before{left:0;background:linear-gradient(90deg,var(--black),transparent)} .lane::after{right:0;background:linear-gradient(-90deg,var(--black),transparent)}
-.lane.inverse::before{background:linear-gradient(90deg,var(--white),transparent)} .lane.inverse::after{background:linear-gradient(-90deg,var(--white),transparent)}
+.lane::before{left:0;background:linear-gradient(90deg,var(--black),transparent)}
+.lane::after{right:0;background:linear-gradient(-90deg,var(--black),transparent)}
+.lane.inverse::before{background:linear-gradient(90deg,var(--white),transparent)}
+.lane.inverse::after{background:linear-gradient(-90deg,var(--white),transparent)}
 .marquee{display:flex;width:max-content;white-space:nowrap;will-change:transform;animation:moveLeft var(--speed,34s) linear infinite}
 .lane[data-direction="right"] .marquee{animation-name:moveRight}
-.run{display:inline-flex;align-items:center;flex:0 0 auto;padding-right:5rem;font-size:clamp(20px,2.2vw,31px);line-height:1;letter-spacing:.035em}
+.run{display:inline-flex;align-items:center;flex:0 0 auto;padding-right:5rem;font-size:clamp(24px,2.8vw,38px);line-height:1;letter-spacing:.035em}
 .type{display:inline-block;margin-right:1.1rem;padding:.08em .38em .12em;border:1px solid currentColor;font-size:.68em;letter-spacing:.14em}
-.name{margin-right:.35em;text-transform:uppercase} .desc{opacity:.78} .sep{margin:0 .8em;opacity:.62}
+.name{margin-right:.35em;text-transform:uppercase}
+.desc{opacity:.78}
+.sep{margin:0 .8em;opacity:.62}
 .empty{opacity:.48}
 @keyframes moveLeft{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
 @keyframes moveRight{from{transform:translate3d(-50%,0,0)}to{transform:translate3d(0,0,0)}}
 @media(max-width:700px){
-  .testimonials{padding:26px 18px 14px}
-  .crossfade{width:90vw;min-height:62px}
-  .quote{font-size:clamp(15px,4.3vw,21px)}
-  .run{font-size:clamp(19px,6vw,26px);padding-right:3rem}
-  .type{margin-right:.7rem} .sep{margin:0 .55em}
+  .run{font-size:clamp(20px,6.4vw,29px);padding-right:3rem}
+  .type{margin-right:.7rem}
+  .sep{margin:0 .55em}
 }
-@media(prefers-reduced-motion:reduce){
-  .quote{transition:none} .marquee{animation:none!important}
-}
+@media(prefers-reduced-motion:reduce){.marquee{animation:none!important}}
 </style>
 </head>
 <body>
 <main class="ticker" aria-label="BarbPH live ticker">
-  <section class="testimonials" aria-label="Testimonials">
-    <h1 class="label">Testimonials</h1>
-    <div class="crossfade" id="testimonial-crossfade" aria-live="polite"></div>
-  </section>
   <section class="board" id="exchange-board" aria-label="Products and programs exchange board"></section>
 </main>
 
 <!-- BARBPH-TICKER-DATA-START -->
-<script id="barbph-ticker-data" type="application/json">{"products":[{"name":"The Legacy Page","description":"The early builds, the first public launch, and the experiments, failures, breakthroughs, and milestones that shaped what came next.","category":""},{"name":"Will Wheel","description":"A KPI dashboard","category":"Score"},{"name":"THE UNI","description":"Interactive knowledge library for exploring connected ideas, subjects, and learning paths.","category":"Learn"},{"name":"The Watch Tower","description":"Live global observation hub featuring real-time cameras and visual feeds from around the world.","category":"Watch"},{"name":"Jana","description":"A private, encrypted notepad app","category":"Notepad"},{"name":"The Bible","description":"Mother Earth over paper technology","category":"Read"},{"name":"The Pendant Light Lounge","description":"CTA Button","category":"SEO ENGINE"},{"name":"Green Forrest Button","description":"CTA Button","category":"SEO ENGINE"},{"name":"Night Sky","description":"CTA Button","category":""},{"name":"Red Roses Button","description":"CTA Button","category":"SEO ENGINE"},{"name":"Joyful Prism","description":"CTA Button","category":"SEO ENGINE"},{"name":"The Vines","description":"CTA Button","category":"SEO ENGINE"},{"name":"Clouds And Stars","description":"CTA Button","category":"SEO ENGINE"},{"name":"The Luna Rosa SoT","description":"Schema Of Things","category":"DATA PULL"},{"name":"Orange Engine","description":"Parsing Machine","category":"PARSING MACHINE"},{"name":"The 2nd Floor Marketplace","description":"COMMUNITY PLATFORM","category":"SAAS"},{"name":"The ORB","description":"MARKETING APP","category":"INFORMATION INTAKE APP"},{"name":"Pages Technology","description":"REALISTIC DIGITAL BOOK EXPERIENCE","category":"Publication Software"},{"name":"No Human Conversation","description":"WELLNESS APP","category":"WELLNESS APP"},{"name":"BarbPH Index Card","description":"One Index Card for Everything BarbPH","category":""},{"name":"BarbPH SEO Health Console","description":"ELECTROCARDIOGRAM SEO CONSOLE","category":"SEO ENGINE"}],"programs":[{"name":"Career Navigation","description":"Personalized guidance to help you clarify your career direction, explore opportunities, and plan your next professional move."},{"name":"Mentorship","description":"Personal mentorship sessions with Coach Doll"},{"name":"Job Interview Practice Session","description":"One-on-one interview practice with feedback to help you answer confidently, communicate clearly, and prepare for real job interviews."},{"name":"Consultation","description":"Advisory sessions that spot the friction in your business flow and give you a clear path to smoother, more efficient operations"},{"name":"Group Session","description":"A collaborative mentorship program designed to help teams strengthen communication, develop shared goals, solve challenges together, and grow through guided reflection, practical discussion, and focused development sessions."}],"testimonials":[{"name":"Ana","quote":"Jana changed how I journal every day.","rating":"5","related_to":"Jana"}]}</script>
+<script id="barbph-ticker-data" type="application/json">{"products":[{"name":"The Legacy Page","description":"The early builds, the first public launch, and the experiments, failures, breakthroughs, and milestones that shaped what came next.","category":""},{"name":"Will Wheel","description":"A KPI dashboard","category":"Score"},{"name":"THE UNI","description":"Interactive knowledge library for exploring connected ideas, subjects, and learning paths.","category":"Learn"},{"name":"The Watch Tower","description":"Live global observation hub featuring real-time cameras and visual feeds from around the world.","category":"Watch"},{"name":"Jana","description":"A private, encrypted notepad app","category":"Notepad"},{"name":"The Bible","description":"Mother Earth over paper technology","category":"Read"},{"name":"The Pendant Light Lounge","description":"CTA Button","category":"SEO ENGINE"},{"name":"Green Forrest Button","description":"CTA Button","category":"SEO ENGINE"},{"name":"Night Sky","description":"CTA Button","category":""},{"name":"Red Roses Button","description":"CTA Button","category":"SEO ENGINE"},{"name":"Joyful Prism","description":"CTA Button","category":"SEO ENGINE"},{"name":"The Vines","description":"CTA Button","category":"SEO ENGINE"},{"name":"Clouds And Stars","description":"CTA Button","category":"SEO ENGINE"},{"name":"The Luna Rosa SoT","description":"Schema Of Things","category":"DATA PULL"},{"name":"Orange Engine","description":"Parsing Machine","category":"PARSING MACHINE"},{"name":"The 2nd Floor Marketplace","description":"COMMUNITY PLATFORM","category":"SAAS"},{"name":"The ORB","description":"MARKETING APP","category":"INFORMATION INTAKE APP"},{"name":"Pages Technology","description":"REALISTIC DIGITAL BOOK EXPERIENCE","category":"Publication Software"},{"name":"No Human Conversation","description":"WELLNESS APP","category":"WELLNESS APP"},{"name":"BarbPH Index Card","description":"One Index Card for Everything BarbPH","category":""},{"name":"BarbPH SEO Health Console","description":"ELECTROCARDIOGRAM SEO CONSOLE","category":"SEO ENGINE"}],"programs":[{"name":"Career Navigation","description":"Personalized guidance to help you clarify your career direction, explore opportunities, and plan your next professional move."},{"name":"Mentorship","description":"Personal mentorship sessions with Coach Doll"},{"name":"Job Interview Practice Session","description":"One-on-one interview practice with feedback to help you answer confidently, communicate clearly, and prepare for real job interviews."},{"name":"Consultation","description":"Advisory sessions that spot the friction in your business flow and give you a clear path to smoother, more efficient operations"},{"name":"Group Session","description":"A collaborative mentorship program designed to help teams strengthen communication, develop shared goals, solve challenges together, and grow through guided reflection, practical discussion, and focused development sessions."}]}</script>
 <!-- BARBPH-TICKER-DATA-END -->
 
 <script>
 (() => {
   const dataEl = document.getElementById('barbph-ticker-data');
   const board = document.getElementById('exchange-board');
-  const crossfade = document.getElementById('testimonial-crossfade');
-  if (!dataEl || !board || !crossfade) return;
+  if (!dataEl || !board) return;
 
-  let data = {products:[],programs:[],testimonials:[]};
+  let data = {products:[],programs:[]};
   try { data = JSON.parse(dataEl.textContent || '{}'); } catch {}
 
   const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const clean = value => String(value ?? '').replace(/\s+/g,' ').trim();
-
-  const testimonials = Array.isArray(data.testimonials) ? data.testimonials : [];
-  if (testimonials.length) {
-    crossfade.innerHTML = testimonials.map((item,index) => {
-      const by = [clean(item.name), clean(item.related_to) ? `about ${clean(item.related_to)}` : ''].filter(Boolean).join(' · ');
-      return `<blockquote class="quote${index===0?' is-active':''}" data-quote aria-hidden="${index===0?'false':'true'}">“${esc(clean(item.quote))}”${by?`<small>${esc(by)}</small>`:''}</blockquote>`;
-    }).join('');
-  } else {
-    crossfade.innerHTML = '<p class="quote is-active empty" data-quote aria-hidden="false">Approved testimonials will appear here.</p>';
-  }
-
   const split3 = list => {
     const out=[[],[],[]];
     list.forEach((item,i)=>out[i%3].push(item));
     return out;
   };
+
   const productLanes = split3(Array.isArray(data.products)?data.products:[]);
   const programLanes = split3(Array.isArray(data.programs)?data.programs:[]);
   const configs = [
@@ -118,19 +93,6 @@ border-bottom:1px solid var(--line)}
     const run = runMarkup(cfg.kind,cfg.items);
     return `<div class="lane ${cfg.className}" data-direction="${cfg.dir}" style="--speed:${cfg.speed}"><div class="marquee"><div class="run">${run}</div><div class="run" aria-hidden="true">${run}</div></div></div>`;
   }).join('');
-
-  const quotes = [...crossfade.querySelectorAll('[data-quote]')];
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (quotes.length > 1 && !reduce) {
-    let index=0;
-    setInterval(() => {
-      quotes[index].classList.remove('is-active');
-      quotes[index].setAttribute('aria-hidden','true');
-      index=(index+1)%quotes.length;
-      quotes[index].classList.add('is-active');
-      quotes[index].setAttribute('aria-hidden','false');
-    },6200);
-  }
 })();
 </script>
 </body>
